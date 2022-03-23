@@ -3,6 +3,7 @@
         <span slot="toolbarTitle">CryptoTron</span>
         <v-list slot="navigationDrawerList">
             <v-list-tile :to="{ name: 'cryptotron-home' }"
+                         exact-path
                          ripple>
                 <v-list-tile-action>
                     <v-icon>home</v-icon>
