@@ -11,10 +11,4 @@ module.exports = {
     // alias to lib directory
     config.resolve.alias.set('_', path.resolve(__dirname, './src/lib'));
   },
-  pwa: {
-    workboxPluginMode: 'InjectManifest',
-    workboxOptions: {
-      swSrc: 'service-worker.js',
-    },
-  },
 };
