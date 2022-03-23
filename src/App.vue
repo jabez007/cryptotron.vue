@@ -10,9 +10,6 @@
 <script>
 export default {
   name: 'app',
-  data: () => ({
-    update: null,
-  }),
 };
 </script>
 
