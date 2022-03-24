@@ -116,7 +116,7 @@ export default {
 
 <style scoped>
 #appLayout {
-  background: rgb(30, 30, 30);
+  background: rgba(var(--vs-dark), 1);
   color: rgb(245, 235, 225);
   height: 100vh;
   width: 100vw;
@@ -167,6 +167,6 @@ export default {
 
 <style>
 #appLayout #main #sidebar .vs-sidebar {
-  background: rgb(30, 30, 30);
+  background: rgba(var(--vs-dark), 1);
 }
 </style>

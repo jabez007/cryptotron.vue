@@ -4,7 +4,7 @@
         <h2>Welcome to CryptoTron</h2>
     </div>
     <div slot="media" class="media">
-      <img alt="CryptoTron logo" src="../assets/images/logo.png">
+      <img alt="CryptoTron logo" src="../assets/img/logo.png">
     </div>
     <div class="main">
         <p>
@@ -35,38 +35,3 @@ export default {
   name: 'About',
 };
 </script>
-
-<style scoped>
-.card {
-  background: rgb(30, 30, 30);
-}
-
-.card .header {
-  font-size: xx-large;
-}
-
-.card .media {
-  display: flex;
-  justify-content: center;
-}
-
-.card .media img {
-  width: 13rem;
-}
-
-.card .main {
-  font-size: large;
-}
-
-.card a {
-  color: rgb(100, 150, 200);
-}
-
-.card a:visited {
-  color: rgb(150, 100, 200);
-}
-
-.card .main .footer {
-  text-align: end;
-}
-</style>
