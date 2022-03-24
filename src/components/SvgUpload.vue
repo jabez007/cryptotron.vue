@@ -23,6 +23,7 @@ import Canvg from 'canvg';
 import FileUpload from './FileUpload.vue';
 
 export default {
+  name: 'SvgUpload',
   props: ['value'],
   components: {
     FileUpload,

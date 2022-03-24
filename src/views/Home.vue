@@ -6,17 +6,30 @@
       color="dark"
       text-color="rgb(245, 235, 225)"
       :to="{ name: 'cryptotron-home' }"
-      >CryptoTron
+    >
+      CryptoTron
     </vs-button>
     <span slot="sidebarItems">
-      <vs-sidebar-item
+      <!--vs-sidebar-item
         index="1"
+        icon="home"
+        :to="{ name: 'cryptotron-home' }"
+      >
+        About
+      </vs-sidebar-item-->
+      <vs-sidebar-item
+        index="2"
         icon="new_releases"
         :to="{ name: 'cryptotron-desideratum' }"
-        >Kerckhoffs's Desideratum
+      >
+        Kerckhoffs's Desideratum
       </vs-sidebar-item>
-      <vs-sidebar-item index="2" icon="question_answer">
-        Dashboard
+      <vs-sidebar-item
+        index="3"
+        icon="build"
+        :to="{ name: 'cryptotron-builder' }"
+      >
+        Create Your Own
       </vs-sidebar-item>
     </span>
   </app-layout>

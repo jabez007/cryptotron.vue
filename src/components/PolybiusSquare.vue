@@ -15,6 +15,7 @@
 
 <script>
 export default {
+  name: 'PolybiusSquare',
   props: {
     square: {
       type: Array,

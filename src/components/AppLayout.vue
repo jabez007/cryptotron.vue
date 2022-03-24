@@ -143,6 +143,14 @@ export default {
 #appLayout #main main,
 #appLayout #main main .vs-row {
   height: 100%;
+  overflow-y: scroll;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+#appLayout #main main::-webkit-scrollbar,
+#appLayout #main main .vs-row::-webkit-scrollbar {
+  display: none; /* Chrome */
 }
 
 #appLayout footer {
