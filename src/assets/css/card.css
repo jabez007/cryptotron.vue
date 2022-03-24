@@ -1,32 +1,42 @@
 .card {
-    background: rgb(30, 30, 30);
-  }
-  
-  .card .header {
-    font-size: xx-large;
-  }
-  
-  .card .media {
-    display: flex;
-    justify-content: center;
-  }
-  
-  .card .media img {
-    width: 13rem;
-  }
-  
-  .card .main {
-    font-size: large;
-  }
-  
-  .card a {
-    color: rgb(100, 150, 200);
-  }
-  
-  .card a:visited {
-    color: rgb(150, 100, 200);
-  }
-  
-  .card .main .footer {
-    text-align: end;
-  }
+  background: rgb(30, 30, 30);
+}
+
+.card .header {
+  font-size: xx-large;
+}
+
+.card .media {
+  display: flex;
+  justify-content: center;
+}
+
+.card .media img {
+  width: 13rem;
+}
+
+.card .main {
+  font-size: large;
+}
+
+.card a {
+  color: rgb(100, 150, 200);
+}
+
+.card a:visited {
+  color: rgb(150, 100, 200);
+}
+
+.card .textareas .vs-con-textarea {
+  background: rgb(225, 225, 225);
+}
+
+.card .textareas .action-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.card .main .footer {
+  text-align: end;
+}

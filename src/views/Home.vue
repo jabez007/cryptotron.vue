@@ -31,6 +31,18 @@
       >
         Create Your Own
       </vs-sidebar-item>
+      <vs-divider icon="private_connectivity" position="left">
+        Ciphers
+      </vs-divider>
+      <vs-sidebar-group title="Substitutions">
+        <vs-sidebar-item
+          index="4.1"
+          icon="find_replace"
+          :to="{ name: 'cryptotron-substitution' }"
+        >
+          Simple
+        </vs-sidebar-item>
+      </vs-sidebar-group>
     </span>
   </app-layout>
 </template>
