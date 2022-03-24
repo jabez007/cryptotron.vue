@@ -2,7 +2,7 @@
   "name": "cryptotron",
   "version": "1.0.8",
   "private": true,
-  "main": "src/index.js",
+  "main": "dist/cryptotron.common.js",
   "scripts": {
     "imagemin": "node imagemin",
     "preserve": "npm run imagemin",
@@ -11,7 +11,8 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "predeploy": "npm run build",
-    "deploy": "push-dir --dir=dist --branch=master --cleanup"
+    "deploy": "push-dir --dir=dist --branch=master --cleanup",
+    "build-library": "vue-cli-service build --target lib --name cryptotron src/index.js"
   },
   "dependencies": {
     "axios": "^0.26.1",
@@ -46,6 +47,9 @@
     "vue-template-compiler": "^2.6.14",
     "vuetify-loader": "^1.7.3"
   },
+  "files": [
+    "dist/*"
+  ],
   "browserslist": [
     "> 1%",
     "last 2 versions",

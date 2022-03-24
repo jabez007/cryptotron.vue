@@ -3,7 +3,7 @@ import Vuetify from 'vuetify/lib';
 import 'vuetify/src/stylus/app.styl';
 import routes from './router/cryptotron';
 
-export default {
+const CryptoTron = {
   install(Vue, options) {
     const { vuetify, basePath, router } = options;
 
@@ -34,3 +34,10 @@ export default {
     }
   },
 };
+
+// Automatic installation if Vue has been added to the global scope.
+// if (typeof window !== 'undefined' && window.Vue) {
+//   window.Vue.use(CryptoTron);
+// }
+
+export default CryptoTron;
