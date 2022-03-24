@@ -2,6 +2,7 @@
   "name": "cryptotron",
   "version": "1.0.8",
   "private": true,
+  "main": "src/index.js",
   "scripts": {
     "imagemin": "node imagemin",
     "preserve": "npm run imagemin",

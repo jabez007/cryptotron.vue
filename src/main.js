@@ -1,10 +1,11 @@
 import Vue from 'vue';
-import './plugins/vuetify';
-import './plugins/vueClipboard';
-import router from './plugins/router';
+import router from './router';
+import CryptoTron from './index';
 import App from './App.vue';
 
 Vue.config.productionTip = false;
+
+Vue.use(CryptoTron, { basePath: '/', router });
 
 new Vue({
   router,
