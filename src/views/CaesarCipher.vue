@@ -31,9 +31,9 @@
 
 <script>
 // @ is an alias to /src
-import { encrypt, decrypt } from '_/ciphers/caesar';
-import Cipher from '@/components/Cipher.vue';
-import CaesarKey from '@/components/cipherKeys/CaesarKey.vue';
+import { encrypt, decrypt } from '../lib/ciphers/caesar';
+import Cipher from '../components/Cipher.vue';
+import CaesarKey from '../components/cipherKeys/CaesarKey.vue';
 
 export default {
   components: {

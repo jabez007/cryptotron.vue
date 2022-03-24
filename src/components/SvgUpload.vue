@@ -20,7 +20,7 @@
 
 <script>
 import Canvg from 'canvg';
-import FileUpload from '@/components/FileUpload.vue';
+import FileUpload from './FileUpload.vue';
 
 export default {
   props: ['value'],

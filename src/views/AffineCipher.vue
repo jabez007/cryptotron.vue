@@ -48,11 +48,12 @@
 
 <script>
 // @ is an alias to /src
-import { gcd, encrypt, decrypt } from '_/ciphers/affine';
-import Cipher from '@/components/Cipher.vue';
-import AffineKey from '@/components/cipherKeys/AffineKey.vue';
+import { gcd, encrypt, decrypt } from '../lib/ciphers/affine';
+import Cipher from '../components/Cipher.vue';
+import AffineKey from '../components/cipherKeys/AffineKey.vue';
 
 export default {
+  name: 'AffineCipher',
   components: {
     Cipher,
     AffineKey,

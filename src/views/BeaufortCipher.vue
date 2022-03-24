@@ -55,10 +55,10 @@
 
 <script>
 // @ is an alias to /src
-import { encrypt, decrypt } from '_/ciphers/beaufort';
-import Cipher from '@/components/Cipher.vue';
-import TabulaRecta from '@/components/TabulaRecta.vue';
-import BeaufortKey from '@/components/cipherKeys/BeaufortKey.vue';
+import { encrypt, decrypt } from '../lib/ciphers/beaufort';
+import Cipher from '../components/Cipher.vue';
+import TabulaRecta from '../components/TabulaRecta.vue';
+import BeaufortKey from '../components/cipherKeys/BeaufortKey.vue';
 
 export default {
   components: {

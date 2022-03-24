@@ -1,28 +1,17 @@
 import VueClipboard from 'vue-clipboard2';
-import Vuetify from 'vuetify/lib';
-import 'vuetify/src/stylus/app.styl';
+import Vuesax from 'vuesax';
 import routes from './router/cryptotron';
+import 'vuesax/dist/vuesax.css'; // Vuesax styles
+import 'material-icons/iconfont/material-icons.css';
 
 const CryptoTron = {
   install(Vue, options) {
-    const { vuetify, basePath, router } = options;
+    const { basePath, router } = options;
 
     Vue.use(VueClipboard);
 
-    Vue.use(Vuetify, vuetify || {
-      iconfont: 'md',
-      options: {
-        /*
-         * will generate a css variable for each theme color, which can then use in a component's style.
-         *
-         * ex:
-         *    .something {
-         *      color: var(--v-primary-base)
-         *      background-color: var(--v-accent-lighten2)
-         *    }
-         */
-        customProperties: true,
-      },
+    Vue.use(Vuesax, {
+      // options here
     });
 
     const newRoutes = routes(basePath || '/cryptotron');

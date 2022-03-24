@@ -56,9 +56,9 @@
 
 <script>
 // @ is an alias to /src
-import { encode, decrypt, enstegano } from '_/ciphers/huffmanian';
-import Cipher from '@/components/Cipher.vue';
-import HuffmanianKey from '@/components/cipherKeys/HuffmanianKey.vue';
+import { encode, decrypt, enstegano } from '../lib/ciphers/huffmanian';
+import Cipher from '../components/Cipher.vue';
+import HuffmanianKey from '../components/cipherKeys/HuffmanianKey.vue';
 
 export default {
   components: {

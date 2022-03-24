@@ -34,9 +34,9 @@
 
 <script>
 // @ is an alias to /src
-import { square, encrypt, decrypt } from '_/ciphers/polybius';
-import Cipher from '@/components/Cipher.vue';
-import PolybiusKey from '@/components/cipherKeys/PolybiusKey.vue';
+import { square, encrypt, decrypt } from '../lib/ciphers/polybius';
+import Cipher from '../components/Cipher.vue';
+import PolybiusKey from '../components/cipherKeys/PolybiusKey.vue';
 
 export default {
   components: {

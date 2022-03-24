@@ -63,10 +63,10 @@
 
 <script>
 // @ is an alias to /src
-import { encrypt, decrypt } from '_/ciphers/runningKey';
-import Cipher from '@/components/Cipher.vue';
-import TabulaRecta from '@/components/TabulaRecta.vue';
-import RunningKeyKey from '@/components/cipherKeys/RunningKeyKey.vue';
+import { encrypt, decrypt } from '../lib/ciphers/runningKey';
+import Cipher from '../components/Cipher.vue';
+import TabulaRecta from '../components/TabulaRecta.vue';
+import RunningKeyKey from '../components/cipherKeys/RunningKeyKey.vue';
 
 export default {
   components: {

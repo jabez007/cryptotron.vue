@@ -63,9 +63,9 @@
 
 <script>
 // @ is an alias to /src
-import { encrypt, decrypt } from '_/ciphers/columnarTransposition';
-import Cipher from '@/components/Cipher.vue';
-import ColumnarTranspositionKey from '@/components/cipherKeys/ColumnarTranspositionKey.vue';
+import { encrypt, decrypt } from '../lib/ciphers/columnarTransposition';
+import Cipher from '../components/Cipher.vue';
+import ColumnarTranspositionKey from '../components/cipherKeys/ColumnarTranspositionKey.vue';
 
 export default {
   components: {

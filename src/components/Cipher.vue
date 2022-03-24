@@ -76,9 +76,9 @@ export default {
   name: 'Cipher',
   components: {
     // @ is an alias to /src
-    EncryptMessage: () => import('@/components/EncryptMessage.vue'),
-    DecryptMessage: () => import('@/components/DecryptMessage.vue'),
-    CrackMessage: () => import('@/components/CrackMessage.vue'),
+    EncryptMessage: () => import('./EncryptMessage.vue'),
+    DecryptMessage: () => import('./DecryptMessage.vue'),
+    CrackMessage: () => import('./CrackMessage.vue'),
   },
   props: {
     encryptAlgorithm: {

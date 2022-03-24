@@ -15,7 +15,9 @@ export class Square {
     ctx.lineTo(this.origin.x, this.origin.y + this.length);
     ctx.lineTo(this.origin.x, this.origin.y);
     // We want the border color and the fill color to match
+    // eslint-disable-next-line no-param-reassign
     ctx.strokeStyle = this.colour;
+    // eslint-disable-next-line no-param-reassign
     ctx.fillStyle = this.colour;
     // Color the border and the body
     ctx.stroke();

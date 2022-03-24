@@ -66,10 +66,10 @@
 // @ is an alias to /src
 import C2S from 'canvas2svg';
 import FileSaver from 'file-saver';
-import { encrypt, enstegano, decode } from '_/ciphers/morellet';
-import Cipher from '@/components/Cipher.vue';
-import SvgUpload from '@/components/SvgUpload.vue';
-import MorelletKey from '@/components/cipherKeys/MorelletKey.vue';
+import { encrypt, enstegano, decode } from '../lib/ciphers/morellet';
+import Cipher from '../components/Cipher.vue';
+import SvgUpload from '../components/SvgUpload.vue';
+import MorelletKey from '../components/cipherKeys/MorelletKey.vue';
 
 const blue = '#006597';
 const orange = '#ff5c30';

@@ -77,9 +77,9 @@
 
 <script>
 // @ is an alias to /src
-import { encrypt, decrypt } from '_/ciphers/railFence';
-import Cipher from '@/components/Cipher.vue';
-import RailFenceKey from '@/components/cipherKeys/RailFenceKey.vue';
+import { encrypt, decrypt } from '../lib/ciphers/railFence';
+import Cipher from '../components/Cipher.vue';
+import RailFenceKey from '../components/cipherKeys/RailFenceKey.vue';
 
 export default {
   components: {

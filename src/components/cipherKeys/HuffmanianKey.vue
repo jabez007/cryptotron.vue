@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import Rules from '_/rules';
-import { encoding } from '_/ciphers/huffmanian';
+import Rules from '../../lib/rules';
+import { encoding } from '../../lib/ciphers/huffmanian';
 import mixin from './cipherKeysMixin';
 
 export default {

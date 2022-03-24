@@ -31,10 +31,10 @@
 </template>
 
 <script>
-import Rules from '_/rules';
-import { getUniqueCharacters } from '_/ciphers';
-import { square } from '_/ciphers/polybius';
-import PolybiusSquare from '@/components/PolybiusSquare.vue';
+import Rules from '../../lib/rules';
+import { getUniqueCharacters } from '../../lib/ciphers';
+import { square } from '../../lib/ciphers/polybius';
+import PolybiusSquare from '../PolybiusSquare.vue';
 import mixin from './cipherKeysMixin';
 
 export default {

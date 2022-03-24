@@ -44,8 +44,8 @@
 
 <script>
 import { Material } from 'vue-color';
-import Rules from '_/rules';
-import { encoding } from '_/ciphers/morellet';
+import Rules from '../../lib/rules';
+import { encoding } from '../../lib/ciphers/morellet';
 import mixin from './cipherKeysMixin';
 
 export default {

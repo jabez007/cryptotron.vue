@@ -1,13 +1,13 @@
 <template>
-  <v-card class="text-xs-center">
-    <img alt="CryptoTron logo" src="../assets/images/logo.png">
-    <v-card-title>
-        <v-spacer></v-spacer>
-        <h2 class="display-3">Welcome to CryptoTron</h2>
-        <v-spacer></v-spacer>
-    </v-card-title>
-    <v-card-text>
-        <p class="subheading">
+  <vs-card class="card">
+    <div slot="header" class="header">
+        <h2>Welcome to CryptoTron</h2>
+    </div>
+    <div slot="media" class="media">
+      <img alt="CryptoTron logo" src="../assets/images/logo.png">
+    </div>
+    <div class="main">
+        <p>
             CryptoTron contains implementations of various ciphers from
             <a href="http://www.practicalcryptography.com/ciphers/" target="_blank">Practical Cryptography</a>
             by leveraging Vue's
@@ -18,7 +18,7 @@
             <br />
             This should allow for the easy addition of ciphers to CryptoTron with only needing to write the methods for encryption and decryption of a cipher.
         </p>
-        <p class="text-xs-left caption">
+        <p class="footer">
           Other Resources
           <ul>
             <li>
@@ -26,12 +26,47 @@
             </li>
           </ul>
         </p>
-    </v-card-text>
-  </v-card>
+    </div>
+  </vs-card>
 </template>
 
 <script>
 export default {
-  name: 'CryptoTronAbout',
+  name: 'About',
 };
 </script>
+
+<style scoped>
+.card {
+  background: rgb(30, 30, 30);
+}
+
+.card .header {
+  font-size: xx-large;
+}
+
+.card .media {
+  display: flex;
+  justify-content: center;
+}
+
+.card .media img {
+  width: 13rem;
+}
+
+.card .main {
+  font-size: large;
+}
+
+.card a {
+  color: rgb(100, 150, 200);
+}
+
+.card a:visited {
+  color: rgb(150, 100, 200);
+}
+
+.card .main .footer {
+  text-align: end;
+}
+</style>

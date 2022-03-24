@@ -52,10 +52,10 @@
 
 <script>
 // @ is an alias to /src
-import { encrypt, decrypt } from '_/ciphers/autokey';
-import Cipher from '@/components/Cipher.vue';
-import TabulaRecta from '@/components/TabulaRecta.vue';
-import AutokeyKey from '@/components/cipherKeys/AutokeyKey.vue';
+import { encrypt, decrypt } from '../lib/ciphers/autokey';
+import Cipher from '../components/Cipher.vue';
+import TabulaRecta from '../components/TabulaRecta.vue';
+import AutokeyKey from '../components/cipherKeys/AutokeyKey.vue';
 
 export default {
   components: {

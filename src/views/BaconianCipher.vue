@@ -53,9 +53,9 @@
 
 <script>
 // @ is an alias to /src
-import { encode, decrypt, enstegano } from '_/ciphers/baconian';
-import Cipher from '@/components/Cipher.vue';
-import BaconianKey from '@/components/cipherKeys/BaconianKey.vue';
+import { encode, decrypt, enstegano } from '../lib/ciphers/baconian';
+import Cipher from '../components/Cipher.vue';
+import BaconianKey from '../components/cipherKeys/BaconianKey.vue';
 
 export default {
   components: {

@@ -57,10 +57,10 @@
 <script>
 
 // @ is an alias to /src
-import { alphaLower } from '_/ciphers';
-import { encrypt, decrypt } from '_/ciphers/substitution';
-import Cipher from '@/components/Cipher.vue';
-import SubstitutionKey from '@/components/cipherKeys/SubstitutionKey.vue';
+import { alphaLower } from '../lib/ciphers';
+import { encrypt, decrypt } from '../lib/ciphers/substitution';
+import Cipher from '../components/Cipher.vue';
+import SubstitutionKey from '../components/cipherKeys/SubstitutionKey.vue';
 
 export default {
   components: {

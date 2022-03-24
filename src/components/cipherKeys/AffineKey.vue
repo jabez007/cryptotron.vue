@@ -27,8 +27,8 @@
 </template>
 
 <script>
-import Rules from '_/rules';
-import { gcd } from '_/ciphers/affine';
+import Rules from '../../lib/rules';
+import { gcd } from '../../lib/ciphers/affine';
 import mixin from './cipherKeysMixin';
 
 export default {

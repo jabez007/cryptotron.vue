@@ -69,10 +69,10 @@
 
 <script>
 // @ is an alias to /src
-import { encrypt, decrypt } from '_/ciphers/fourSquare';
-import { square } from '_/ciphers/polybius';
-import Cipher from '@/components/Cipher.vue';
-import FourSquareKey from '@/components/cipherKeys/FourSquareKey.vue';
+import { encrypt, decrypt } from '../lib/ciphers/fourSquare';
+import { square } from '../lib/ciphers/polybius';
+import Cipher from '../components/Cipher.vue';
+import FourSquareKey from '../components/cipherKeys/FourSquareKey.vue';
 
 export default {
   components: {

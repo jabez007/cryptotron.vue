@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import Rules from '_/rules';
+import Rules from '../../lib/rules';
 import mixin from './cipherKeysMixin';
 
 export default {

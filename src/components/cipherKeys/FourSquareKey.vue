@@ -42,9 +42,9 @@
 </template>
 
 <script>
-import Rules from '_/rules';
-import { square } from '_/ciphers/polybius';
-import PolybiusSquare from '@/components/PolybiusSquare.vue';
+import Rules from '../../lib/rules';
+import { square } from '../../lib/ciphers/polybius';
+import PolybiusSquare from '../PolybiusSquare.vue';
 import mixin from './cipherKeysMixin';
 
 export default {

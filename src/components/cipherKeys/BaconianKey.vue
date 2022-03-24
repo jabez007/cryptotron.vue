@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import Rules from '_/rules';
-import { encoding } from '_/ciphers/baconian';
+import Rules from '../../lib/rules';
+import { encoding } from '../../lib/ciphers/baconian';
 import mixin from './cipherKeysMixin';
 
 export default {

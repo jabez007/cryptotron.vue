@@ -1,11 +1,12 @@
 const path = require('path');
+const { name } = require('./package.json');
 
 const basePath = process.env.NODE_ENV === 'production'
-  ? '/cryptotron/'
+  ? `/${name}/`
   : '/';
 
 module.exports = {
-  baseUrl: basePath,
+  // baseUrl: basePath,
   publicPath: basePath,
   chainWebpack: (config) => {
     // alias to lib directory

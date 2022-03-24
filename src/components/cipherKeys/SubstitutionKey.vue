@@ -33,7 +33,7 @@
 
 <script>
 import draggable from 'vuedraggable';
-import { alphaLower, getUniqueCharacters } from '_/ciphers';
+import { alphaLower, getUniqueCharacters } from '../../lib/ciphers';
 import mixin from './cipherKeysMixin';
 
 export default {

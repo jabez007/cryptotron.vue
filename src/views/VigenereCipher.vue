@@ -66,10 +66,10 @@
 
 <script>
 // @ is an alias to /src
-import { encrypt, decrypt } from '_/ciphers/vigenere';
-import Cipher from '@/components/Cipher.vue';
-import TabulaRecta from '@/components/TabulaRecta.vue';
-import VigenereKey from '@/components/cipherKeys/VigenereKey.vue';
+import { encrypt, decrypt } from '../lib/ciphers/vigenere';
+import Cipher from '../components/Cipher.vue';
+import TabulaRecta from '../components/TabulaRecta.vue';
+import VigenereKey from '../components/cipherKeys/VigenereKey.vue';
 
 export default {
   components: {

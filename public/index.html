@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta property="og:url" content="https://jabez007.github.io/cryptotron">
+    <meta property="og:url" content="https://jabez007.github.io/<%= htmlWebpackPlugin.options.title %>">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="CryptoTron">
+    <meta property="og:title" content="<%= htmlWebpackPlugin.options.title %>">
     <meta property="og:description" content="A graphical interface for the implementation of various classical ciphers">
-    <meta property="og:image" content="https://jabez007.github.io/cryptotron/img/banner.jpg">
+    <meta property="og:image" content="https://jabez007.github.io/<%= htmlWebpackPlugin.options.title %>/img/banner.jpg">
     <% if (process.env.NODE_ENV === 'production') { %>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6R9GYD8S4K"></script>
@@ -21,13 +21,13 @@
     </script>
     <% } %>
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title>CryptoTron</title>
+    <title><%= htmlWebpackPlugin.options.title %></title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons">
   </head>
   <body>
     <noscript>
-      <strong>We're sorry but CryptoTron doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->

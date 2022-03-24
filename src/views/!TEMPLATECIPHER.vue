@@ -19,7 +19,7 @@
 <script>
 /* eslint-disable */  // <- remove this when creating a new cipher from template
 // @ is an alias to /src
-import Cipher from '@/components/Cipher.vue';
+import Cipher from '../components/Cipher.vue';
 
 export default {
   components: {
