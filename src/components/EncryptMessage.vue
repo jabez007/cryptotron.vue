@@ -2,17 +2,12 @@
   <vs-card class="card">
     <div class="textareas">
       <slot name="plainText" v-bind="{ plainText }">
-        <vs-textarea label="Plain Text" v-model="plainText">
-        </vs-textarea>
+        <vs-textarea label="Plain Text" v-model="plainText"> </vs-textarea>
       </slot>
       <slot name="cipherText" v-bind="{ cipherText, copyToClipboard, save }">
         <vs-row>
           <vs-col vs-w="11">
-            <vs-textarea
-              label="Cipher Text"
-              :value="cipherText"
-              readonly
-            >
+            <vs-textarea label="Cipher Text" :value="cipherText" readonly>
             </vs-textarea>
           </vs-col>
           <vs-col vs-w="1" class="action-buttons">

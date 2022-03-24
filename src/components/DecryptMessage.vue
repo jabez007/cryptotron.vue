@@ -1,29 +1,30 @@
 <template>
-  <v-card>
-    <v-card-text>
-      <slot name="cipherText"
-            v-bind="{ cipherText }">
-        <v-textarea label="Cipher Text"
-                    v-model="cipherText"
-                    auto-grow
-                    clearable>
-        </v-textarea>
+  <vs-card class="card">
+    <div class="textareas">
+      <slot name="cipherText" v-bind="{ cipherText }">
+        <vs-textarea label="Cipher Text" v-model="cipherText"> </vs-textarea>
       </slot>
-      <slot name="plainText"
-            v-bind="{ plainText, copyToClipboard, save }">
-        <v-textarea label="Plain Text"
-                    :value="plainText"
-                    prepend-inner-icon="file_copy"
-                    @click:prepend-inner="copyToClipboard(plainText)"
-                    append-icon="save"
-                    @click:append="save(plainText)"
-                    outline
-                    auto-grow
-                    readonly>
-        </v-textarea>
+      <slot name="plainText" v-bind="{ plainText, copyToClipboard, save }">
+        <vs-row>
+          <vs-col vs-w="11">
+            <vs-textarea label="Plain Text" :value="plainText" readonly>
+            </vs-textarea>
+          </vs-col>
+          <vs-col vs-w="1" class="action-buttons">
+            <vs-row vs-justify="center">
+              <vs-button
+                icon="file_copy"
+                @click="copyToClipboard(plainText)"
+              ></vs-button>
+            </vs-row>
+            <vs-row vs-justify="center">
+              <vs-button icon="save" @click="save(plainText)"></vs-button>
+            </vs-row>
+          </vs-col>
+        </vs-row>
       </slot>
-    </v-card-text>
-  </v-card>
+    </div>
+  </vs-card>
 </template>
 
 <script>
