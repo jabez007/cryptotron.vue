@@ -2,7 +2,7 @@
   <div id="appLayout">
     <vs-navbar>
       <vs-navbar-title slot="title" class="app-title">
-        <vs-row vs-type="flex" vs-justify="space-between" vs-align="center">
+        <vs-row vs-justify="space-between" vs-align="center">
           <vs-col vs-w="3">
             <vs-button
               v-if="navigationDrawer"
@@ -38,11 +38,12 @@
         hidden-background
         v-model="drawer"
       >
+        <!-- do not reduce on touchscreens -->
         <slot name="sidebarItems"></slot>
       </vs-sidebar>
 
       <main>
-        <vs-row vs-type="flex" vs-justify="center" vs-align="center">
+        <vs-row vs-justify="center" vs-align="center">
           <vs-col vs-justify="center">
             <slot name="content">
               <transition :name="transitionName" mode="out-in">
@@ -55,7 +56,7 @@
     </div>
 
     <footer>
-      <vs-row vs-type="flex" vs-justify="space-between" vs-align="center">
+      <vs-row vs-justify="space-between" vs-align="center">
         <vs-col vs-w="1">
           <vs-button
             v-if="bugUrl"

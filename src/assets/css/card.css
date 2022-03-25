@@ -30,6 +30,7 @@
 .card .textareas .vs-con-textarea,
 .card .textareas input {
   background: rgb(225, 225, 225);
+  color: rgb(30, 30, 30);
 }
 
 .card .textareas .vs-placeholder-label,

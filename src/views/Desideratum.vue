@@ -1,7 +1,7 @@
 <template>
   <vs-card class="card">
     <div slot="header" class="header">
-      <vs-row vs-type="flex" vs-justify="center" vs-align="center">
+      <vs-row vs-justify="center" vs-align="center">
         <h3>Kerckhoffs's Desideratum of Cryptography</h3>
         <vs-button
           flat

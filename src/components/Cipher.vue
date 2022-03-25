@@ -1,74 +1,63 @@
 <template>
-  <v-card>
-    <slot v-if="$vuetify.breakpoint.mdAndUp" name="description"></slot>
-    <v-card>
-      <v-card-title class="text-xs-right" v-if="$slots.key">
-        <v-icon large>vpn_key</v-icon>
-        <v-spacer></v-spacer>
+  <vs-card class="card">
+    <vs-collapse>
+      <vs-collapse-item open>
+        <!-- default closed on smaller screens -->
+        <slot name="description"></slot>
+      </vs-collapse-item>
+    </vs-collapse>
+    <vs-row v-if="$slots.key" vs-justify="center" vs-align="center">
+      <vs-col vs-w="3">
+        <vs-icon icon="vpn_key" size="large"></vs-icon>
+      </vs-col>
+      <vs-col vs-w="7">
         <slot name="key"></slot>
-        <v-spacer></v-spacer>
-      </v-card-title>
-      <v-tabs grow>
-        <v-tab v-if="$vuetify.breakpoint.smAndDown" key="description">Details</v-tab>
-        <v-tab key="encrypt">Encrypt</v-tab>
-        <v-tab key="decrypt">Decrypt</v-tab>
-        <v-tab v-if="keysGenerator" key="crack">Analysis</v-tab>
-        <v-tab-item v-if="$vuetify.breakpoint.smAndDown" key="description" lazy>
-          <slot name="description"></slot>
-        </v-tab-item>
-        <v-tab-item key="encrypt" lazy>
-          <EncryptMessage
-            :encryptAlgorithm="encryptAlgorithm"
-            :cipherKey="cipherKey"
-            @success="onSuccess"
-            @error="onError"
-          >
-            <template slot="plainText" slot-scope="scope">
-              <slot name="encrypt-plainText" v-bind="scope"></slot>
-            </template>
-            <template slot="cipherText" slot-scope="scope">
-              <slot name="encrypt-cipherText" v-bind="scope"></slot>
-            </template>
-          </EncryptMessage>
-        </v-tab-item>
-        <v-tab-item key="decrypt" lazy>
-          <DecryptMessage
-            :decryptAlgorithm="decryptAlgorithm"
-            :cipherKey="cipherKey"
-            @success="onSuccess"
-            @error="onError"
-          >
-            <template slot="cipherText" slot-scope="scope">
-              <slot name="decrypt-cipherText" v-bind="scope"></slot>
-            </template>
-            <template slot="plainText" slot-scope="scope">
-              <slot name="decrypt-plainText" v-bind="scope"></slot>
-            </template>
-          </DecryptMessage>
-        </v-tab-item>
-        <v-tab-item v-if="keysGenerator" key="crack" lazy>
-          <CrackMessage
-            :decryptAlgorithm="decryptAlgorithm"
-            :ngramsFile="ngramsFile"
-            :keysGenerator="keysGenerator"
-            @success="onSuccess"
-            @error="onError"
-            @update-key="$emit('update-key', $event)"
-          />
-        </v-tab-item>
-      </v-tabs>
-    </v-card>
-    <v-snackbar
-      v-model="openSnackbar"
-      :color="status"
-      :timeout="snackbarTimeout"
-      class="text-xs-center"
-      vertical
-    >
-      <span class="body-2">{{ statusMessage }}</span>
-      <v-icon @click="openSnackbar = false">close</v-icon>
-    </v-snackbar>
-  </v-card>
+      </vs-col>
+    </vs-row>
+    <vs-tabs alignment="fixed">
+      <vs-tab label="Encrypt">
+        <encrypt-message
+          :encryptAlgorithm="encryptAlgorithm"
+          :cipherKey="cipherKey"
+          @success="onSuccess"
+          @error="onError"
+        >
+          <template slot="plainText" slot-scope="scope">
+            <slot name="encrypt-plainText" v-bind="scope"></slot>
+          </template>
+          <template slot="cipherText" slot-scope="scope">
+            <slot name="encrypt-cipherText" v-bind="scope"></slot>
+          </template>
+        </encrypt-message>
+      </vs-tab>
+      <vs-tab label="Decrypt">
+        <decrypt-message
+          :decryptAlgorithm="decryptAlgorithm"
+          :cipherKey="cipherKey"
+          @success="onSuccess"
+          @error="onError"
+        >
+          <template slot="cipherText" slot-scope="scope">
+            <slot name="decrypt-cipherText" v-bind="scope"></slot>
+          </template>
+          <template slot="plainText" slot-scope="scope">
+            <slot name="decrypt-plainText" v-bind="scope"></slot>
+          </template>
+        </decrypt-message>
+      </vs-tab>
+      <vs-tab v-if="keysGenerator" label="Analysis">
+        <crack-message
+          :decryptAlgorithm="decryptAlgorithm"
+          :ngramsFile="ngramsFile"
+          :keysGenerator="keysGenerator"
+          @ready="onReady"
+          @update-key="$emit('update-key', $event)"
+          @success="onSuccess"
+          @error="onError"
+        />
+      </vs-tab>
+    </vs-tabs>
+  </vs-card>
 </template>
 
 <script>
@@ -102,24 +91,27 @@ export default {
       default: 'quadgrams',
     },
   },
-  data: () => ({
-    openSnackbar: false,
-    snackbarTimeout: 2000,
-    status: '',
-    statusMessage: '',
-  }),
+  data: () => ({}),
   methods: {
+    onReady(message) {
+      this.$vs.notify({
+        title: 'Ready',
+        text: message,
+      });
+    },
     onSuccess(message) {
-      this.openSnackbar = false;
-      this.status = 'success';
-      this.statusMessage = message;
-      this.openSnackbar = true;
+      this.$vs.notify({
+        title: 'Success',
+        text: message,
+        color: 'success',
+      });
     },
     onError(message) {
-      this.openSnackbar = false;
-      this.status = 'error';
-      this.statusMessage = message;
-      this.openSnackbar = true;
+      this.$vs.notify({
+        title: 'Error',
+        text: message,
+        color: 'error',
+      });
     },
   },
 };
@@ -127,7 +119,7 @@ export default {
 
 <style>
 a.example {
-  color: #FF9800;
+  color: #ff9800;
 }
 
 a.example:hover {
