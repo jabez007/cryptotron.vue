@@ -27,11 +27,18 @@
   color: rgb(150, 100, 200);
 }
 
-.card .textareas .vs-con-textarea {
+.card .textareas .vs-con-textarea,
+.card .textareas input {
   background: rgb(225, 225, 225);
 }
 
-.card .textareas textarea {
+.card .textareas .vs-placeholder-label,
+.card .textareas .span-text-validation {
+  color: rgb(245, 235, 225);
+}
+
+.card .textareas textarea,
+.card .textareas input {
   font-size: large;
 }
 

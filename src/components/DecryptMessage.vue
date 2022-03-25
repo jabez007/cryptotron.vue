@@ -2,7 +2,7 @@
   <vs-card class="card">
     <div class="textareas">
       <slot name="cipherText" v-bind="{ cipherText }">
-        <vs-textarea label="Cipher Text" v-model="cipherText"> </vs-textarea>
+        <vs-textarea label="Cipher Text" v-model="cipherText"></vs-textarea>
       </slot>
       <slot name="plainText" v-bind="{ plainText, copyToClipboard, save }">
         <vs-row>
@@ -73,6 +73,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-</style>

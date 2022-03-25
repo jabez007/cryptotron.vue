@@ -1,52 +1,48 @@
 <template>
-  <v-card>
-    <v-slide-y-transition hide-on-leave>
-      <v-progress-circular v-show="crackingMessage"
-                           :size="clientHeight"
-                           style="width:100%;"
-                           indeterminate>
-      </v-progress-circular>
-    </v-slide-y-transition>
-    <v-slide-y-reverse-transition hide-on-leave>
-      <v-card-text ref="client"
-                   v-show="!crackingMessage">
-        <v-layout row
-                  wrap>
-          <v-flex xs12
-                  md9>
-            <v-textarea label="Cipher Text"
-                        v-model="cipherText"
-                        append-icon="send"
-                        @click:append="crackMessage"
-                        auto-grow
-                        clearable>
-            </v-textarea>
-          </v-flex>
-          <v-spacer></v-spacer>
-          <v-flex xs12
-                  md2>
-            <v-text-field label="Max key attempts"
-                          v-model.number="maxSteps"
-                          type="number"
-                          persistent-hint
-                          clearable
-                          required>
-            </v-text-field>
-          </v-flex>
-        </v-layout>
-        <v-textarea label="Plain Text"
-                    :value="plainText"
-                    prepend-inner-icon="file_copy"
-                    @click:prepend-inner="copyToClipboard"
-                    append-icon="save"
-                    @click:append="save"
-                    outline
-                    auto-grow
-                    readonly>
-        </v-textarea>
-      </v-card-text>
-    </v-slide-y-reverse-transition>
-  </v-card>
+  <vs-card class="card">
+    <div class="textareas">
+      <vs-row vs-justify="space-between">
+        <vs-col vs-w="9">
+          <vs-textarea label="Cipher Text" v-model="cipherText"> </vs-textarea>
+        </vs-col>
+        <vs-col vs-w="3">
+          <vs-row vs-justify="center" vs-align="center">
+            <vs-col vs-w="8">
+              <vs-input
+                icon="autorenew"
+                label-placeholder="Max key attempts"
+                description-text="Enter the number of different keys to attempt"
+                v-model.number="maxSteps"
+                type="number"
+                required
+              ></vs-input>
+            </vs-col>
+            <vs-col vs-w="2">
+              <vs-button
+                icon="send"
+                @click="crackMessage"
+                :disabled="!ngrams"
+              ></vs-button>
+            </vs-col>
+          </vs-row>
+        </vs-col>
+      </vs-row>
+      <vs-row>
+        <vs-col vs-w="11">
+          <vs-textarea label="Plain Text" :value="plainText" readonly>
+          </vs-textarea>
+        </vs-col>
+        <vs-col vs-w="1" class="action-buttons">
+          <vs-row vs-justify="center">
+            <vs-button icon="file_copy" @click="copyToClipboard"></vs-button>
+          </vs-row>
+          <vs-row vs-justify="center">
+            <vs-button icon="save" @click="save"></vs-button>
+          </vs-row>
+        </vs-col>
+      </vs-row>
+    </div>
+  </vs-card>
 </template>
 
 <script>
@@ -76,7 +72,6 @@ export default {
     plainText: '',
     maxSteps: 1000,
     crackingMessage: false,
-    clientHeight: 0,
   }),
   computed: {
     L() {
@@ -98,29 +93,49 @@ export default {
       return 0.0;
     },
   },
+  watch: {
+    crackingMessage(newVal) {
+      console.log(`cracking: ${newVal}`);
+      if (newVal) {
+        this.$vs.loading();
+      } else {
+        this.$vs.loading.close();
+      }
+    },
+  },
   created() {
     const storedNgrams = localStorage.getItem(this.ngramsFile);
     if (storedNgrams) {
       this.ngrams = JSON.parse(lzString.decompress(storedNgrams));
     } else {
       const self = this;
-      axios.get(`/ngrams/${this.ngramsFile}.json`)
+      axios
+        .get(`/ngrams/${this.ngramsFile}.json`)
         .then((response) => {
           const ngramsObj = response.data;
 
-          localStorage.setItem(self.ngramsFile, lzString.compress(JSON.stringify(ngramsObj)));
+          localStorage.setItem(
+            self.ngramsFile,
+            lzString.compress(JSON.stringify(ngramsObj)),
+          );
 
-          localStorage.setItem(`${self.ngramsFile}L`, Object.keys(ngramsObj)[0].length);
+          localStorage.setItem(
+            `${self.ngramsFile}L`,
+            Object.keys(ngramsObj)[0].length,
+          );
 
           const sum = Object.values(ngramsObj).reduce((a, b) => a + b, 0);
           localStorage.setItem(`${self.ngramsFile}N`, sum);
-          localStorage.setItem(`${self.ngramsFile}floor`, Math.log10(0.01 / sum));
+          localStorage.setItem(
+            `${self.ngramsFile}floor`,
+            Math.log10(0.01 / sum),
+          );
 
           self.ngrams = ngramsObj;
-          alert('ready');
+          self.$emit('ready', 'N-grams loaded');
         })
         .catch((err) => {
-          alert(err);
+          self.$emit('error', err.message);
         });
     }
   },
@@ -141,7 +156,6 @@ export default {
       return score;
     },
     crackMessage() {
-      this.clientHeight = this.$refs.client.clientHeight;
       this.crackingMessage = true;
       const self = this;
       setTimeout(() => {
@@ -151,8 +165,11 @@ export default {
         let s = 0;
         let key = null;
         // eslint-disable-next-line
-        while (key = self.keysGenerator(key, ciphertext, bestKey)) {
-          const plaintext = self.decryptAlgorithm(ciphertext, key).toUpperCase().replace(/[^A-Z]/g, '');
+        while ((key = self.keysGenerator(key, ciphertext, bestKey))) {
+          const plaintext = self
+            .decryptAlgorithm(ciphertext, key)
+            .toUpperCase()
+            .replace(/[^A-Z]/g, '');
           const currentScore = self.getScore(plaintext);
           if (currentScore > bestScore) {
             bestScore = currentScore;
@@ -189,6 +206,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-</style>
