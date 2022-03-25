@@ -6,25 +6,30 @@
     :keysGenerator="possibleKeys"
     @update-key="onUpdateKey"
   >
-    <v-card slot="description">
-      <v-card-title>
-        <h5 class="headline">The Caesar Cipher</h5>
-      </v-card-title>
-      <v-card-text>
+    <vs-card class="card cipher" slot="description">
+      <div class="header" slot="header">
+        <h5>The Caesar Cipher</h5>
+      </div>
+      <div class="main">
         <p>
           The Caesar cipher is one of the earliest known and simplest ciphers.
-          It is a type of substitution cipher in which each letter in the plaintext is 'shifted' a certain number of places down the alphabet.
-          For example, with a shift of 1, A would be replaced by B, B would become C, and so on.
-          The method is named after Julius Caesar, who apparently used it to communicate with his generals.
+          It is a type of substitution cipher in which each letter in the
+          plaintext is 'shifted' a certain number of places down the alphabet.
+          For example, with a shift of 1, A would be replaced by B, B would
+          become C, and so on. The method is named after Julius Caesar, who
+          apparently used it to communicate with his generals.
         </p>
         <p>
-          More complex encryption schemes such as the Vigenère cipher employ the Caesar cipher as one element of the encryption process.
-          The widely known
-          <a class="example" @click="key={ shift: 13 }">ROT13</a> 'encryption' is simply a Caesar cipher with an offset of 13.
-          The Caesar cipher offers essentially no communication security as it can be easily broken even by hand.
+          More complex encryption schemes such as the Vigenère cipher employ the
+          Caesar cipher as one element of the encryption process. The widely
+          known
+          <a class="example" @click="key = { shift: 13 }">ROT13</a> 'encryption'
+          is simply a Caesar cipher with an offset of 13. The Caesar cipher
+          offers essentially no communication security as it can be easily
+          broken even by hand.
         </p>
-      </v-card-text>
-    </v-card>
+      </div>
+    </vs-card>
     <caesar-key slot="key" v-model="key"></caesar-key>
   </Cipher>
 </template>

@@ -42,6 +42,20 @@
         >
           Simple
         </vs-sidebar-item>
+        <vs-sidebar-item
+          index="4.2"
+          icon="plus_one"
+          :to="{ name: 'cryptotron-caesar' }"
+        >
+          Caesar
+        </vs-sidebar-item>
+        <vs-sidebar-item
+          index="4.3"
+          icon="exposure_plus_2"
+          :to="{ name: 'cryptotron-affine' }"
+        >
+          Affine
+        </vs-sidebar-item>
       </vs-sidebar-group>
     </span>
   </app-layout>

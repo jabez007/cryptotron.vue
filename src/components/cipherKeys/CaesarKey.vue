@@ -1,14 +1,15 @@
 <template>
-    <v-form ref="form">
-      <v-text-field
+  <vs-row class="card key" vs-justify="center">
+    <vs-col vs-w="2">
+      <vs-input-number
         label="Shift"
-        type="number"
         v-model.number="key.shift"
-        :rules="rules"
-        clearable
-        required
-      ></v-text-field>
-    </v-form>
+        min="0"
+        max="26"
+        size="large"
+      ></vs-input-number>
+    </vs-col>
+  </vs-row>
 </template>
 
 <script>

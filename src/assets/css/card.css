@@ -33,7 +33,8 @@
 
 .card .textareas .vs-con-textarea,
 .card .textareas input,
-.card.key input {
+.card.key input,
+.card.key .vs-input-number {
   background: rgb(245, 235, 225);
   color: rgba(var(--vs-dark), 1);
 }
