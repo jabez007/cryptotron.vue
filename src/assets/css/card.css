@@ -1,5 +1,5 @@
 .card {
-  background: rgb(30, 30, 30);
+  background: rgba(var(--vs-dark), 1);
 }
 
 .card .header {
@@ -28,21 +28,27 @@
 }
 
 .card .textareas .vs-con-textarea,
-.card .textareas input {
-  background: rgb(225, 225, 225);
-  color: rgb(30, 30, 30);
+.card .textareas input,
+.card.key input {
+  background: rgb(245, 235, 225);
+  color: rgba(var(--vs-dark), 1);
 }
 
 .card .textareas .vs-placeholder-label,
-.card .textareas .span-text-validation {
+.card .textareas .span-text-validation,
+.card.key .span-text-validation {
   color: rgb(245, 235, 225);
 }
 
 .card .textareas textarea,
-.card .textareas input {
+.card .textareas input,
+.card.key input {
   font-size: large;
 }
 
+.card.key .vs-input {
+  width: 100%;
+}
 
 .card .textareas .action-buttons {
   display: flex;

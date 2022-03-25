@@ -1,34 +1,37 @@
 <template>
-  <v-form ref="form">
-    <v-layout row>
-      <div>
-        <v-chip
+  <vs-card class="card key">
+    <vs-row vs-justify="center">
+      <ul>
+        <li
           v-for="char in key.plainAlphabet"
           :key="char.toUpperCase()"
-          style="margin: 1px !important; font-family: monospace, monospace;"
-          label
-          small
-        >{{ char.toUpperCase() }}</v-chip>
-      </div>
-    </v-layout>
-    <v-layout row>
-      <draggable v-model="key.cipherAlphabet" group="key.cipherAlphabet">
-        <transition-group>
-          <v-chip
-            v-for="char in key.cipherAlphabet"
-            :key="char"
-            color="info"
-            style="margin: 1px !important; font-family: monospace, monospace;"
-            label
-            small
-          >{{ char }}</v-chip>
+          style="font-family: monospace, monospace"
+        >
+          {{ char.toUpperCase() }}
+        </li>
+      </ul>
+    </vs-row>
+    <vs-row vs-justify="center">
+      <draggable
+        tag="ul"
+        class="draggable"
+        v-model="key.cipherAlphabet"
+        v-bind="{ animation: 200 }"
+      >
+        <transition-group type="transition" name="flip-list">
+          <li v-for="char in key.cipherAlphabet" :key="char" color="primary">
+            {{ char }}
+          </li>
         </transition-group>
       </draggable>
-    </v-layout>
-    <v-layout row>
-      <v-text-field label="Key Word" v-model.trim="compKeyword" clearable></v-text-field>
-    </v-layout>
-  </v-form>
+    </vs-row>
+    <vs-row>
+      <vs-input
+        description-text="Key Word"
+        v-model.trim="compKeyword"
+      ></vs-input>
+    </vs-row>
+  </vs-card>
 </template>
 
 <script>
@@ -68,3 +71,25 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+ul {
+  list-style-type: none;
+}
+
+ul li {
+  display: inline-block;
+  font-family: monospace, monospace;
+  margin: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 10%;
+}
+
+ul.draggable li {
+  background: rgba(var(--vs-primary), 1);
+}
+
+.flip-list-move {
+  transition: transform 0.5s;
+}
+</style>

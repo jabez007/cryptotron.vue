@@ -10,7 +10,7 @@
       <vs-col vs-w="3">
         <vs-icon icon="vpn_key" size="large"></vs-icon>
       </vs-col>
-      <vs-col vs-w="7">
+      <vs-col vs-w="9">
         <slot name="key"></slot>
       </vs-col>
     </vs-row>
