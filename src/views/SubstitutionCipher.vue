@@ -6,16 +6,16 @@
     :keysGenerator="possibleKeys"
     @update-key="onUpdateKey"
   >
-    <v-card slot="description">
-      <v-card-title>
+    <vs-card class="card cipher" slot="description">
+      <div class="header" slot="header">
         <h5 class="headline">The Simple Substitution Cipher</h5>
-      </v-card-title>
-      <v-card-text>
+      </div>
+      <div class="main">
         <p>
           The simple substitution cipher is a cipher that has been in use for many hundreds of years (an excellent history is given in Simon Singhs 'the Code Book').
           It basically consists of substituting every plaintext character for a different ciphertext character. It differs from the
           <a
-            @click="$router.push('/ceasar')"
+            @click="$router.push({ name: 'cryptotron-caesar' })"
           >Caesar cipher</a> in that the cipher alphabet is not simply the alphabet shifted,
           it is completely jumbled.
         </p>
@@ -48,8 +48,8 @@
           >'QWERTY'</a>
           key, based on the standard layout for a US keyboard.
         </p>
-      </v-card-text>
-    </v-card>
+      </div>
+    </vs-card>
     <substitution-key slot="key" v-model="key"></substitution-key>
   </Cipher>
 </template>

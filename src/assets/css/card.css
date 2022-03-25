@@ -2,6 +2,10 @@
   background: rgba(var(--vs-dark), 1);
 }
 
+.card.cipher {
+  text-align: left;
+}
+
 .card .header {
   font-size: xx-large;
 }
