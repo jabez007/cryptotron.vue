@@ -1,29 +1,27 @@
 <template>
-    <v-form ref="form">
-      <v-layout row>
-        <v-flex xs5>
-          <v-text-field
-            label="Alpha"
-            type="number"
-            v-model.number="key.alpha"
-            :rules="[...rules, (val) => gcd(val, 26) === 1 || 'The value must be relatively prime to 26']"
-            clearable
-            required
-          ></v-text-field>
-        </v-flex>
-        <v-spacer></v-spacer>
-        <v-flex xs5>
-          <v-text-field
-            label="Beta"
-            type="number"
-            v-model.number="key.beta"
-            :rules="rules"
-            clearable
-            required
-          ></v-text-field>
-        </v-flex>
-      </v-layout>
-    </v-form>
+  <vs-row class="card key" vs-justify="center">
+    <vs-col vs-w="2">
+      <vs-input-number
+        label="Alpha"
+        v-model.number="alpha"
+        min="1"
+        max="25"
+        step="2"
+        size="large"
+        required
+      ></vs-input-number>
+    </vs-col>
+    <vs-col vs-w="2">
+      <vs-input-number
+        label="Beta"
+        v-model.number="key.beta"
+        min="0"
+        max="25"
+        size="large"
+        required
+      ></vs-input-number>
+    </vs-col>
+  </vs-row>
 </template>
 
 <script>
@@ -34,8 +32,23 @@ import mixin from './cipherKeysMixin';
 export default {
   mixins: [mixin],
   computed: {
+    alpha: {
+      get() {
+        return this.key.alpha;
+      },
+      set(newVal) {
+        if (Number.isInteger(newVal)) {
+          const direction = (newVal - this.key.alpha) / Math.abs(newVal - this.key.alpha);
+          let val = newVal;
+          while (gcd(val, 26) !== 1) {
+            val += direction;
+          }
+          this.key.alpha = val % 26;
+        }
+      },
+    },
     rules() {
-      return [Rules.required, Rules.integer];
+      return [Rules.required, Rules.integer, val => gcd(val, 26) === 1];
     },
   },
   methods: {

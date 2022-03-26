@@ -5,8 +5,9 @@
         label="Shift"
         v-model.number="key.shift"
         min="0"
-        max="26"
+        max="25"
         size="large"
+        required
       ></vs-input-number>
     </vs-col>
   </vs-row>

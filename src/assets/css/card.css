@@ -61,6 +61,10 @@
   justify-content: space-evenly;
 }
 
+.card .main p {
+  text-indent: 2rem;
+}
+
 .card .main .footer {
   text-align: end;
 }
