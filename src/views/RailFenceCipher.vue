@@ -6,71 +6,93 @@
     :keysGenerator="possibleKeys"
     @update-key="onUpdateKey"
   >
-    <v-card slot="description">
-      <v-card-title>
-        <h5 class="headline">The Rail-Fence Cipher</h5>
-      </v-card-title>
-      <v-card-text>
+    <vs-card class="card cipher" slot="description">
+      <div class="header" slot="header">
+        <h5>The Rail-Fence Cipher</h5>
+      </div>
+      <div class="main">
         <p>
-          The rail-fence cipher (also called a zigzag cipher) is a very simple form of transposition cipher.
-          It derives its name from the way in which it is encoded,
-          following a simple rule for mixing up the characters in the plaintext to form the ciphertext.
+          The rail-fence cipher (also called a zigzag cipher) is a very simple
+          form of transposition cipher. It derives its name from the way in
+          which it is encoded, following a simple rule for mixing up the
+          characters in the plaintext to form the ciphertext.
         </p>
         <p>
-          The rail-fence cipher is often decribed as a "write down the columns, read along the rows" cipher.
-          This is equivalent to using an un-keyed columnar transposition cipher.
+          The rail-fence cipher is often decribed as a "write down the columns,
+          read along the rows" cipher. This is equivalent to using an un-keyed
+          columnar transposition cipher.
         </p>
         <p>
-          The rail-fence cipher offers essentially no communication security, and can be easily broken even by hand.
-          Although weak on its own, it can be combined with other ciphers, such as a
-          <a
-            @click="$router.push('/substitution')"
-          >substitution cipher</a>,
-          the combination of which is more difficult to break than either cipher on it's own.
+          The rail-fence cipher offers essentially no communication security,
+          and can be easily broken even by hand. Although weak on its own, it
+          can be combined with other ciphers, such as a
+          <a @click="$router.push({ name: 'cryptotron-substitution' })"
+            >substitution cipher</a
+          >, the combination of which is more difficult to break than either
+          cipher on it's own.
         </p>
         <h6 class="title">Example</h6>
         <p>
-          The key for the railfence cipher is just the number of rails.
-          To encrypt a piece of text, the plain text is written downwards and diagonally on successive "rails" of an imaginary fence,
-          then moving up when we reach the bottom rail.
-          When we reach the top rail, the message is written downwards again.
-          This continues until the whole plaintext is written out.
-          The message is then read off in rows.
+          The key for the railfence cipher is just the number of rails. To
+          encrypt a piece of text, the plain text is written downwards and
+          diagonally on successive "rails" of an imaginary fence, then moving up
+          when we reach the bottom rail. When we reach the top rail, the message
+          is written downwards again. This continues until the whole plaintext
+          is written out. The message is then read off in rows.
         </p>
         <p>
-          For <a @click="key={ rails: 3 }; exampleMsg='WE ARE DISCOVERED. FLEE AT ONCE'">example</a>,
-          if we have 3 rails and a message of
+          For
+          <a
+            @click="
+              key = { rails: 3 };
+              exampleMsg = 'WE ARE DISCOVERED. FLEE AT ONCE';
+            "
+            >example</a
+          >, if we have 3 rails and a message of
           <q>WE ARE DISCOVERED. FLEE AT ONCE</q>
           then the cipher text reads off as
           <q>WECRLTEERDSOEEFEAOCAIVDEN</q>
         </p>
-        <v-expand-transition>
-          <v-card v-if="key.rails >= 3 && key.rails <= 5 && exampleMsg">
-            <v-card-title>
-              <v-text-field v-model="exampleMsg"></v-text-field>
-              <v-icon @click="exampleMsg=''">close</v-icon>
-            </v-card-title>
-            <v-card-text>
-              <table>
-                <tr v-for="i in cipherGrid.length" :key="i">
-                  <td
-                    v-for="j in cipherGrid[i-1].length" :key="j"
-                    :class="`amber--text ${cipherGrid[i-1][j-1] === '-' ? 'text--lighten-3' : 'text--darken-3'}`"
-                  >{{ cipherGrid[i-1][j-1] }}</td>
-                </tr>
-              </table>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <span class="body-2 amber--text">
-                {{ cipherGrid.flat().map(c => c.replace(/[^a-z]/, '')).join('') }}
-              </span>
-              <v-spacer></v-spacer>
-            </v-card-actions>
-          </v-card>
-        </v-expand-transition>
-      </v-card-text>
-    </v-card>
+        <vs-popup
+          class="dark"
+          title="Rail-Fence Example"
+          background-color-popup="rgb(30, 30, 30)"
+          :active.sync="openExample"
+        >
+          <div style="text-align: center">
+            <vs-row vs-justify="center">
+              <vs-col vs-w="12" style="display: flex; justify-content: center">
+                <vs-input style="width: 100%" v-model="exampleMsg"></vs-input>
+              </vs-col>
+              <vs-col vs-w="12">
+                <rail-fence-key full-width v-model="key"></rail-fence-key>
+              </vs-col>
+            </vs-row>
+            <table>
+              <tr v-for="i in cipherGrid.length" :key="i">
+                <td
+                  v-for="j in cipherGrid[i - 1].length"
+                  :key="j"
+                  :style="`color: ${
+                    cipherGrid[i - 1][j - 1] === '-' ? '#ffe082' : '#ff8f00'
+                  } !important`"
+                >
+                  {{ cipherGrid[i - 1][j - 1] }}
+                </td>
+              </tr>
+            </table>
+            <span style="color: #ffc107 !important">
+              {{
+                cipherGrid
+                  .flat()
+                  .map((c) => c.replace(/[^a-z]/, ""))
+                  .join("")
+              }}
+            </span>
+          </div>
+        </vs-popup>
+      </div>
+    </vs-card>
     <rail-fence-key slot="key" v-model="key"></rail-fence-key>
   </Cipher>
 </template>
@@ -93,9 +115,20 @@ export default {
     exampleMsg: '',
   }),
   computed: {
+    openExample: {
+      get() {
+        // return this.key.rails >= 3 && this.key.rails <= 5 && !!this.exampleMsg;
+        return this.key.rails >= 2 && !!this.exampleMsg;
+      },
+      set(newVal) {
+        if (!newVal) {
+          this.exampleMsg = '';
+        }
+      },
+    },
     cipherGrid() {
       const { rails } = this.key;
-      if (rails >= 3 && rails <= 5 && this.exampleMsg) {
+      if (this.openExample) {
         const msg = this.exampleMsg.toLowerCase().replace(/[^a-z]/g, '');
         const grid = new Array(rails)
           .fill('-')
@@ -166,17 +199,25 @@ table {
   border-spacing: 1px;
   border-collapse: separate;
   font-family: monospace, monospace;
-}
-tr {
-  background: var(--v-secondary-base);
+  background: rgba(var(--vs-dark), 1);
 }
 tr:nth-child(odd) {
-  background: var(--v-secondary-lighten1);
+  background: rgb(40, 40, 40);
 }
 tr:nth-child(even) {
-  background: var(--v-secondary-darken1);
+  background: rgb(20, 20, 20);
 }
 td {
   text-align: center;
+}
+</style>
+
+<style>
+.dark .vs-popup {
+  color: rgb(245, 235, 225);
+}
+
+.dark .vs-popup {
+  color: rgb(245, 235, 225);
 }
 </style>

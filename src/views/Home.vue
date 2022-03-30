@@ -56,6 +56,29 @@
         >
           Affine
         </vs-sidebar-item>
+        <!--vs-sidebar-item
+          index="4.4"
+          icon="hill"
+          :to="{ name: 'cryptotron-hill' }"
+        >
+          Hill
+        </vs-sidebar-item-->
+      </vs-sidebar-group>
+      <vs-sidebar-group title="Transposition">
+        <vs-sidebar-item
+          index="5.1"
+          icon="fence"
+          :to="{ name: 'cryptotron-railfence' }"
+        >
+          Rail-Fence
+        </vs-sidebar-item>
+        <vs-sidebar-item
+          index="5.2"
+          icon="swap_horiz"
+          :to="{ name: 'cryptotron-columnar-transposition' }"
+        >
+          Columnar
+        </vs-sidebar-item>
       </vs-sidebar-group>
     </span>
   </app-layout>

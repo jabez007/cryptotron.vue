@@ -1,14 +1,15 @@
 <template>
-    <v-form ref="form">
-      <v-text-field
+  <vs-row class="card key" vs-justify="center">
+    <vs-col :vs-w="fullWidth ? 12 : 2">
+      <vs-input-number
         label="Number of Rails"
-        type="number"
         v-model.number="key.rails"
-        :rules="rules"
-        clearable
+        min="1"
+        size="large"
         required
-      ></v-text-field>
-    </v-form>
+      ></vs-input-number>
+    </vs-col>
+  </vs-row>
 </template>
 
 <script>
@@ -17,6 +18,12 @@ import mixin from './cipherKeysMixin';
 
 export default {
   mixins: [mixin],
+  props: {
+    fullWidth: {
+      type: Boolean,
+      default: false,
+    },
+  },
   computed: {
     rules() {
       return [Rules.required, Rules.integer, Rules.positive];
