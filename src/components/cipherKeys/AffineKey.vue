@@ -1,27 +1,29 @@
 <template>
-  <vs-row class="card key" vs-justify="center">
-    <vs-col vs-w="2">
-      <vs-input-number
-        label="Alpha"
-        v-model.number="alpha"
-        min="1"
-        max="25"
-        step="2"
-        size="large"
-        required
-      ></vs-input-number>
-    </vs-col>
-    <vs-col vs-w="2">
-      <vs-input-number
-        label="Beta"
-        v-model.number="key.beta"
-        min="0"
-        max="25"
-        size="large"
-        required
-      ></vs-input-number>
-    </vs-col>
-  </vs-row>
+  <vs-card class="card key">
+    <vs-row vs-justify="center">
+      <vs-col vs-w="2">
+        <vs-input-number
+          label="Alpha"
+          v-model.number="alpha"
+          min="1"
+          max="25"
+          step="2"
+          size="large"
+          required
+        ></vs-input-number>
+      </vs-col>
+      <vs-col vs-w="2">
+        <vs-input-number
+          label="Beta"
+          v-model.number="key.beta"
+          min="0"
+          max="25"
+          size="large"
+          required
+        ></vs-input-number>
+      </vs-col>
+    </vs-row>
+  </vs-card>
 </template>
 
 <script>
