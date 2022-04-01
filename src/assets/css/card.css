@@ -66,5 +66,6 @@
 }
 
 .card .main .footer {
+  font-size: medium;
   text-align: end;
 }
