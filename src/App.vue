@@ -25,8 +25,8 @@
 </template>
 
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
-import { ref } from "vue";
+import { RouterLink, RouterView, useRoute } from "vue-router";
+import { ref, watch } from "vue";
 
 const menuOpen = ref(false);
 
@@ -37,6 +37,12 @@ const toggleMenu = () => {
 const closeMenu = () => {
   menuOpen.value = false;
 };
+
+const route = useRoute();
+
+watch(route, () => {
+  closeMenu();
+});
 </script>
 
 <style scoped>
@@ -117,7 +123,7 @@ header {
 
 .nav-overlay {
   position: fixed;
-  top: 0;
+  top: 50px;
   right: -100%;
   width: 350px;
   height: 100vh;
@@ -137,7 +143,7 @@ header {
 
 .nav-overlay-bg {
   position: fixed;
-  top: 0;
+  top: calc(50px + 2rem + 2px);
   left: 0;
   width: 100%;
   height: 100%;
