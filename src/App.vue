@@ -72,18 +72,43 @@ if (!parentRouteName) {
   }
 }
 
+console.debug(`Route query: ${JSON.stringify(route.query)}`);
+console.debug(`Window location search: ${window.location.search}`);
 console.debug(`Router history base: ${router.options.history.base}`);
 setTimeout(() => {
-  if (router.options.history.base.startsWith("/#")) {
-    const initialRoute = router.resolve(`${window.location.hash.slice(1)}`);
+  let initialRoute;
+  if (window.location.search) {
+    console.debug("Using location query parameter");
+    initialRoute = router.resolve(
+      new URLSearchParams(window.location.search).get("initialRoute") || {
+        name: "cryptotron-home",
+      },
+    );
+  } else if (Object.keys(route.query).length > 0) {
+    console.debug("Using route query parameter");
+    initialRoute = router.resolve(
+      (route.query.initialRoute as string) || { name: "cryptotron-home" },
+    );
+  } else if (router.options.history.base.endsWith("#")) {
+    console.debug("Using hash");
+    initialRoute = router.resolve(`${window.location.hash.slice(1)}`);
+  } else {
+    console.debug("Using path");
+    initialRoute = router.resolve(
+      `${window.location.pathname.slice(router.options.history.base.length)}`,
+    );
+  }
+
+  console.debug(`Initial route matched: ${JSON.stringify(initialRoute.matched)}`);
+  if (
+    initialRoute.matched.length > 0 &&
+    initialRoute.matched.some((p) => p.path === initialRoute.path)
+  ) {
     console.debug(`Navigating to initial route: ${initialRoute.fullPath}`);
     router.push(initialRoute);
   } else {
-    const initialRoute = router.resolve(
-      `${window.location.pathname.slice(router.options.history.base.length)}`,
-    );
-    console.debug(`Navigating to initial route: ${initialRoute.fullPath}`);
-    router.push(initialRoute);
+    console.warn(`No route for ${initialRoute.fullPath}`);
+    router.push({ name: "cryptotron-home" });
   }
 }, 100);
 
