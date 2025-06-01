@@ -1,16 +1,32 @@
-@import "./base.css";
-@import "./scrollbar.css";
-
-#app {
-  min-height: 100vh;
-  min-width: 100vw;
+.cryptotron-app {
+  min-height: 100%;
+  min-width: 100%;
+  overflow-x: hidden;
   font-weight: normal;
   display: flex;
   flex-direction: column;
 }
 
-a,
-.green {
+.cryptotron-app {
+  color: var(--cryptotron-text-primary);
+  background: var(--cryptotron-dark-bg);
+  background-image:
+    linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family: "Space Mono", monospace;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:deep(a),
+:deep(.green) {
   text-decoration: none;
   color: hsla(160, 100%, 37%, 1);
   transition: 0.4s;
@@ -18,7 +34,7 @@ a,
 }
 
 @media (hover: hover) {
-  a:hover {
+  :deep(a:hover) {
     background-color: hsla(160, 100%, 37%, 0.2);
   }
 }

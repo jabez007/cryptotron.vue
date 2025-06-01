@@ -1,33 +1,93 @@
 <template>
-  <header>
-    <div class="logo">
-      <img alt="Vue logo" src="@/assets/logo.png" width="50" height="50" />
-      CryptoTron
+  <div class="cryptotron-app">
+    <header>
+      <div class="logo">
+        <img alt="Vue logo" src="@/assets/logo.png" width="50" height="50" />
+        CryptoTron
+      </div>
+
+      <button @click="toggleMenu" :class="['hamburger-button', { active: menuOpen }]"
+        aria-label="Toggle navigation menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </header>
+
+    <!-- Navigation Overlay -->
+    <div :class="['nav-overlay-bg', { active: menuOpen }]" @click="closeMenu"></div>
+    <nav :class="['nav-overlay', { active: menuOpen }]">
+      <RouterLink :to="{ name: 'cryptotron-home' }">Home</RouterLink>
+      <RouterLink :to="{ name: 'cryptotron-about' }">About</RouterLink>
+    </nav>
+
+    <div id="app-content">
+      <RouterView />
     </div>
-
-    <button @click="toggleMenu" :class="['hamburger-button', { active: menuOpen }]" aria-label="Toggle navigation menu">
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-    </button>
-  </header>
-
-  <!-- Navigation Overlay -->
-  <div :class="['nav-overlay-bg', { active: menuOpen }]" @click="closeMenu"></div>
-  <nav :class="['nav-overlay', { active: menuOpen }]">
-    <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/about">About</RouterLink>
-  </nav>
-
-  <div id="app-content">
-    <RouterView />
   </div>
 </template>
 
 <script setup lang="ts">
-import { RouterLink, RouterView, useRoute } from "vue-router";
+import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 import { ref, watch } from "vue";
 
+const router = useRouter();
+const route = useRoute();
+
+console.debug(`Current URL: ${window.location.pathname}${window.location.hash}`);
+
+// Get the current route name to add children to
+const parentRouteName = route.name as string;
+console.debug(`Parent route name: ${parentRouteName}`);
+
+if (!parentRouteName) {
+  if (!router.hasRoute("cryptotron-home")) {
+    router.addRoute({
+      name: "cryptotron-home",
+      path: "/",
+      component: () => import("@/views/HomeView.vue"),
+    });
+  }
+  if (!router.hasRoute("cryptotron-about")) {
+    router.addRoute({
+      name: "cryptotron-about",
+      path: "/about",
+      component: () => import("@/views/AboutView.vue"),
+    });
+  }
+} else {
+  if (!router.hasRoute("cryptotron-home")) {
+    router.addRoute(parentRouteName, {
+      name: "cryptotron-home",
+      path: "",
+      component: () => import("@/views/HomeView.vue"),
+    });
+  }
+  if (!router.hasRoute("cryptotron-about")) {
+    router.addRoute(parentRouteName, {
+      name: "cryptotron-about",
+      path: "about",
+      component: () => import("@/views/AboutView.vue"),
+    });
+  }
+}
+
+console.debug(`Router history base: ${router.options.history.base}`);
+setTimeout(() => {
+  if (router.options.history.base.startsWith("/#")) {
+    const initialRoute = router.resolve(`${window.location.hash.slice(1)}`);
+    console.debug(`Navigating to initial route: ${initialRoute.fullPath}`);
+    router.push(initialRoute);
+  } else {
+    const initialRoute = router.resolve(
+      `${window.location.pathname.slice(router.options.history.base.length)}`,
+    );
+    console.debug(`Navigating to initial route: ${initialRoute.fullPath}`);
+    router.push(initialRoute);
+  }
+}, 100);
+
+/* nav menu */
 const menuOpen = ref(false);
 
 const toggleMenu = () => {
@@ -38,21 +98,21 @@ const closeMenu = () => {
   menuOpen.value = false;
 };
 
-const route = useRoute();
-
 watch(route, () => {
   closeMenu();
 });
 </script>
 
 <style>
-@import "@/assets/main.css";
+@import "@/assets/base.css";
 </style>
 
 <style scoped>
+@import "@/assets/main.css";
+
 header {
-  min-width: 100vw;
-  background: linear-gradient(135deg, var(--darker-bg) 0%, rgba(15, 15, 25, 0.95) 100%);
+  min-width: 100%;
+  background: linear-gradient(135deg, var(--cryptotron-darker-bg) 0%, rgba(15, 15, 25, 0.95) 100%);
   border-bottom: 2px solid var(--neon-cyan);
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   padding: 1rem 2rem;
@@ -131,7 +191,7 @@ header {
   right: -100%;
   width: 350px;
   height: 100vh;
-  background: linear-gradient(135deg, var(--darker-bg) 0%, rgba(15, 15, 25, 0.98) 100%);
+  background: linear-gradient(135deg, var(--cryptotron-darker-bg) 0%, rgba(15, 15, 25, 0.98) 100%);
   backdrop-filter: blur(20px);
   border-left: 2px solid var(--neon-cyan);
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
@@ -170,7 +230,7 @@ nav {
 }
 
 nav a {
-  color: var(--text-primary);
+  color: var(--cryptotron-text-primary);
   text-decoration: none;
   padding: 1rem 1.5rem;
   border: 1px solid transparent;
@@ -211,7 +271,7 @@ nav a:hover::before {
 
 nav a.router-link-exact-active {
   background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.1));
-  color: var(--color-text);
+  color: var(--cryptotron-color-text);
 }
 
 nav a.router-link-exact-active:hover {

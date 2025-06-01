@@ -4,7 +4,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--darker-bg);
+  background: var(--cryptotron-darker-bg);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -19,5 +19,5 @@
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--neon-cyan) var(--darker-bg);
+  scrollbar-color: var(--neon-cyan) var(--cryptotron-darker-bg);
 }
