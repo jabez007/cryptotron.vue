@@ -330,8 +330,14 @@ nav a.router-link-exact-active:hover {
 }
 
 #app-content {
-  max-width: 810px;
+  min-height: calc(100vh - 50px - 2rem - 2px);
+  max-height: calc(100vh - 50px - 2rem - 2px);
+  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  place-items: center;
 }
 </style>

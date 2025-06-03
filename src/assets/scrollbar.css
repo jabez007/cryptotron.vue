@@ -17,7 +17,8 @@
 }
 
 /* Firefox */
-* {
+#app-content,
+#app-content :deep(*) {
   scrollbar-width: thin;
   scrollbar-color: var(--neon-cyan) var(--cryptotron-darker-bg);
 }

@@ -1,5 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap");
-@import "./scrollbar.css";
 
 /* color palette and variables for cyberpunk */
 :root {
@@ -14,12 +13,4 @@
   --cryptotron-text-secondary: #a0a0a0;
   --cryptotron-grid-color: rgba(0, 255, 255, 0.1);
   --section-gap: 160px;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  font-weight: normal;
 }
