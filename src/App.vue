@@ -17,6 +17,9 @@
     <!-- Navigation Overlay -->
     <div :class="['nav-overlay-bg', { active: menuOpen }]" @click="closeMenu"></div>
     <nav :class="['nav-overlay', { active: menuOpen }]">
+      <RouterLink to="/">
+        <IconDocumentation />
+      </RouterLink>
       <RouterLink :to="{ name: 'cryptotron-home' }">Home</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-about' }">About</RouterLink>
     </nav>
@@ -28,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import IconDocumentation from "@/components/icons/IconDocumentation.vue";
 import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 import { ref, watch } from "vue";
 
@@ -100,6 +104,13 @@ setTimeout(() => {
   }
 
   console.debug(`Initial route matched: ${JSON.stringify(initialRoute.matched)}`);
+  if (initialRoute.matched.length > 0 &&
+    initialRoute.matched.some((p) => p.path === route.path)) {
+    console.debug('Already on correct route, skipping navigation')
+    router.replace(initialRoute)
+    return
+  }
+
   if (
     initialRoute.matched.length > 0 &&
     initialRoute.matched.some((p) => p.path === initialRoute.path)
