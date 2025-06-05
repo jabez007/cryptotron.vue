@@ -1,7 +1,7 @@
 <template>
   <div class="cryptotron-app">
     <header>
-      <div class="logo">
+      <div class="logo" @click="router.push({ name: 'cryptotron-home' })">
         <img alt="Vue logo" src="@/assets/logo.png" width="50" height="50" />
         CryptoTron
       </div>
@@ -22,10 +22,15 @@
       </RouterLink>
       <RouterLink :to="{ name: 'cryptotron-home' }">Home</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-about' }">About</RouterLink>
+      <RouterLink :to="{ name: 'cryptotron-caesar' }">Caesar</RouterLink>
     </nav>
 
     <div id="app-content">
-      <RouterView />
+      <RouterView v-slot="{ Component, route }">
+        <transition name="cyber-glitch" mode="out-in">
+          <component :is="Component" :key="route.name" />
+        </transition>
+      </RouterView>
     </div>
   </div>
 </template>
@@ -168,6 +173,7 @@ header {
 }
 
 .logo {
+  cursor: pointer;
   display: flex;
   align-items: center;
   font-family: "Orbitron", monospace;
@@ -343,5 +349,177 @@ nav a.router-link-exact-active:hover {
   display: flex;
   flex-direction: column;
   place-items: center;
+}
+
+/* Transition Animations */
+
+/* Cyber Fade */
+.cyber-fade-enter-active,
+.cyber-fade-leave-active {
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cyber-fade-enter-from {
+  opacity: 0;
+  filter: brightness(0) hue-rotate(180deg);
+  transform: scale(1.1);
+}
+
+.cyber-fade-leave-to {
+  opacity: 0;
+  filter: brightness(0) hue-rotate(-180deg);
+  transform: scale(0.9);
+}
+
+/* Cyber Slide Left */
+.cyber-slide-left-enter-active,
+.cyber-slide-left-leave-active {
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.cyber-slide-left-enter-from {
+  transform: translateX(100%) skewX(-5deg);
+  opacity: 0;
+  filter: hue-rotate(90deg) saturate(2);
+}
+
+.cyber-slide-left-leave-to {
+  transform: translateX(-100%) skewX(5deg);
+  opacity: 0;
+  filter: hue-rotate(-90deg) saturate(0.5);
+}
+
+/* Cyber Slide Right */
+.cyber-slide-right-enter-active,
+.cyber-slide-right-leave-active {
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.cyber-slide-right-enter-from {
+  transform: translateX(-100%) skewX(5deg);
+  opacity: 0;
+  filter: hue-rotate(-90deg) saturate(2);
+}
+
+.cyber-slide-right-leave-to {
+  transform: translateX(100%) skewX(-5deg);
+  opacity: 0;
+  filter: hue-rotate(90deg) saturate(0.5);
+}
+
+/* Cyber Glitch */
+.cyber-glitch-enter-active {
+  animation: glitch-enter 0.8s ease-out;
+}
+
+.cyber-glitch-leave-active {
+  animation: glitch-leave 0.8s ease-in;
+}
+
+/* Keyframe Animations */
+@keyframes glitch-effect {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10% {
+    transform: translateX(-2px) scaleX(1.01);
+  }
+
+  20% {
+    transform: translateX(2px) scaleX(0.99);
+  }
+
+  30% {
+    transform: translateX(-1px) scaleX(1.005);
+  }
+
+  40% {
+    transform: translateX(1px) scaleX(0.995);
+  }
+
+  50% {
+    transform: translateX(-0.5px) scaleX(1.002);
+  }
+}
+
+@keyframes scan-lines-move {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(10px);
+  }
+}
+
+@keyframes glitch-enter {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px) rotateY(90deg);
+    filter: hue-rotate(180deg) contrast(2) brightness(0.5);
+  }
+
+  20% {
+    transform: translateX(10px) rotateY(0deg);
+    filter: hue-rotate(90deg) contrast(1.5) brightness(1.2);
+  }
+
+  40% {
+    transform: translateX(-5px) rotateY(0deg);
+    filter: hue-rotate(-45deg) contrast(1.2) brightness(1.1);
+  }
+
+  60% {
+    transform: translateX(2px) rotateY(0deg);
+    filter: hue-rotate(20deg) contrast(1.1) brightness(1.05);
+  }
+
+  80% {
+    transform: translateX(-1px) rotateY(0deg);
+    filter: hue-rotate(-10deg) contrast(1.05) brightness(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotateY(0deg);
+    filter: hue-rotate(0deg) contrast(1) brightness(1);
+  }
+}
+
+@keyframes glitch-leave {
+  0% {
+    opacity: 1;
+    transform: translateX(0) rotateY(0deg);
+    filter: hue-rotate(0deg) contrast(1) brightness(1);
+  }
+
+  20% {
+    transform: translateX(-2px) rotateY(0deg);
+    filter: hue-rotate(-20deg) contrast(1.1) brightness(0.9);
+  }
+
+  40% {
+    transform: translateX(5px) rotateY(0deg);
+    filter: hue-rotate(45deg) contrast(1.3) brightness(0.7);
+  }
+
+  60% {
+    transform: translateX(-10px) rotateY(0deg);
+    filter: hue-rotate(-90deg) contrast(1.6) brightness(0.5);
+  }
+
+  80% {
+    transform: translateX(50px) rotateY(45deg);
+    filter: hue-rotate(-180deg) contrast(2) brightness(0.3);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(100px) rotateY(90deg);
+    filter: hue-rotate(-270deg) contrast(3) brightness(0);
+  }
 }
 </style>
