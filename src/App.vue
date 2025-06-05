@@ -17,7 +17,7 @@
     <!-- Navigation Overlay -->
     <div :class="['nav-overlay-bg', { active: menuOpen }]" @click="closeMenu"></div>
     <nav :class="['nav-overlay', { active: menuOpen }]">
-      <RouterLink to="/">
+      <RouterLink v-if="isSubApp" to="/">
         <IconDocumentation />
       </RouterLink>
       <RouterLink :to="{ name: 'cryptotron-home' }">Home</RouterLink>
@@ -137,6 +137,11 @@ const closeMenu = () => {
 watch(route, () => {
   closeMenu();
 });
+
+/* Check if runing as sub-app to avoid displaying duplicate home links */
+const rootName = router.resolve("/").name
+console.debug(`Root route resolved to ${rootName as string}`)
+const isSubApp = ref(rootName !== 'cryptotron-home')
 </script>
 
 <style>
