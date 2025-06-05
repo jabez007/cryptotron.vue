@@ -38,43 +38,42 @@ import { ref, watch } from "vue";
 const router = useRouter();
 const route = useRoute();
 
+const cryptotronRoutes = [
+  {
+    name: "cryptotron-home",
+    path: "/",
+    component: () => import("@/views/HomeView.vue"),
+  },
+  {
+    name: "cryptotron-about",
+    path: "/about",
+    component: () => import("@/views/AboutView.vue"),
+  },
+  {
+    name: "cryptotron-caesar",
+    path: "/caesar",
+    component: () => import("@/views/CaesarView.vue"),
+  }
+]
+
 console.debug(`Current URL: ${window.location.pathname}${window.location.hash}`);
 
 // Get the current route name to add children to
 const parentRouteName = route.name as string;
 console.debug(`Parent route name: ${parentRouteName}`);
 
-if (!parentRouteName) {
-  if (!router.hasRoute("cryptotron-home")) {
-    router.addRoute({
-      name: "cryptotron-home",
-      path: "/",
-      component: () => import("@/views/HomeView.vue"),
-    });
+cryptotronRoutes.forEach((r) => {
+  if (!router.hasRoute(r.name)) {
+    console.debug(`Adding ${r.name} to router`)
+    if (!parentRouteName) {
+      router.addRoute(r)
+    } else {
+      router.addRoute(parentRouteName, r)
+    }
+  } else {
+    console.warn(`Route ${r.name} already exists on router`)
   }
-  if (!router.hasRoute("cryptotron-about")) {
-    router.addRoute({
-      name: "cryptotron-about",
-      path: "/about",
-      component: () => import("@/views/AboutView.vue"),
-    });
-  }
-} else {
-  if (!router.hasRoute("cryptotron-home")) {
-    router.addRoute(parentRouteName, {
-      name: "cryptotron-home",
-      path: "",
-      component: () => import("@/views/HomeView.vue"),
-    });
-  }
-  if (!router.hasRoute("cryptotron-about")) {
-    router.addRoute(parentRouteName, {
-      name: "cryptotron-about",
-      path: "about",
-      component: () => import("@/views/AboutView.vue"),
-    });
-  }
-}
+})
 
 console.debug(`Route query: ${JSON.stringify(route.query)}`);
 console.debug(`Window location search: ${window.location.search}`);

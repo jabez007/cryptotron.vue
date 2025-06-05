@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
 
 </script>
 
 <template>
   <div class="cipher-grid">
-    <div class="cipher-card">
+    <div class="cipher-card" @click="router.push({ name: 'cryptotron-caesar' })">
       <h3>Caesar Cipher</h3>
       <p>The simplest substitution cipher, used by Julius Caesar himself. Shift each letter by a fixed number of
         positions in the alphabet.</p>
