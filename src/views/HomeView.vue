@@ -30,10 +30,12 @@ const router = useRouter()
   margin-top: 2rem;
   display: flex;
   flex-wrap: wrap;
+  place-content: center;
 }
 
 .cipher-card {
   flex: 1 0 29%;
+  max-width: 600px;
   margin: 2rem;
   background: var(--cryptotron-card-bg);
   border: 1px solid var(--cryptotron-border-glow);
