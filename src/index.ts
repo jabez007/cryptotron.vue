@@ -1,6 +1,5 @@
 import type { App } from 'vue';
 import type { Router } from 'vue-router';
-import CryptoTronApp from './App.vue'
 import CryptoTronRoutes from './router/routes.ts'
 
 interface PluginOptions {
@@ -9,7 +8,7 @@ interface PluginOptions {
 }
 
 export default {
-  app: CryptoTronApp,
+  app: () => import('./App.vue'),
   install(_app: App, options: PluginOptions) {
     CryptoTronRoutes(options.parentRouteName).forEach((r) => {
       if (!options.router.hasRoute(r.name)) {

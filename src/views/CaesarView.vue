@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { caesar } from 'cryptotron.js';
+import { caesar } from '@jabez007/cryptotron.js';
 import CipherCard from '@/components/CipherCard.vue';
 import KeyCaesar from '@/components/keys/KeyCaesar.vue';
 import { ref } from 'vue';

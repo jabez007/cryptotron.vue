@@ -1,19 +1,23 @@
 {
-  "name": "cryptotron.vue",
+  "name": "@jabez007/cryptotron.vue",
   "version": "0.0.0",
-  "private": true,
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "jabez007",
   "files": [
-    "lib"
+    "lib/**/*",
+    "README.md"
   ],
-  "main": "./lib/cryptotron-app.umd.cjs",
-  "module": "./lib/cryptotron-app.js",
+  "main": "./lib/cryptotron-app.umd.js",
+  "module": "./lib/cryptotron-app.es.js",
   "exports": {
     ".": {
-      "import": "./lib/cryptotron-app.js",
-      "require": "./lib/cryptotron-app.umd.cjs"
+      "import": "./lib/cryptotron-app.es.js",
+      "require": "./lib/cryptotron-app.umd.js"
     },
-    "./style.css": "./lib/cryptotron-app.css"
+    "./style.css": "./lib/cryptotron.vue.css"
   },
   "types": "./lib/index.d.ts",
   "scripts": {
@@ -25,15 +29,15 @@
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
+    "prepublishOnly": "npm run build:lib",
     "predeploy": "npm run build",
     "deploy": "push-dir --dir=dist --branch=main --cleanup"
   },
   "dependencies": {
-    "cryptotron.js": "file:../cryptotron.js",
-    "vue": "^3.5.13",
-    "vue-router": "^4.5.0"
+    "@jabez007/cryptotron.js": "^0.0.0"
   },
   "peerDependencies": {
+    "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {

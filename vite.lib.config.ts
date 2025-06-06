@@ -19,7 +19,8 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: "CryptoTronApp",
-      fileName: "cryptotron-app"
+      fileName: (format) => `cryptotron-app.${format}.js`,
+      formats: ["es", 'umd']
     },
     rollupOptions: {
       external: ["vue", "vue-router"],

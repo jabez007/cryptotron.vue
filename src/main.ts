@@ -3,8 +3,13 @@ import { createApp } from 'vue'
 import router from './router'
 import CryptoTronPlugin from './index.ts'
 
-const app = createApp(CryptoTronPlugin.app)
+CryptoTronPlugin.app().then((App) => {
+  const app = createApp(App.default)
 
-app.use(CryptoTronPlugin, { router })
-app.use(router)
-app.mount('#app')
+  app.use(CryptoTronPlugin, { router })
+  app.use(router)
+
+  app.mount('#app')
+})
+
+
