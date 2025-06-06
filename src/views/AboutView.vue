@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="about-content">
     <div class="about-hero">
       <h1 class="page-title">About CryptoTron</h1>
       <p class="hero-subtitle">Decrypt the Past • Encrypt the Future</p>
@@ -85,7 +85,7 @@
 </template>
 
 <style scoped>
-.main-content {
+.about-content {
   flex: 1;
   max-width: 1200px;
   margin: 0 auto;
@@ -95,7 +95,7 @@
 
 .page-title {
   font-family: 'Orbitron', monospace;
-  font-size: 2.5rem;
+  font-size: 2.3rem;
   font-weight: 700;
   text-align: center;
   margin-bottom: 3rem;
@@ -113,7 +113,7 @@
 }
 
 .hero-subtitle {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   color: var(--text-secondary);
   margin-top: 1rem;
   font-style: italic;
@@ -130,13 +130,14 @@
 }
 
 .about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
   margin-bottom: 3rem;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .about-card {
+  flex: 1 0 29%;
+  margin: 2rem;
   background: var(--cryptotron-card-bg);
   border: 1px solid var(--cryptotron-border-glow);
   border-radius: 12px;
@@ -145,6 +146,17 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   position: relative;
   overflow: hidden;
+}
+
+@media only screen and (max-width: 600px) {
+  .about-content {
+    padding: 0;
+  }
+
+  .about-card {
+    min-width: 100%;
+    margin: 1rem auto;
+  }
 }
 
 .about-card::before {
@@ -212,13 +224,14 @@
 }
 
 .tech-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
   margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .tech-badge {
+  flex: 1 0 29%;
+  margin: 1.5rem;
   background: rgba(0, 255, 255, 0.1);
   border: 1px solid rgba(0, 255, 255, 0.3);
   border-radius: 8px;
