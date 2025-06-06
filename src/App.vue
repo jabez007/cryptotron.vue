@@ -43,10 +43,16 @@ import { ref, watch } from "vue";
 const router = useRouter();
 const route = useRoute();
 
+console.debug(`Current URL: ${window.location.pathname}${window.location.hash}`);
+
+// Get the current route name to add children to
+const parentRouteName = route.name as string;
+console.debug(`Parent route name: ${parentRouteName}`);
+
 const cryptotronRoutes = [
   {
     name: "cryptotron-home",
-    path: "/",
+    path: parentRouteName ? "" : "/",
     component: () => import("@/views/HomeView.vue"),
   },
   {
@@ -60,12 +66,6 @@ const cryptotronRoutes = [
     component: () => import("@/views/CaesarView.vue"),
   }
 ]
-
-console.debug(`Current URL: ${window.location.pathname}${window.location.hash}`);
-
-// Get the current route name to add children to
-const parentRouteName = route.name as string;
-console.debug(`Parent route name: ${parentRouteName}`);
 
 cryptotronRoutes.forEach((r) => {
   if (!router.hasRoute(r.name)) {
