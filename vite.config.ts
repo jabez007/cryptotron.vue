@@ -7,7 +7,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import { name } from './package.json';
 
 const basePath = process.env.NODE_ENV === 'production'
-  ? `/${name}/`
+  ? `/${name.split('/').slice(-1)[0]}/`
   : '/';
 
 // https://vite.dev/config/
