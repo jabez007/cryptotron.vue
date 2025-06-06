@@ -1,3 +1,27 @@
+import type { App } from 'vue';
+import type { Router } from 'vue-router';
 import CryptoTronApp from './App.vue'
+import CryptoTronRoutes from './router/routes.ts'
 
-export default CryptoTronApp
+interface PluginOptions {
+  router: Router,
+  parentRouteName?: string
+}
+
+export default {
+  app: CryptoTronApp,
+  install(_app: App, options: PluginOptions) {
+    CryptoTronRoutes(options.parentRouteName).forEach((r) => {
+      if (!options.router.hasRoute(r.name)) {
+        console.debug(`Adding ${r.name} to router with path '${r.path}'`)
+        if (!options.parentRouteName) {
+          options.router.addRoute(r)
+        } else {
+          options.router.addRoute(options.parentRouteName, r)
+        }
+      } else {
+        console.warn(`Route ${r.name} already exists on router`)
+      }
+    })
+  }
+}

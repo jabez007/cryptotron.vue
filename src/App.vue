@@ -40,92 +40,13 @@ import IconDocumentation from "@/components/icons/IconDocumentation.vue";
 import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 import { ref, watch } from "vue";
 
-const router = useRouter();
-const route = useRoute();
+const props = defineProps(['appRouter', 'appRoute'])
 
-console.debug(`Current URL: ${window.location.pathname}${window.location.hash}`);
+const router = useRouter() || props.appRouter;
+const route = useRoute() || props.appRoute;
 
-// Get the current route name to add children to
-const parentRouteName = route.name as string;
-console.debug(`Parent route name: ${parentRouteName}`);
-
-const cryptotronRoutes = [
-  {
-    name: "cryptotron-home",
-    path: parentRouteName ? "" : "/",
-    component: () => import("@/views/HomeView.vue"),
-  },
-  {
-    name: "cryptotron-about",
-    path: "/about",
-    component: () => import("@/views/AboutView.vue"),
-  },
-  {
-    name: "cryptotron-caesar",
-    path: "/caesar",
-    component: () => import("@/views/CaesarView.vue"),
-  }
-]
-
-cryptotronRoutes.forEach((r) => {
-  if (!router.hasRoute(r.name)) {
-    console.debug(`Adding ${r.name} to router`)
-    if (!parentRouteName) {
-      router.addRoute(r)
-    } else {
-      router.addRoute(parentRouteName, r)
-    }
-  } else {
-    console.warn(`Route ${r.name} already exists on router`)
-  }
-})
-
-console.debug(`Route query: ${JSON.stringify(route.query)}`);
-console.debug(`Window location search: ${window.location.search}`);
-console.debug(`Router history base: ${router.options.history.base}`);
-setTimeout(() => {
-  let initialRoute;
-  if (window.location.search) {
-    console.debug("Using location query parameter");
-    initialRoute = router.resolve(
-      new URLSearchParams(window.location.search).get("initialRoute") || {
-        name: "cryptotron-home",
-      },
-    );
-  } else if (Object.keys(route.query).length > 0) {
-    console.debug("Using route query parameter");
-    initialRoute = router.resolve(
-      (route.query.initialRoute as string) || { name: "cryptotron-home" },
-    );
-  } else if (router.options.history.base.endsWith("#")) {
-    console.debug("Using hash");
-    initialRoute = router.resolve(`${window.location.hash.slice(1)}`);
-  } else {
-    console.debug("Using path");
-    initialRoute = router.resolve(
-      `${window.location.pathname.slice(router.options.history.base.length)}`,
-    );
-  }
-
-  console.debug(`Initial route matched: ${JSON.stringify(initialRoute.matched)}`);
-  if (initialRoute.matched.length > 0 &&
-    initialRoute.matched.some((p) => p.path === route.path)) {
-    console.debug('Already on correct route, skipping navigation')
-    router.replace(initialRoute)
-    return
-  }
-
-  if (
-    initialRoute.matched.length > 0 &&
-    initialRoute.matched.some((p) => p.path === initialRoute.path)
-  ) {
-    console.debug(`Navigating to initial route: ${initialRoute.fullPath}`);
-    router.push(initialRoute);
-  } else {
-    console.warn(`No route for ${initialRoute.fullPath}`);
-    router.push({ name: "cryptotron-home" });
-  }
-}, 100);
+console.debug(`Current router is`, router)
+console.debug(`Current route is`, route)
 
 /* nav menu */
 const menuOpen = ref(false);
