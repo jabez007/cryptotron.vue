@@ -6,6 +6,7 @@
     "access": "public"
   },
   "author": "jabez007",
+  "license": "GPL-3.0-only",
   "files": [
     "lib/**/*",
     "README.md"
