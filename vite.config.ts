@@ -10,6 +10,8 @@ const basePath = process.env.NODE_ENV === 'production'
   ? `/${name.split('/').slice(-1)[0]}/`
   : '/';
 
+console.debug(`Base path set to: ${basePath}`)
+
 // https://vite.dev/config/
 export default defineConfig({
   base: basePath,
