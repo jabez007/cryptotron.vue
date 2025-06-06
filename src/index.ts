@@ -10,9 +10,12 @@ interface PluginOptions {
 export default {
   app: () => import('./App.vue'),
   install(_app: App, options: PluginOptions) {
+
     CryptoTronRoutes(options.parentRouteName).forEach((r) => {
+
       if (!options.router.hasRoute(r.name)) {
         console.debug(`Adding ${r.name} to router with path '${r.path}'`)
+
         if (!options.parentRouteName) {
           console.debug(`Adding to parent ${options.parentRouteName}`)
           options.router.addRoute(r)
@@ -20,6 +23,7 @@ export default {
           console.debug(`Adding to root`)
           options.router.addRoute(options.parentRouteName, r)
         }
+
       } else {
         console.warn(`Route ${r.name} already exists on router`)
       }

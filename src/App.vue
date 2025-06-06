@@ -40,10 +40,8 @@ import IconDocumentation from "@/components/icons/IconDocumentation.vue";
 import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 import { ref, watch } from "vue";
 
-const props = defineProps(['appRouter', 'appRoute'])
-
-const router = useRouter() || props.appRouter;
-const route = useRoute() || props.appRoute;
+const router = useRouter();
+const route = useRoute();
 
 console.debug(`Current router is`, router)
 console.debug(`Current route is`, route)
