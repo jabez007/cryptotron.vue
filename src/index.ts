@@ -16,12 +16,12 @@ export default {
       if (!options.router.hasRoute(r.name)) {
         console.debug(`Adding ${r.name} to router with path '${r.path}'`)
 
-        if (!options.parentRouteName) {
+        if (options.parentRouteName) {
           console.debug(`Adding to parent ${options.parentRouteName}`)
-          options.router.addRoute(r)
+          options.router.addRoute(options.parentRouteName, r)
         } else {
           console.debug(`Adding to root`)
-          options.router.addRoute(options.parentRouteName, r)
+          options.router.addRoute(r)
         }
 
       } else {
