@@ -82,8 +82,17 @@ const clear = () => {
   text-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
 }
 
+.cipher-container {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .cipher-theory,
 .cipher-practice {
+  max-width: calc(100vw - 7rem);
+  min-width: 100%;
+  margin-bottom: 2rem;
   background: var(--cryptotron-card-bg);
   border: 1px solid var(--cryptotron-border-glow);
   border-radius: 12px;
@@ -234,6 +243,7 @@ const clear = () => {
 
 .button-group {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1rem;
 }
