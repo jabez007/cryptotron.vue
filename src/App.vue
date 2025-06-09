@@ -34,7 +34,8 @@
     </div>
 
     <footer class="app-footer">
-      <button class="bug-report-btn" @click="openIssues">
+      <button class="bug-report-btn" aria-label="Report a bug or issue" title="Report a bug or issue"
+        @click="openIssues">
         <IconBug />
       </button>
     </footer>
