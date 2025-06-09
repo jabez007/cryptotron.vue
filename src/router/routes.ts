@@ -1,7 +1,9 @@
-export default (parentRouteName?: string) => [
+import type { RouteRecord } from 'vue-router';
+
+export default (parentRoute?: RouteRecord) => [
   {
     name: "cryptotron-home",
-    path: parentRouteName ? "" : "/",
+    path: parentRoute ? "" : "/",
     component: () => import("@/views/HomeView.vue"),
   },
   {
