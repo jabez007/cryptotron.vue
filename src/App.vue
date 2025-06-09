@@ -32,10 +32,18 @@
         </transition>
       </RouterView>
     </div>
+
+    <footer class="app-footer">
+      <button class="bug-report-btn" @click="openIssues">
+        <IconBug />
+      </button>
+    </footer>
+
   </div>
 </template>
 
 <script setup lang="ts">
+import IconBug from "@/components/icons/IconBug.vue";
 import IconDocumentation from "@/components/icons/IconDocumentation.vue";
 import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 import { ref, watch } from "vue";
@@ -65,6 +73,13 @@ watch(route, () => {
 const rootName = router.resolve("/").name
 console.debug(`Root route resolved to ${rootName as string}`)
 const isSubApp = ref(rootName !== 'cryptotron-home')
+
+/* Bug report functionality */
+const openIssues = () => {
+  // Replace with your actual GitHub repo URL
+  const githubIssuesUrl = 'https://github.com/jabez007/cryptotron.vue/issues';
+  window.open(githubIssuesUrl, '_blank', 'noopener,noreferrer');
+};
 </script>
 
 <style>
@@ -264,67 +279,87 @@ nav a.router-link-exact-active:hover {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
+  padding-bottom: 3rem;
   overflow: auto;
   display: flex;
   flex-direction: column;
   place-items: center;
 }
 
+/* Footer Styles */
+.app-footer {
+  min-width: 100%;
+  background: linear-gradient(135deg, var(--cryptotron-darker-bg) 0%, rgba(15, 15, 25, 0.95) 100%);
+  /*border-top: 2px solid var(--neon-cyan);*/
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  padding: 0.5rem 2rem;
+  display: flex;
+  justify-content: start;
+  align-items: start;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  bottom: 0;
+  z-index: 50;
+}
+
+.bug-report-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--neon-cyan);
+  border-radius: 12px;
+  padding: 0.5rem;
+  color: var(--neon-cyan);
+  font-family: "Space Mono", monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.bug-report-btn:hover {
+  background: rgba(0, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.bug-report-btn:active {
+  transform: translateY(0);
+}
+
+.bug-report-btn svg {
+  transition: all 0.3s ease;
+}
+
+.bug-report-btn:hover svg {
+  animation: bug-wiggle 0.6s ease-in-out;
+}
+
+.bug-text {
+  font-weight: 600;
+}
+
+@keyframes bug-wiggle {
+
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(-5deg) scale(1.1);
+  }
+
+  75% {
+    transform: rotate(5deg) scale(1.1);
+  }
+}
+
 /* Transition Animations */
-
-/* Cyber Fade */
-.cyber-fade-enter-active,
-.cyber-fade-leave-active {
-  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.cyber-fade-enter-from {
-  opacity: 0;
-  filter: brightness(0) hue-rotate(180deg);
-  transform: scale(1.1);
-}
-
-.cyber-fade-leave-to {
-  opacity: 0;
-  filter: brightness(0) hue-rotate(-180deg);
-  transform: scale(0.9);
-}
-
-/* Cyber Slide Left */
-.cyber-slide-left-enter-active,
-.cyber-slide-left-leave-active {
-  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.cyber-slide-left-enter-from {
-  transform: translateX(100%) skewX(-5deg);
-  opacity: 0;
-  filter: hue-rotate(90deg) saturate(2);
-}
-
-.cyber-slide-left-leave-to {
-  transform: translateX(-100%) skewX(5deg);
-  opacity: 0;
-  filter: hue-rotate(-90deg) saturate(0.5);
-}
-
-/* Cyber Slide Right */
-.cyber-slide-right-enter-active,
-.cyber-slide-right-leave-active {
-  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.cyber-slide-right-enter-from {
-  transform: translateX(-100%) skewX(5deg);
-  opacity: 0;
-  filter: hue-rotate(-90deg) saturate(2);
-}
-
-.cyber-slide-right-leave-to {
-  transform: translateX(100%) skewX(-5deg);
-  opacity: 0;
-  filter: hue-rotate(90deg) saturate(0.5);
-}
 
 /* Cyber Glitch */
 .cyber-glitch-enter-active {
