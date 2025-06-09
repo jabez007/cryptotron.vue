@@ -1,28 +1,24 @@
 import type { App } from 'vue';
-import type { Router, RouteRecord } from 'vue-router';
+import type { Router } from 'vue-router';
 import CryptoTronRoutes from './router/routes.ts'
 
 interface PluginOptions {
   router: Router,
-  parentRoute?: RouteRecord
+  parentRouteName?: string
 }
 
 export default {
   app: () => import('./App.vue'),
   install(_app: App, options: PluginOptions) {
 
-    if (options.parentRoute) {
-      options.parentRoute.children = options.parentRoute.children ?? []
-    }
-
-    CryptoTronRoutes(options.parentRoute).forEach((r) => {
+    CryptoTronRoutes(options.parentRouteName).forEach((r) => {
 
       if (!options.router.hasRoute(r.name)) {
         console.debug(`Adding ${r.name} to router with path '${r.path}'`)
 
-        if (options.parentRoute) {
-          console.debug(`Adding to parent ${options.parentRoute.name as string}`)
-          options.parentRoute.children.push(r)
+        if (options.parentRouteName) {
+          console.debug(`Adding to parent ${options.parentRouteName}`)
+          options.router.addRoute(options.parentRouteName, r)
         } else {
           console.debug(`Adding to root`)
           options.router.addRoute(r)
@@ -34,8 +30,5 @@ export default {
 
     })
 
-    if (options.parentRoute) {
-      options.router.addRoute(options.parentRoute)
-    }
   }
 }
