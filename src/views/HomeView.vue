@@ -1,26 +1,31 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
 </script>
 
 <template>
   <div class="cipher-grid">
     <div class="cipher-card" @click="router.push({ name: 'cryptotron-caesar' })">
       <h3>Caesar Cipher</h3>
-      <p>The simplest substitution cipher, used by Julius Caesar himself. Shift each letter by a fixed number of
-        positions in the alphabet.</p>
+      <p>
+        The simplest substitution cipher, used by Julius Caesar himself. Shift each letter by a
+        fixed number of positions in the alphabet.
+      </p>
     </div>
-    <div class="cipher-card">
+    <div class="cipher-card" @click="router.push({ name: 'cryptotron-vigenere' })">
       <h3>Vigenère Cipher</h3>
-      <p>A polyalphabetic substitution cipher that uses a keyword to create multiple Caesar shifts, making it much
-        harder to crack.</p>
+      <p>
+        A polyalphabetic substitution cipher that uses a keyword to create multiple Caesar shifts,
+        making it much harder to crack.
+      </p>
     </div>
     <div class="cipher-card">
       <h3>Polybius Square</h3>
-      <p>A digraph substitution cipher that encrypts pairs of letters using a 5×5 grid of letters based on a
-        keyword.</p>
+      <p>
+        A digraph substitution cipher that encrypts pairs of letters using a 5×5 grid of letters
+        based on a keyword.
+      </p>
     </div>
   </div>
 </template>

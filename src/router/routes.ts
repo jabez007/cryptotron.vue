@@ -1,20 +1,25 @@
 export default (parentRouteName?: string) => {
-  const rootPath = parentRouteName ? "" : "/"
+  const rootPath = parentRouteName ? '' : '/'
   return [
     {
-      name: "cryptotron-home",
+      name: 'cryptotron-home',
       path: rootPath,
-      component: () => import("@/views/HomeView.vue"),
+      component: () => import('@/views/HomeView.vue'),
     },
     {
-      name: "cryptotron-about",
+      name: 'cryptotron-about',
       path: `${rootPath}about`,
-      component: () => import("@/views/AboutView.vue"),
+      component: () => import('@/views/AboutView.vue'),
     },
     {
-      name: "cryptotron-caesar",
+      name: 'cryptotron-caesar',
       path: `${rootPath}caesar`,
-      component: () => import("@/views/CaesarView.vue"),
-    }
+      component: () => import('@/views/CaesarView.vue'),
+    },
+    {
+      name: 'cryptotron-vigenere',
+      path: `${rootPath}caesar`,
+      component: () => import('@/views/VigenereView.vue'),
+    },
   ]
 }

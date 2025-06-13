@@ -23,6 +23,7 @@
       <RouterLink :to="{ name: 'cryptotron-home' }">Home</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-about' }">About</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-caesar' }">Caesar</RouterLink>
+      <RouterLink :to="{ name: 'cryptotron-vigenere' }">Vigenère</RouterLink>
     </nav>
 
     <div id="app-content">
@@ -39,56 +40,55 @@
         <IconBug />
       </button>
     </footer>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import IconBug from "@/components/icons/IconBug.vue";
-import IconDocumentation from "@/components/icons/IconDocumentation.vue";
-import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
-import { ref, watch } from "vue";
+import IconBug from '@/components/icons/IconBug.vue'
+import IconDocumentation from '@/components/icons/IconDocumentation.vue'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+import { ref, watch } from 'vue'
 
-const router = useRouter();
-const route = useRoute();
+const router = useRouter()
+const route = useRoute()
 
 console.debug(`Current router is`, router)
 console.debug(`Current route is`, route)
 
 /* nav menu */
-const menuOpen = ref(false);
+const menuOpen = ref(false)
 
 const toggleMenu = () => {
-  menuOpen.value = !menuOpen.value;
-};
+  menuOpen.value = !menuOpen.value
+}
 
 const closeMenu = () => {
-  menuOpen.value = false;
-};
+  menuOpen.value = false
+}
 
 watch(route, () => {
-  closeMenu();
-});
+  closeMenu()
+})
 
 /* Check if runing as sub-app to avoid displaying duplicate home links */
-const rootName = router.resolve("/").name
+const rootName = router.resolve('/').name
 console.debug(`Root route resolved to ${rootName as string}`)
 const isSubApp = ref(rootName !== 'cryptotron-home')
 
 /* Bug report functionality */
 const openIssues = () => {
   // Replace with your actual GitHub repo URL
-  const githubIssuesUrl = 'https://github.com/jabez007/cryptotron.vue/issues';
-  window.open(githubIssuesUrl, '_blank', 'noopener,noreferrer');
-};
+  const githubIssuesUrl = 'https://github.com/jabez007/cryptotron.vue/issues'
+  window.open(githubIssuesUrl, '_blank', 'noopener,noreferrer')
+}
 </script>
 
 <style>
-@import "@/assets/base.css";
+@import '@/assets/base.css';
 </style>
 
 <style scoped>
-@import "@/assets/main.css";
+@import '@/assets/main.css';
 
 header {
   min-width: 100%;
@@ -111,7 +111,7 @@ header {
   cursor: pointer;
   display: flex;
   align-items: center;
-  font-family: "Orbitron", monospace;
+  font-family: 'Orbitron', monospace;
   font-size: 2rem;
   font-weight: 900;
   background: linear-gradient(45deg, var(--neon-cyan), var(--neon-magenta));
@@ -221,7 +221,7 @@ nav a {
   overflow: hidden;
   display: block;
   margin-bottom: 0.5rem;
-  font-family: "Space Mono", monospace;
+  font-family: 'Space Mono', monospace;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 0.9rem;
@@ -236,7 +236,7 @@ nav a.router-link-exact-active {
 }
 
 nav a::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: -100%;
@@ -260,7 +260,7 @@ nav a.router-link-exact-active:hover {
 }
 
 .nav-category {
-  font-family: "Orbitron", monospace;
+  font-family: 'Orbitron', monospace;
   font-size: 0.8rem;
   color: var(--neon-magenta);
   text-transform: uppercase;
@@ -312,7 +312,7 @@ nav a.router-link-exact-active:hover {
   border-radius: 12px;
   padding: 0.5rem;
   color: var(--neon-cyan);
-  font-family: "Space Mono", monospace;
+  font-family: 'Space Mono', monospace;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 1px;

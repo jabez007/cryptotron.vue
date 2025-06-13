@@ -1,7 +1,7 @@
 <template>
   <div class="form-control">
     <label class="control-label">Shift Value:</label>
-    <input class="cipher-input" type="number" v-model.lazy.number="shift.value" min="1" max="25">
+    <input class="cipher-input" type="number" v-model.lazy.number="shift.value" min="1" max="25" />
     <div v-if="shift.hasError" class="error-messages">
       <p v-for="error in shift.errors" :key="error">{{ error }}</p>
     </div>
@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { useCipherKey, validationRules } from './mixin';
+import { useCipherKey, validationRules } from './mixin'
 
 interface CaesarCipherKey {
   shift: number
@@ -21,8 +21,8 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   cipherKey: () => ({
-    shift: 0
-  })
+    shift: 0,
+  }),
 })
 
 const emit = defineEmits<{
@@ -30,28 +30,11 @@ const emit = defineEmits<{
 }>()
 
 const { createPropertyComputed } = useCipherKey(props, emit, {
-  shift: [
-    validationRules.required,
-    validationRules.numberRange(0, 25)
-  ]
+  shift: [validationRules.required, validationRules.numberRange(0, 25)],
 })
 const shift = createPropertyComputed('shift')
 </script>
 
 <style scoped>
-.form-control {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.cipher-input.has-error {
-  border-color: red;
-  outline: 1px solid red;
-}
-
-.error-messages {
-  color: red;
-  font-size: 0.875rem;
-}
+@import './cipher-key.css';
 </style>

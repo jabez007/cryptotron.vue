@@ -1,8 +1,7 @@
 <template>
   <div class="cipher-content">
-    <h1 class="page-title">Caesar Cipher</h1>
+    <h1 class="page-title">{{ title }}</h1>
     <div class="cipher-container">
-
       <div class="tab-navigation">
         <button @click="cipherActiveTab = 'theory'" :class="['tab-button', { active: cipherActiveTab === 'theory' }]">
           📚 Theory
@@ -39,8 +38,9 @@
             </div>
 
             <div class="button-group">
-              <button @click="encryptOutput = props.encryptAlgorithm(encryptInput)"
-                class="cipher-button">Encrypt</button>
+              <button @click="encryptOutput = props.encryptAlgorithm(encryptInput)" class="cipher-button">
+                Encrypt
+              </button>
               <button @click="clearEncrypt" class="cipher-button">Clear</button>
             </div>
 
@@ -62,28 +62,30 @@
             </div>
 
             <div class="button-group">
-              <button @click="decryptOutput = props.decryptAlgorithm(decryptInput)"
-                class="cipher-button">Decrypt</button>
+              <button @click="decryptOutput = props.decryptAlgorithm(decryptInput)" class="cipher-button">
+                Decrypt
+              </button>
               <button @click="clearDecrypt" class="cipher-button">Clear</button>
               <button class="cipher-button">Crack</button>
             </div>
 
-
             <CipherOutput label="Output" :text="decryptOutput" />
           </div>
         </div>
-
       </div>
-
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import CipherOutput from './CipherOutput.vue';
-import { ref } from 'vue';
+import CipherOutput from './CipherOutput.vue'
+import { ref } from 'vue'
 
 const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
   encryptAlgorithm: {
     type: Function,
     required: true,
@@ -100,7 +102,7 @@ const props = defineProps({
     type: Function,
     required: false,
   },
-});
+})
 
 const cipherActiveTab = ref('theory')
 
@@ -108,16 +110,16 @@ const encryptInput = ref('')
 const encryptOutput = ref('')
 
 const clearEncrypt = () => {
-  encryptInput.value = '';
-  encryptOutput.value = '';
+  encryptInput.value = ''
+  encryptOutput.value = ''
 }
 
 const decryptInput = ref('')
 const decryptOutput = ref('')
 
 const clearDecrypt = () => {
-  decryptInput.value = '';
-  decryptOutput.value = '';
+  decryptInput.value = ''
+  decryptOutput.value = ''
 }
 </script>
 
