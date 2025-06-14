@@ -1,28 +1,14 @@
-<!-- Flowchart.vue -->
 <script setup lang="ts">
-import { ref } from 'vue'
-import { MarkerType, useVueFlow, VueFlow } from '@vue-flow/core'
+import { onMounted, nextTick, ref } from 'vue'
+import { MarkerType, useVueFlow, VueFlow, type Edge, type Node } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 
-const nodes = ref([
-  { id: '1', label: 'Node 1', position: { x: 250, y: 5 } },
-  { id: '2', label: 'Node 2', position: { x: 100, y: 100 } },
-  { id: '3', label: 'Node 3', position: { x: 400, y: 100 } },
-  { id: '4', label: 'Node 4', position: { x: 400, y: 200 } },
-])
+const isReady = ref(false)
 
-const edges = ref([
-  {
-    id: 'e1-2',
-    source: '1',
-    target: '2',
-    updatable: true,
-    animated: true,
-    markerEnd: MarkerType.Arrow,
-  },
-  { id: 'e1-3', source: '1', target: '3' },
-])
+const nodes = ref<Node[]>([])
+
+const edges = ref<Edge[]>([])
 
 const {
   addEdges,
@@ -33,6 +19,34 @@ const {
   removeEdges,
   updateEdge,
 } = useVueFlow()
+
+onMounted(() => {
+  setTimeout(async () => {
+    nodes.value.push(
+      ...[
+        { id: '1', label: 'Node 1', position: { x: 250, y: 5 } },
+        { id: '2', label: 'Node 2', position: { x: 100, y: 100 } },
+        { id: '3', label: 'Node 3', position: { x: 400, y: 100 } },
+        { id: '4', label: 'Node 4', position: { x: 400, y: 200 } },
+      ],
+    )
+    edges.value.push(
+      ...[
+        {
+          id: 'e1-2',
+          source: '1',
+          target: '2',
+          updatable: true,
+          animated: true,
+          markerEnd: MarkerType.Arrow,
+        },
+        { id: 'e1-3', source: '1', target: '3' },
+      ],
+    )
+    await nextTick()
+    isReady.value = true
+  }, 100)
+})
 
 onNodeClick(({ event, node }) => {
   console.debug('On Node Click', event, node)
@@ -60,8 +74,8 @@ onEdgeUpdate(({ connection, edge }) => {
 </script>
 
 <template>
-  <VueFlow class="dark basic-flow" :nodes="nodes" :edges="edges" :connection-radius="53" :edge-updater-radius="23"
-    fit-view-on-init>
+  <VueFlow v-if="isReady" class="dark basic-flow" :nodes="nodes" :edges="edges" :connection-radius="53"
+    :edge-updater-radius="23" fit-view-on-init>
     <Background />
     <Controls position="top-left"></Controls>
   </VueFlow>
@@ -81,6 +95,7 @@ onEdgeUpdate(({ connection, edge }) => {
 .basic-flow.dark .vue-flow__node {
   background: var(--cryptotron-dark-bg);
   color: var(--cryptotron-text-primary);
+  box-sizing: border-box;
 }
 
 .basic-flow.dark .vue-flow__node.selected {
@@ -127,7 +142,7 @@ onEdgeUpdate(({ connection, edge }) => {
 
 <style scoped>
 .vue-flow {
-  height: 33vh;
+  height: 400px;
   border: 1px solid var(--cryptotron-border-glow);
   border-radius: 12px;
 }
