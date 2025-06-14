@@ -36,6 +36,8 @@
   },
   "dependencies": {
     "@jabez007/cryptotron.js": "^0.0.0",
+    "@vue-flow/background": "^1.3.2",
+    "@vue-flow/controls": "^1.1.2",
     "@vue-flow/core": "^1.45.0"
   },
   "peerDependencies": {
