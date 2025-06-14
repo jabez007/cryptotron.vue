@@ -74,11 +74,13 @@ onEdgeUpdate(({ connection, edge }) => {
 </script>
 
 <template>
-  <VueFlow v-if="isReady" class="dark basic-flow" :nodes="nodes" :edges="edges" :connection-radius="53"
-    :edge-updater-radius="23" fit-view-on-init>
-    <Background />
-    <Controls position="top-left"></Controls>
-  </VueFlow>
+  <div class="builder-container">
+    <VueFlow v-if="isReady" class="dark basic-flow" :nodes="nodes" :edges="edges" :connection-radius="53"
+      :edge-updater-radius="23" fit-view-on-init>
+      <Background />
+      <Controls position="top-left"></Controls>
+    </VueFlow>
+  </div>
 </template>
 
 <style>
@@ -141,6 +143,11 @@ onEdgeUpdate(({ connection, edge }) => {
 </style>
 
 <style scoped>
+.builder-container {
+  height: 100%;
+  width: 100%;
+}
+
 .vue-flow {
   height: 400px;
   border: 1px solid var(--cryptotron-border-glow);
