@@ -12,6 +12,11 @@ export default (parentRouteName?: string) => {
       component: () => import('@/views/AboutView.vue'),
     },
     {
+      name: 'cryptotron-builder',
+      path: `${rootPath}builder`,
+      component: () => import('@/views/BuilderView.vue'),
+    },
+    {
       name: 'cryptotron-caesar',
       path: `${rootPath}caesar`,
       component: () => import('@/views/CaesarView.vue'),
