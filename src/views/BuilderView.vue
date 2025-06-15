@@ -10,6 +10,7 @@ import {
 } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
+import CipherOutput from '@/components/CipherOutput.vue'
 
 const isReady = ref(false)
 
@@ -59,6 +60,65 @@ onNodeClick(({ event, node }) => {
   console.debug('On Node Click', event, node)
 })
 
+/*
+ * The Union-Find structure keeps track of connected components.
+ */
+class UnionFind {
+  private parent: Record<string, string>
+  private rank: Record<string, number>
+  private nodes: Set<string>
+
+  constructor() {
+    this.parent = {}
+    this.rank = {}
+    this.nodes = new Set()
+  }
+
+  makeSet(x: string): void {
+    if (!this.nodes.has(x)) {
+      this.parent[x] = x
+      this.rank[x] = 0
+      this.nodes.add(x)
+    }
+  }
+
+  find(x: string): string {
+    if (this.parent[x] !== x) {
+      this.parent[x] = this.find(this.parent[x]) // Path compression
+    }
+    return this.parent[x]
+  }
+
+  union(x: string, y: string): boolean {
+    const rootX = this.find(x)
+    const rootY = this.find(y)
+
+    if (rootX === rootY) {
+      return false // Already in the same set
+    }
+
+    // Union by rank
+    if (this.rank[rootX] > this.rank[rootY]) {
+      this.parent[rootY] = rootX
+    } else if (this.rank[rootX] < this.rank[rootY]) {
+      this.parent[rootX] = rootY
+    } else {
+      this.parent[rootY] = rootX
+      this.rank[rootX]++
+    }
+    return true
+  }
+
+  // New method to find root nodes
+  getRootNodes(): string[] {
+    const roots = new Set<string>()
+    for (const node of this.nodes) {
+      roots.add(this.find(node))
+    }
+    return Array.from(roots)
+  }
+}
+
 const validateNewEdge = (
   existingEdges: Edge[],
   newEdge: Connection,
@@ -78,53 +138,7 @@ const validateNewEdge = (
       return false
     }
   }
-  /*
-   * The Union-Find structure keeps track of connected components.
-   */
-  class UnionFind {
-    private parent: Record<string, string>
-    private rank: Record<string, number>
-
-    constructor() {
-      this.parent = {}
-      this.rank = {}
-    }
-
-    makeSet(x: string): void {
-      if (!(x in this.parent)) {
-        this.parent[x] = x
-        this.rank[x] = 0
-      }
-    }
-
-    find(x: string): string {
-      if (this.parent[x] !== x) {
-        this.parent[x] = this.find(this.parent[x]) // Path compression
-      }
-      return this.parent[x]
-    }
-
-    union(x: string, y: string): boolean {
-      const rootX = this.find(x)
-      const rootY = this.find(y)
-
-      if (rootX === rootY) {
-        return false // Already in the same set
-      }
-
-      // Union by rank
-      if (this.rank[rootX] > this.rank[rootY]) {
-        this.parent[rootY] = rootX
-      } else if (this.rank[rootX] < this.rank[rootY]) {
-        this.parent[rootX] = rootY
-      } else {
-        this.parent[rootY] = rootX
-        this.rank[rootX]++
-      }
-      return true
-    }
-  }
-
+  /* */
   function willCreateCycle(edges: Edge[], newEdge: Connection): boolean {
     const uf = new UnionFind()
 
@@ -186,6 +200,96 @@ onEdgeUpdate(({ connection, edge }) => {
   /* */
   updateEdge(edge, connection)
 })
+
+/* */
+const inputText = ref('')
+const outputText = ref('')
+
+const clear = () => {
+  inputText.value = ''
+  outputText.value = ''
+}
+
+class GraphAnalyzer {
+  private unionFind = new UnionFind()
+  private adjacencyList: Record<string, string[]> = {}
+  private rootNodes: string[] = []
+
+  constructor(edges: Edge[]) {
+    // Build adjacency list and union find structure
+    for (const edge of edges) {
+      this.unionFind.makeSet(edge.source)
+      this.unionFind.makeSet(edge.target)
+      this.unionFind.union(edge.source, edge.target)
+
+      if (!this.adjacencyList[edge.source]) {
+        this.adjacencyList[edge.source] = []
+      }
+      this.adjacencyList[edge.source].push(edge.target)
+
+      // For undirected graph, add reverse connection
+      if (!this.adjacencyList[edge.target]) {
+        this.adjacencyList[edge.target] = []
+      }
+      this.adjacencyList[edge.target].push(edge.source)
+    }
+
+    this.rootNodes = this.unionFind.getRootNodes()
+  }
+
+  getRootNodes(): string[] {
+    return this.rootNodes
+  }
+
+  getConnectedNodes(root?: string): string[] {
+    const startNode = root || this.rootNodes[0]
+    if (!startNode) return []
+
+    const visited = new Set<string>()
+    const result: string[] = []
+
+    // Depth-First Search to traverse connections
+    const dfs = (node: string) => {
+      visited.add(node)
+      result.push(node)
+
+      for (const neighbor of this.adjacencyList[node] || []) {
+        if (!visited.has(neighbor)) {
+          dfs(neighbor)
+        }
+      }
+    }
+
+    dfs(startNode)
+    return result
+  }
+
+  getAllConnectedComponents(): string[][] {
+    return this.rootNodes.map((root) => this.getConnectedNodes(root))
+  }
+}
+
+const encrypt = () => {
+  console.debug('Encrypting message')
+
+  const currentEdges = getEdges.value
+  console.debug('Current edges', currentEdges)
+
+  const graph = new GraphAnalyzer(currentEdges)
+  console.log('Found root nodes', graph.getRootNodes())
+
+  if (graph.getRootNodes().length > 1) {
+    console.warn('More than 1 root node found')
+    return
+  }
+  if (graph.getRootNodes().length < 1) {
+    console.warn('No root node found')
+    return
+  }
+
+  const traversal = graph.getConnectedNodes()
+  console.debug('Encryption traversal', traversal)
+}
 </script>
 
 <template>
@@ -195,6 +299,26 @@ onEdgeUpdate(({ connection, edge }) => {
       <Background />
       <Controls position="top-left"></Controls>
     </VueFlow>
+
+    <div class="cipher-practice">
+      <h2 class="section-title">Encrypt/Decrypt Messages</h2>
+      <div class="control-group">
+        <slot name="cipherKey"></slot>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label">Input Text:</label>
+        <textarea class="cipher-textarea" v-model="inputText" placeholder="Enter text to encrypt/decrypt..."></textarea>
+      </div>
+
+      <div class="button-group">
+        <button class="cipher-button" @click="encrypt">Encrypt</button>
+        <button class="cipher-button">Decrypt</button>
+        <button class="cipher-button" @click="clear">Clear</button>
+      </div>
+
+      <CipherOutput label="Output" :text="outputText" />
+    </div>
   </div>
 </template>
 
@@ -258,13 +382,15 @@ onEdgeUpdate(({ connection, edge }) => {
 </style>
 
 <style scoped>
+@import '@/assets/cipher-card.css';
+
 .builder-container {
   height: 100%;
   width: 100%;
 }
 
 .vue-flow {
-  height: 400px;
+  height: 33vh;
   border: 1px solid var(--cryptotron-border-glow);
   border-radius: 12px;
 }

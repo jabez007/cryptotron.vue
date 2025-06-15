@@ -36,5 +36,5 @@ const keyword = createPropertyComputed('keyword')
 </script>
 
 <style scoped>
-@import './cipher-key.css';
+@import '@/assets/cipher-key.css';
 </style>
