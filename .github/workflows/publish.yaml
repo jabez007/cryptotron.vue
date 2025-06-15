@@ -29,7 +29,7 @@ jobs:
       contents: write # Required to upload assets to the release
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -54,7 +54,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Shared Publish to GHPR
         uses: McCann-Hub/create-typescript-template/.github/shared/ghpr/publish@master
@@ -69,7 +69,7 @@ jobs:
       id-token: write # The OIDC ID token is used for authentication with JSR.
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Shared Publish to JSR
         if: ${{ hashFiles('deno.json') != '' }}
