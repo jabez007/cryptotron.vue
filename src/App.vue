@@ -22,6 +22,7 @@
       </RouterLink>
       <RouterLink :to="{ name: 'cryptotron-home' }">Home</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-about' }">About</RouterLink>
+      <RouterLink :to="{ name: 'cryptotron-builder' }">BYOA</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-caesar' }">Caesar</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-vigenere' }">Vigenère</RouterLink>
     </nav>

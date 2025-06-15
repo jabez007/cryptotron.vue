@@ -555,9 +555,7 @@ const decrypt = () => {
 
         <div class="modal-footer">
           <button class="modal-button modal-button-cancel" @click="closeNodeModal">Cancel</button>
-          <button class="modal-button modal-button-save" @click="updateNodeKey">
-            Save Changes
-          </button>
+          <button class="cipher-button" @click="updateNodeKey">Save Changes</button>
         </div>
       </div>
     </div>
@@ -592,7 +590,7 @@ const decrypt = () => {
           <button class="modal-button modal-button-cancel" @click="closeAddNodeModal">
             Cancel
           </button>
-          <button class="modal-button modal-button-save" @click="addNewNode">Add Node</button>
+          <button class="cipher-button" @click="addNewNode">Add Node</button>
         </div>
       </div>
     </div>
@@ -679,7 +677,7 @@ const decrypt = () => {
   right: 20px;
   width: 56px;
   height: 56px;
-  background: var(--cryptotron-border-glow, #4a9eff);
+  background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -689,16 +687,31 @@ const decrypt = () => {
   transition: all 0.3s ease;
   z-index: 100;
   color: white;
+  overflow: hidden;
 }
 
 .add-node-button:hover {
-  background: #3a8eef;
   transform: scale(1.1);
   box-shadow: 0 6px 25px rgba(74, 158, 255, 0.4);
 }
 
 .add-node-button:active {
   transform: scale(0.95);
+}
+
+.add-node-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.add-node-button:hover::before {
+  left: 100%;
 }
 
 .modal-select {

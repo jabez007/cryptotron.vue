@@ -9,22 +9,37 @@ const router = useRouter()
     <div class="cipher-card" @click="router.push({ name: 'cryptotron-caesar' })">
       <h3>Caesar Cipher</h3>
       <p>
-        The simplest substitution cipher, used by Julius Caesar himself. Shift each letter by a
-        fixed number of positions in the alphabet.
+        One of the oldest known ciphers and simplest substitution cipher, used by Julius Caesar
+        himself! Shift each letter by a fixed number of positions in the alphabet (e.g., ROT13).
+      </p>
+    </div>
+    <div class="cipher-card">
+      <h3>Rail-Fence Cipher</h3>
+      <p>
+        A transposition cipher from the 19th-century that writes the message in a zigzag pattern
+        across multiple "rails", then reads off the ciphertext row by row. Simple yet effective!
       </p>
     </div>
     <div class="cipher-card" @click="router.push({ name: 'cryptotron-vigenere' })">
       <h3>Vigenère Cipher</h3>
       <p>
-        A polyalphabetic substitution cipher that uses a keyword to create multiple Caesar shifts,
-        making it much harder to crack.
+        A 16th-century polyalphabetic substitution cipher that resisted cracking for centuries! Uses
+        a keyword to create multiple shifting alphabets, making it much harder to crack.
       </p>
     </div>
     <div class="cipher-card">
       <h3>Polybius Square</h3>
       <p>
-        A digraph substitution cipher that encrypts pairs of letters using a 5×5 grid of letters
-        based on a keyword.
+        Invented by the ancient Greeks! A digraph substitution cipher that turn letters into
+        coordinates using a 5×5 grid of letters (I and J share a cell) based on a keyword.
+      </p>
+    </div>
+    <div class="cipher-card" @click="router.push({ name: 'cryptotron-builder' })">
+      <h3>Interactive Cipher Chain Builder</h3>
+      <p>
+        Create visual encryption pipelines by connecting cipher blocks. Build complex multi-step
+        sequences with Caesar, Vigenère, and other classical ciphers. Discover how combining
+        different encryption methods strengthens security through hands-on experimentation.
       </p>
     </div>
   </div>
