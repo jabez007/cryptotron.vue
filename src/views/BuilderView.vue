@@ -10,6 +10,7 @@ import {
 } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
+import { caesar, vigenere } from '@jabez007/cryptotron.js'
 import CipherOutput from '@/components/CipherOutput.vue'
 
 const isReady = ref(false)
@@ -21,6 +22,7 @@ const edges = ref<Edge[]>([])
 const {
   addEdges,
   getEdges,
+  getNodes,
   onConnect,
   onEdgeDoubleClick,
   onEdgeUpdate,
@@ -33,8 +35,26 @@ onMounted(() => {
   setTimeout(async () => {
     nodes.value.push(
       ...[
-        { id: '1', label: 'Node 1', position: { x: 250, y: 5 } },
-        { id: '2', label: 'Node 2', position: { x: 100, y: 100 } },
+        {
+          id: '1',
+          label: 'Caesar',
+          data: {
+            encryptAlgorithm: caesar.encrypt,
+            decryptAlgorithm: caesar.decrypt,
+            cipherKey: { shift: 3 },
+          },
+          position: { x: 250, y: 5 },
+        },
+        {
+          id: '2',
+          label: 'Vigenère',
+          data: {
+            encryptAlgorithm: vigenere.encrypt,
+            decryptAlgorithm: vigenere.decrypt,
+            cipherKey: { keyword: 'foobar' },
+          },
+          position: { x: 100, y: 100 },
+        },
         { id: '3', label: 'Node 3', position: { x: 400, y: 100 } },
         { id: '4', label: 'Node 4', position: { x: 400, y: 200 } },
       ],
@@ -269,11 +289,11 @@ class GraphAnalyzer {
   }
 }
 
-const encrypt = () => {
-  console.debug('Encrypting message')
-
+const getTraversedNodedata = () => {
   const currentEdges = getEdges.value
+  const currentNodes = getNodes.value
   console.debug('Current edges', currentEdges)
+  console.debug('Current nodes', currentNodes)
 
   const graph = new GraphAnalyzer(currentEdges)
   console.log('Found root nodes', graph.getRootNodes())
@@ -289,6 +309,37 @@ const encrypt = () => {
 
   const traversal = graph.getConnectedNodes()
   console.debug('Encryption traversal', traversal)
+
+  const traversedNodeData = traversal.map((id) => currentNodes.find((node) => node.id === id)?.data)
+  console.debug('Traversed node data', traversedNodeData)
+
+  return traversedNodeData
+}
+
+const encrypt = () => {
+  console.debug('Encrypting message')
+
+  const encryptionData = getTraversedNodedata()
+
+  if (encryptionData) {
+    outputText.value = encryptionData.reduce(
+      (acc, curr) => curr.encryptAlgorithm(curr.cipherKey)(acc),
+      inputText.value,
+    )
+  }
+}
+
+const decrypt = () => {
+  console.debug('Decrypting message')
+
+  const decryptionData = getTraversedNodedata()
+
+  if (decryptionData) {
+    outputText.value = decryptionData.reduceRight(
+      (acc, curr) => curr.decryptAlgorithm(curr.cipherKey)(acc),
+      inputText.value,
+    )
+  }
 }
 </script>
 
@@ -313,7 +364,7 @@ const encrypt = () => {
 
       <div class="button-group">
         <button class="cipher-button" @click="encrypt">Encrypt</button>
-        <button class="cipher-button">Decrypt</button>
+        <button class="cipher-button" @click="decrypt">Decrypt</button>
         <button class="cipher-button" @click="clear">Clear</button>
       </div>
 
