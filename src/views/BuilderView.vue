@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { onMounted, nextTick, ref } from 'vue'
-import { MarkerType, useVueFlow, VueFlow, type Edge, type Node } from '@vue-flow/core'
+import {
+  MarkerType,
+  useVueFlow,
+  VueFlow,
+  type Connection,
+  type Edge,
+  type Node,
+} from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 
@@ -12,6 +19,7 @@ const edges = ref<Edge[]>([])
 
 const {
   addEdges,
+  getEdges,
   onConnect,
   onEdgeDoubleClick,
   onEdgeUpdate,
@@ -40,7 +48,6 @@ onMounted(() => {
           animated: true,
           markerEnd: MarkerType.Arrow,
         },
-        { id: 'e1-3', source: '1', target: '3' },
       ],
     )
     await nextTick()
@@ -52,8 +59,109 @@ onNodeClick(({ event, node }) => {
   console.debug('On Node Click', event, node)
 })
 
+const validateNewEdge = (
+  existingEdges: Edge[],
+  newEdge: Connection,
+  oldEdge: Partial<Edge> = { source: '', target: '' },
+): boolean => {
+  console.debug('Validating new edge', newEdge, oldEdge)
+  /* */
+  if (existingEdges.some((e) => e.source === newEdge.source)) {
+    if (oldEdge.source !== newEdge.source) {
+      console.warn(`Node ${newEdge.source} already has an edge from it`)
+      return false
+    }
+  }
+  if (existingEdges.some((e) => e.target === newEdge.target)) {
+    if (oldEdge.target !== newEdge.target) {
+      console.warn(`Node ${newEdge.target} already has an edge to it`)
+      return false
+    }
+  }
+  /*
+   * The Union-Find structure keeps track of connected components.
+   */
+  class UnionFind {
+    private parent: Record<string, string>
+    private rank: Record<string, number>
+
+    constructor() {
+      this.parent = {}
+      this.rank = {}
+    }
+
+    makeSet(x: string): void {
+      if (!(x in this.parent)) {
+        this.parent[x] = x
+        this.rank[x] = 0
+      }
+    }
+
+    find(x: string): string {
+      if (this.parent[x] !== x) {
+        this.parent[x] = this.find(this.parent[x]) // Path compression
+      }
+      return this.parent[x]
+    }
+
+    union(x: string, y: string): boolean {
+      const rootX = this.find(x)
+      const rootY = this.find(y)
+
+      if (rootX === rootY) {
+        return false // Already in the same set
+      }
+
+      // Union by rank
+      if (this.rank[rootX] > this.rank[rootY]) {
+        this.parent[rootY] = rootX
+      } else if (this.rank[rootX] < this.rank[rootY]) {
+        this.parent[rootX] = rootY
+      } else {
+        this.parent[rootY] = rootX
+        this.rank[rootX]++
+      }
+      return true
+    }
+  }
+
+  function willCreateCycle(edges: Edge[], newEdge: Connection): boolean {
+    const uf = new UnionFind()
+
+    // Add all nodes to the Union-Find structure
+    for (const edge of edges) {
+      uf.makeSet(edge.source)
+      uf.makeSet(edge.target)
+    }
+    uf.makeSet(newEdge.source)
+    uf.makeSet(newEdge.target)
+
+    // Union existing edges
+    for (const edge of edges) {
+      uf.union(edge.source, edge.target)
+    }
+
+    // Check if the new edge connects already connected components
+    return uf.find(newEdge.source) === uf.find(newEdge.target)
+  }
+
+  if (willCreateCycle(existingEdges, newEdge)) {
+    console.warn(`Connecting Node ${newEdge.source} to Node ${newEdge.target} will create a loop`)
+    return false
+  }
+  /* */
+  return true
+}
+
 onConnect((connection) => {
   console.debug('On Connect', connection)
+  /* */
+  const existing = getEdges.value
+  console.debug('Existing edges', existing)
+  if (!validateNewEdge(existing, connection)) {
+    return
+  }
+  /* */
   addEdges({
     ...connection,
     updatable: true,
@@ -69,6 +177,13 @@ onEdgeDoubleClick(({ edge, event }) => {
 
 onEdgeUpdate(({ connection, edge }) => {
   console.debug('On Edge Update', connection, edge)
+  /* */
+  const existing = getEdges.value
+  console.debug('Existing edges', existing)
+  if (!validateNewEdge(existing, connection, edge)) {
+    return
+  }
+  /* */
   updateEdge(edge, connection)
 })
 </script>
