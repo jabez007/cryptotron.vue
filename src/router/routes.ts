@@ -23,7 +23,7 @@ export default (parentRouteName?: string) => {
     },
     {
       name: 'cryptotron-vigenere',
-      path: `${rootPath}caesar`,
+      path: `${rootPath}vigenere`,
       component: () => import('@/views/VigenereView.vue'),
     },
   ]
