@@ -10,6 +10,9 @@ interface PluginOptions {
 export default {
   app: () => import('./App.vue'),
   install(_app: App, options: PluginOptions) {
+    if (!options?.router) {
+      throw new Error('[CryptoTron] Router instance is required when installing the plugin')
+    }
     CryptoTronRoutes(options.parentRouteName).forEach((r) => {
       if (!options.router.hasRoute(r.name)) {
         console.debug(`Adding ${r.name} to router with path '${r.path}'`)
