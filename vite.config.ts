@@ -4,8 +4,17 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
+import { name } from './package.json';
+
+const basePath = process.env.NODE_ENV === 'production'
+  ? `/${name.split('/').slice(-1)[0]}/`
+  : '/';
+
+console.debug(`Base path set to: ${basePath}`)
+
 // https://vite.dev/config/
 export default defineConfig({
+  base: basePath,
   plugins: [
     vue(),
     vueDevTools(),

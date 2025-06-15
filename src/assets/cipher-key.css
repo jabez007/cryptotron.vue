@@ -1,0 +1,15 @@
+.form-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cipher-input.has-error {
+  border-color: red;
+  outline: 1px solid red;
+}
+
+.error-messages {
+  color: red;
+  font-size: 0.875rem;
+}

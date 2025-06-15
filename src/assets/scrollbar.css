@@ -1,0 +1,24 @@
+/* Chrome, Edge, and Safari */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cryptotron-darker-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--neon-cyan), var(--neon-magenta));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(var(--neon-magenta), var(--neon-green));
+}
+
+/* Firefox */
+#app-content,
+#app-content :deep(*) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon-cyan) var(--cryptotron-darker-bg);
+}

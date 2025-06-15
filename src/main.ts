@@ -1,11 +1,15 @@
-import './assets/main.css'
-
 import { createApp } from 'vue'
-import App from './App.vue'
+//import App from './App.vue'
 import router from './router'
+import CryptoTronPlugin from './index.ts'
 
-const app = createApp(App)
+CryptoTronPlugin.app().then((App) => {
+  const app = createApp(App.default)
 
-app.use(router)
+  app.use(CryptoTronPlugin, { router })
+  app.use(router)
 
-app.mount('#app')
+  app.mount('#app')
+})
+
+

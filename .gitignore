@@ -28,3 +28,6 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+lib
+!src/lib
+.aider*
