@@ -38,9 +38,7 @@
             </div>
 
             <div class="button-group">
-              <button @click="encryptOutput = props.encryptAlgorithm(encryptInput)" class="cipher-button">
-                Encrypt
-              </button>
+              <button @click="encrypt" class="cipher-button">Encrypt</button>
               <button @click="clearEncrypt" class="cipher-button">Clear</button>
             </div>
 
@@ -62,9 +60,7 @@
             </div>
 
             <div class="button-group">
-              <button @click="decryptOutput = props.decryptAlgorithm(decryptInput)" class="cipher-button">
-                Decrypt
-              </button>
+              <button @click="decrypt" class="cipher-button">Decrypt</button>
               <button @click="clearDecrypt" class="cipher-button">Clear</button>
               <button class="cipher-button">Crack</button>
             </div>
@@ -109,6 +105,15 @@ const cipherActiveTab = ref('theory')
 const encryptInput = ref('')
 const encryptOutput = ref('')
 
+const encrypt = () => {
+  try {
+    encryptOutput.value = props.encryptAlgorithm(encryptInput.value)
+  } catch (err) {
+    console.error(err)
+    encryptOutput.value = '⚠️  encryption failed'
+  }
+}
+
 const clearEncrypt = () => {
   encryptInput.value = ''
   encryptOutput.value = ''
@@ -116,6 +121,15 @@ const clearEncrypt = () => {
 
 const decryptInput = ref('')
 const decryptOutput = ref('')
+
+const decrypt = () => {
+  try {
+    decryptOutput.value = props.decryptAlgorithm(decryptInput.value)
+  } catch (err) {
+    console.error(err)
+    decryptOutput.value = '⚠️  decryption failed'
+  }
+}
 
 const clearDecrypt = () => {
   decryptInput.value = ''
