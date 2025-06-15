@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Run build script
-        run: npm run build # Replace 'build' with your actual script name from package.json
+        run: npm run build
 
       - name: Configure Git
         run: |
