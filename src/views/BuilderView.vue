@@ -13,9 +13,36 @@ import { Controls } from '@vue-flow/controls'
 import { caesar, vigenere } from '@jabez007/cryptotron.js'
 import CipherOutput from '@/components/CipherOutput.vue'
 
+// Available cipher types for the add node modal
+const availableCiphers = [
+  {
+    type: 'caesar',
+    label: 'Caesar Cipher',
+    defaultKey: { shift: 3 },
+    encryptAlgorithm: caesar.encrypt,
+    decryptAlgorithm: caesar.decrypt,
+    cipherKeyComponent: () => import('@/components/keys/KeyCaesar.vue'),
+  },
+  {
+    type: 'vigenere',
+    label: 'Vigenère Cipher',
+    defaultKey: { keyword: 'secret' },
+    encryptAlgorithm: vigenere.encrypt,
+    decryptAlgorithm: vigenere.decrypt,
+    cipherKeyComponent: () => import('@/components/keys/KeyVigenere.vue'),
+  },
+  // Add more cipher types as needed
+]
+
 const isReady = ref(false)
 
-const showModal = ref(false)
+const showAddNodeModal = ref(false)
+const newNodeData = ref({
+  label: '',
+  type: 'caesar',
+})
+
+const showNodeModal = ref(false)
 const selectedNode = ref<Node | null>(null)
 const keyComponent = shallowRef(null)
 
@@ -24,13 +51,17 @@ const edges = ref<Edge[]>([])
 
 const {
   addEdges,
+  addNodes,
+  fitView,
   getEdges,
   getNodes,
   onConnect,
   onEdgeDoubleClick,
   onEdgeUpdate,
   onNodeClick,
+  onNodeDoubleClick,
   removeEdges,
+  removeNodes,
   updateEdge,
   updateNodeData,
 } = useVueFlow()
@@ -61,8 +92,6 @@ onMounted(() => {
           },
           position: { x: 100, y: 100 },
         },
-        { id: '3', label: 'Node 3', position: { x: 400, y: 100 } },
-        { id: '4', label: 'Node 4', position: { x: 400, y: 200 } },
       ],
     )
     edges.value.push(
@@ -82,6 +111,57 @@ onMounted(() => {
   }, 100)
 })
 
+// Add node modal functions
+const openAddNodeModal = () => {
+  newNodeData.value = {
+    label: '',
+    type: 'caesar',
+  }
+  showAddNodeModal.value = true
+}
+
+const closeAddNodeModal = () => {
+  showAddNodeModal.value = false
+  newNodeData.value = {
+    label: '',
+    type: 'caesar',
+  }
+}
+
+const addNewNode = () => {
+  const selectedCipher = availableCiphers.find((c) => c.type === newNodeData.value.type)
+  if (!selectedCipher) return
+
+  const nodeId = `node-${Date.now()}`
+  const label = newNodeData.value.label || selectedCipher.label
+
+  // Find a good position for the new node (simple placement logic)
+  const existingNodes = getNodes.value
+  const maxY = existingNodes.length > 0 ? Math.max(...existingNodes.map((n) => n.position.y)) : 0
+
+  const newNode = {
+    id: nodeId,
+    label,
+    data: {
+      encryptAlgorithm: selectedCipher.encryptAlgorithm,
+      decryptAlgorithm: selectedCipher.decryptAlgorithm,
+      cipherKey: { ...selectedCipher.defaultKey },
+      cipherKeyComponent: selectedCipher.cipherKeyComponent,
+    },
+    position: {
+      x: 50 + (existingNodes.length % 4) * 150,
+      y: maxY + 120,
+    },
+  }
+
+  addNodes([newNode])
+  setTimeout(async () => {
+    await nextTick()
+    fitView()
+  }, 100)
+  closeAddNodeModal()
+}
+
 // Modal key editing functionality
 const openNodeModal = async (node: Node) => {
   selectedNode.value = { ...node }
@@ -99,11 +179,11 @@ const openNodeModal = async (node: Node) => {
     keyComponent.value = null
   }
 
-  showModal.value = true
+  showNodeModal.value = true
 }
 
-const closeModal = () => {
-  showModal.value = false
+const closeNodeModal = () => {
+  showNodeModal.value = false
   selectedNode.value = null
   keyComponent.value = null
 }
@@ -113,7 +193,7 @@ const updateNodeKey = () => {
     updateNodeData(selectedNode.value.id, {
       data: selectedNode.value.data,
     })
-    closeModal()
+    closeNodeModal()
   }
 }
 
@@ -128,6 +208,10 @@ onNodeClick(({ event, node }) => {
   }
 })
 
+onNodeDoubleClick(({ event, node }) => {
+  console.debug('On Node Double-Click', event, node)
+  removeNodes(node)
+})
 /*
  * The Union-Find structure keeps track of connected components.
  */
@@ -253,7 +337,7 @@ onConnect((connection) => {
 })
 
 onEdgeDoubleClick(({ edge, event }) => {
-  console.debug('One Edge Double Click', event, edge)
+  console.debug('One Edge Double-Click', event, edge)
   removeEdges(edge)
 })
 
@@ -397,6 +481,14 @@ const decrypt = () => {
       :edge-updater-radius="23" fit-view-on-init>
       <Background />
       <Controls position="top-left"></Controls>
+
+      <!-- Floating Add Node Button -->
+      <div class="add-node-button" @click="openAddNodeModal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </div>
     </VueFlow>
 
     <div class="cipher-practice">
@@ -420,11 +512,11 @@ const decrypt = () => {
     </div>
 
     <!-- Modal for editing cipher keys -->
-    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+    <div v-if="showNodeModal" class="modal-overlay" @click="closeNodeModal">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
           <h3>Edit {{ selectedNode?.label }} Key</h3>
-          <button class="modal-close" @click="closeModal">&times;</button>
+          <button class="modal-close" @click="closeNodeModal">&times;</button>
         </div>
 
         <div class="modal-body">
@@ -443,10 +535,45 @@ const decrypt = () => {
         </div>
 
         <div class="modal-footer">
-          <button class="modal-button modal-button-cancel" @click="closeModal">Cancel</button>
+          <button class="modal-button modal-button-cancel" @click="closeNodeModal">Cancel</button>
           <button class="modal-button modal-button-save" @click="updateNodeKey">
             Save Changes
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for adding new cipher nodes -->
+    <div v-if="showAddNodeModal" class="modal-overlay" @click="closeAddNodeModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3>Add New Cipher Node</h3>
+          <button class="modal-close" @click="closeAddNodeModal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="modal-label">Cipher Type:</label>
+            <select v-model="newNodeData.type" class="modal-select">
+              <option v-for="cipher in availableCiphers" :key="cipher.type" :value="cipher.type">
+                {{ cipher.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="modal-label">Custom Label (optional):</label>
+            <input type="text" v-model="newNodeData.label" class="modal-input"
+              :placeholder="`Default: ${availableCiphers.find((c) => c.type === newNodeData.type)?.label || ''}`" />
+            <small class="modal-help">Leave empty to use the default cipher name</small>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-button modal-button-cancel" @click="closeAddNodeModal">
+            Cancel
+          </button>
+          <button class="modal-button modal-button-save" @click="addNewNode">Add Node</button>
         </div>
       </div>
     </div>
@@ -524,6 +651,61 @@ const decrypt = () => {
   height: 33vh;
   border: 1px solid var(--cryptotron-border-glow);
   border-radius: 12px;
+}
+
+/* Add Node Button */
+.add-node-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  background: var(--cryptotron-border-glow, #4a9eff);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(74, 158, 255, 0.3);
+  transition: all 0.3s ease;
+  z-index: 100;
+  color: white;
+}
+
+.add-node-button:hover {
+  background: #3a8eef;
+  transform: scale(1.1);
+  box-shadow: 0 6px 25px rgba(74, 158, 255, 0.4);
+}
+
+.add-node-button:active {
+  transform: scale(0.95);
+}
+
+.modal-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--cryptotron-border-glow, #444);
+  border-radius: 6px;
+  background: var(--cryptotron-dark-bg, #0a0a0a);
+  color: var(--cryptotron-text-primary, #fff);
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.modal-select:focus {
+  outline: none;
+  border-color: var(--cryptotron-border-glow, #666);
+  box-shadow: 0 0 0 2px rgba(116, 185, 255, 0.2);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
 }
 
 /* Modal Styles */
