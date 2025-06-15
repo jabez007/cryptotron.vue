@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, nextTick, ref } from 'vue'
+import { computed, onMounted, nextTick, ref, shallowRef } from 'vue'
 import {
   MarkerType,
   useVueFlow,
@@ -15,8 +15,11 @@ import CipherOutput from '@/components/CipherOutput.vue'
 
 const isReady = ref(false)
 
-const nodes = ref<Node[]>([])
+const showModal = ref(false)
+const selectedNode = ref<Node | null>(null)
+const keyComponent = shallowRef(null)
 
+const nodes = ref<Node[]>([])
 const edges = ref<Edge[]>([])
 
 const {
@@ -29,6 +32,7 @@ const {
   onNodeClick,
   removeEdges,
   updateEdge,
+  updateNodeData,
 } = useVueFlow()
 
 onMounted(() => {
@@ -78,8 +82,50 @@ onMounted(() => {
   }, 100)
 })
 
+// Modal key editing functionality
+const openNodeModal = async (node: Node) => {
+  selectedNode.value = { ...node }
+
+  // Load the cipher key component if it exists
+  if (node.data?.cipherKeyComponent) {
+    try {
+      const component = await node.data.cipherKeyComponent()
+      keyComponent.value = component.default || component
+    } catch (error) {
+      console.error('Failed to load cipher key component:', error)
+      keyComponent.value = null
+    }
+  } else {
+    keyComponent.value = null
+  }
+
+  showModal.value = true
+}
+
+const closeModal = () => {
+  showModal.value = false
+  selectedNode.value = null
+  keyComponent.value = null
+}
+
+const updateNodeKey = () => {
+  if (selectedNode.value) {
+    updateNodeData(selectedNode.value.id, {
+      data: selectedNode.value.data,
+    })
+    closeModal()
+  }
+}
+
+// Computed properties for different cipher key types
+const hasKeyComponent = computed(() => keyComponent.value !== null)
+
 onNodeClick(({ event, node }) => {
   console.debug('On Node Click', event, node)
+  // Only open modal for nodes with cipher data
+  if (node.data && (node.data.encryptAlgorithm || node.data.decryptAlgorithm)) {
+    openNodeModal(node)
+  }
 })
 
 /*
@@ -372,6 +418,38 @@ const decrypt = () => {
 
       <CipherOutput label="Output" :text="outputText" />
     </div>
+
+    <!-- Modal for editing cipher keys -->
+    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3>Edit {{ selectedNode?.label }} Key</h3>
+          <button class="modal-close" @click="closeModal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Use the cipher's dedicated key component if available -->
+          <div v-if="hasKeyComponent && selectedNode">
+            <component :is="keyComponent" v-model:cipher-key="selectedNode.data.cipherKey" />
+          </div>
+
+          <!-- Fallback for nodes without key components -->
+          <div v-else-if="selectedNode">
+            <label class="modal-label">Cipher Key:</label>
+            <textarea v-model="selectedNode.data.cipherKey" class="modal-textarea"
+              placeholder="Enter cipher key configuration"></textarea>
+            <small class="modal-help">This cipher doesn't have a dedicated key editor</small>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-button modal-button-cancel" @click="closeModal">Cancel</button>
+          <button class="modal-button modal-button-save" @click="updateNodeKey">
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -446,5 +524,143 @@ const decrypt = () => {
   height: 33vh;
   border: 1px solid var(--cryptotron-border-glow);
   border-radius: 12px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: var(--cryptotron-card-bg, #1a1a1a);
+  border: 1px solid var(--cryptotron-border-glow, #444);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--cryptotron-border-glow, #444);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--cryptotron-text-primary, #fff);
+  font-size: 1.2rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--cryptotron-text-secondary, #ccc);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--cryptotron-text-primary, #fff);
+  font-weight: 500;
+}
+
+.modal-input,
+.modal-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--cryptotron-border-glow, #444);
+  border-radius: 6px;
+  background: var(--cryptotron-dark-bg, #0a0a0a);
+  color: var(--cryptotron-text-primary, #fff);
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.modal-input:focus,
+.modal-textarea:focus {
+  outline: none;
+  border-color: var(--cryptotron-border-glow, #666);
+  box-shadow: 0 0 0 2px rgba(116, 185, 255, 0.2);
+}
+
+.modal-textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.modal-help {
+  display: block;
+  margin-top: 4px;
+  color: var(--cryptotron-text-secondary, #aaa);
+  font-size: 12px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  border-top: 1px solid var(--cryptotron-border-glow, #444);
+  justify-content: flex-end;
+}
+
+.modal-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.modal-button-cancel {
+  background: var(--cryptotron-dark-bg, #333);
+  color: var(--cryptotron-text-secondary, #ccc);
+}
+
+.modal-button-cancel:hover {
+  background: #444;
+}
+
+.modal-button-save {
+  background: var(--cryptotron-border-glow, #4a9eff);
+  color: white;
+}
+
+.modal-button-save:hover {
+  background: #3a8eef;
 }
 </style>
