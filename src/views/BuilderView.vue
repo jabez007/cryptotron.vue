@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, nextTick, ref, shallowRef } from 'vue'
+import { onMounted, nextTick, ref, shallowRef } from 'vue'
 import {
   MarkerType,
   useVueFlow,
@@ -11,19 +11,11 @@ import {
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
 import { availableCiphers, defaultEdges, defaultNodes } from '@/components/builder/constants'
+import AddNodeModal from '@/components/builder/ModalAddNode.vue'
+import EditNodeModal from '@/components/builder/ModalEditNode.vue'
 import CipherOutput from '@/components/CipherOutput.vue'
 
 const isReady = ref(false)
-
-const showAddNodeModal = ref(false)
-const newNodeData = ref({
-  label: '',
-  type: 'caesar',
-})
-
-const showNodeModal = ref(false)
-const selectedNode = ref<Node | null>(null)
-const keyComponent = shallowRef(null)
 
 const nodes = ref<Node[]>([])
 const edges = ref<Edge[]>([])
@@ -54,6 +46,12 @@ onMounted(() => {
   }, 100)
 })
 
+const showAddNodeModal = ref(false)
+const newNodeData = ref({
+  label: '',
+  type: 'caesar',
+})
+
 // Add node modal functions
 const openAddNodeModal = () => {
   newNodeData.value = {
@@ -71,14 +69,13 @@ const closeAddNodeModal = () => {
   }
 }
 
-const addNewNode = () => {
-  const selectedCipher = availableCiphers.find((c) => c.type === newNodeData.value.type)
+const handleAddNode = (nodeData: { label: string; type: string }) => {
+  const selectedCipher = availableCiphers.find((c) => c.type === nodeData.type)
   if (!selectedCipher) return
 
   const nodeId = `node-${Date.now()}`
-  const label = newNodeData.value.label || selectedCipher.label
+  const label = nodeData.label || selectedCipher.label
 
-  // Find a good position for the new node (simple placement logic)
   const existingNodes = getNodes.value
   const maxY = existingNodes.length > 0 ? Math.max(...existingNodes.map((n) => n.position.y)) : 0
 
@@ -104,6 +101,10 @@ const addNewNode = () => {
   }, 100)
   closeAddNodeModal()
 }
+
+const showNodeModal = ref(false)
+const selectedNode = ref<Node | null>(null)
+const keyComponent = shallowRef(null)
 
 // Modal key editing functionality
 const openNodeModal = async (node: Node) => {
@@ -131,7 +132,7 @@ const closeNodeModal = () => {
   keyComponent.value = null
 }
 
-const updateNodeKey = () => {
+const handleUpdateNode = () => {
   if (selectedNode.value) {
     updateNodeData(selectedNode.value.id, {
       data: selectedNode.value.data,
@@ -139,9 +140,6 @@ const updateNodeKey = () => {
     closeNodeModal()
   }
 }
-
-// Computed properties for different cipher key types
-const hasKeyComponent = computed(() => keyComponent.value !== null)
 
 let clickTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -159,7 +157,7 @@ onNodeClick(({ event, node }) => {
     clickTimeout = setTimeout(() => {
       openNodeModal(node)
       clickTimeout = null
-    }, 200) // 200ms delay to allow double-click detection
+    }, 250) // 250ms delay to allow double-click detection
   }
 })
 
@@ -173,7 +171,12 @@ onNodeDoubleClick(({ event, node }) => {
   }
 
   removeNodes(node)
+  setTimeout(async () => {
+    await nextTick()
+    fitView()
+  }, 100)
 })
+
 /*
  * The Union-Find structure keeps track of connected components.
  */
@@ -298,11 +301,6 @@ onConnect((connection) => {
   })
 })
 
-onEdgeDoubleClick(({ edge, event }) => {
-  console.debug('One Edge Double-Click', event, edge)
-  removeEdges(edge)
-})
-
 onEdgeUpdate(({ connection, edge }) => {
   console.debug('On Edge Update', connection, edge)
   /* */
@@ -313,6 +311,11 @@ onEdgeUpdate(({ connection, edge }) => {
   }
   /* */
   updateEdge(edge, connection)
+})
+
+onEdgeDoubleClick(({ edge, event }) => {
+  console.debug('One Edge Double-Click', event, edge)
+  removeEdges(edge)
 })
 
 /* */
@@ -473,70 +476,10 @@ const decrypt = () => {
       <CipherOutput label="Output" :text="outputText" />
     </div>
 
-    <!-- Modal for editing cipher keys -->
-    <div v-if="showNodeModal" class="modal-overlay" @click="closeNodeModal">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>Edit {{ selectedNode?.label }} Key</h3>
-          <button class="modal-close" @click="closeNodeModal">&times;</button>
-        </div>
+    <AddNodeModal v-if="showAddNodeModal" @close="closeAddNodeModal" @add-node="handleAddNode" />
 
-        <div class="modal-body">
-          <!-- Use the cipher's dedicated key component if available -->
-          <div v-if="hasKeyComponent && selectedNode">
-            <component :is="keyComponent" v-model:cipher-key="selectedNode.data.cipherKey" />
-          </div>
-
-          <!-- Fallback for nodes without key components -->
-          <div v-else-if="selectedNode">
-            <label class="modal-label">Cipher Key:</label>
-            <textarea v-model="selectedNode.data.cipherKey" class="modal-textarea"
-              placeholder="Enter cipher key configuration"></textarea>
-            <small class="modal-help">This cipher doesn't have a dedicated key editor</small>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="modal-button modal-button-cancel" @click="closeNodeModal">Cancel</button>
-          <button class="cipher-button" @click="updateNodeKey">Save Changes</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal for adding new cipher nodes -->
-    <div v-if="showAddNodeModal" class="modal-overlay" @click="closeAddNodeModal">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3>Add New Cipher Node</h3>
-          <button class="modal-close" @click="closeAddNodeModal">&times;</button>
-        </div>
-
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="modal-label">Cipher Type:</label>
-            <select v-model="newNodeData.type" class="modal-select">
-              <option v-for="cipher in availableCiphers" :key="cipher.type" :value="cipher.type">
-                {{ cipher.label }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="modal-label">Custom Label (optional):</label>
-            <input type="text" v-model="newNodeData.label" class="modal-input"
-              :placeholder="`Default: ${availableCiphers.find((c) => c.type === newNodeData.type)?.label || ''}`" />
-            <small class="modal-help">Leave empty to use the default cipher name</small>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="modal-button modal-button-cancel" @click="closeAddNodeModal">
-            Cancel
-          </button>
-          <button class="cipher-button" @click="addNewNode">Add Node</button>
-        </div>
-      </div>
-    </div>
+    <EditNodeModal v-if="showNodeModal && selectedNode" :node="selectedNode" @close="closeNodeModal"
+      @update-node="handleUpdateNode" />
   </div>
 </template>
 
@@ -655,169 +598,5 @@ const decrypt = () => {
 
 .add-node-button:hover::before {
   left: 100%;
-}
-
-.modal-select {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--cryptotron-border-glow, #444);
-  border-radius: 6px;
-  background: var(--cryptotron-dark-bg, #0a0a0a);
-  color: var(--cryptotron-text-primary, #fff);
-  font-size: 14px;
-  transition: border-color 0.2s ease;
-  box-sizing: border-box;
-}
-
-.modal-select:focus {
-  outline: none;
-  border-color: var(--cryptotron-border-glow, #666);
-  box-shadow: 0 0 0 2px rgba(116, 185, 255, 0.2);
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group:last-child {
-  margin-bottom: 0;
-}
-
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-
-.modal-content {
-  background: var(--cryptotron-card-bg, #1a1a1a);
-  border: 1px solid var(--cryptotron-border-glow, #444);
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  width: 90%;
-  max-width: 400px;
-  max-height: 80vh;
-  overflow: hidden;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid var(--cryptotron-border-glow, #444);
-}
-
-.modal-header h3 {
-  margin: 0;
-  color: var(--cryptotron-text-primary, #fff);
-  font-size: 1.2rem;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--cryptotron-text-secondary, #ccc);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: background 0.2s ease;
-}
-
-.modal-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.modal-body {
-  padding: 20px;
-}
-
-.modal-label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--cryptotron-text-primary, #fff);
-  font-weight: 500;
-}
-
-.modal-input,
-.modal-textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid var(--cryptotron-border-glow, #444);
-  border-radius: 6px;
-  background: var(--cryptotron-dark-bg, #0a0a0a);
-  color: var(--cryptotron-text-primary, #fff);
-  font-size: 14px;
-  transition: border-color 0.2s ease;
-  box-sizing: border-box;
-}
-
-.modal-input:focus,
-.modal-textarea:focus {
-  outline: none;
-  border-color: var(--cryptotron-border-glow, #666);
-  box-shadow: 0 0 0 2px rgba(116, 185, 255, 0.2);
-}
-
-.modal-textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-.modal-help {
-  display: block;
-  margin-top: 4px;
-  color: var(--cryptotron-text-secondary, #aaa);
-  font-size: 12px;
-}
-
-.modal-footer {
-  display: flex;
-  gap: 10px;
-  padding: 20px;
-  border-top: 1px solid var(--cryptotron-border-glow, #444);
-  justify-content: flex-end;
-}
-
-.modal-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.modal-button-cancel {
-  background: var(--cryptotron-dark-bg, #333);
-  color: var(--cryptotron-text-secondary, #ccc);
-}
-
-.modal-button-cancel:hover {
-  background: #444;
-}
-
-.modal-button-save {
-  background: var(--cryptotron-border-glow, #4a9eff);
-  color: white;
-}
-
-.modal-button-save:hover {
-  background: #3a8eef;
 }
 </style>
