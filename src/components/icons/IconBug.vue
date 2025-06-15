@@ -1,6 +1,6 @@
 <template>
-  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-    stroke-linecap="round" stroke-linejoin="round">
+  <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="bug icon">
     <path d="m8 2 1.88 1.88" />
     <path d="M14.12 3.88 16 2" />
     <path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1" />
