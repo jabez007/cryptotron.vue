@@ -11,7 +11,7 @@ const emit = defineEmits<{
   'update-node': [node: Node]
 }>()
 
-const localNode = ref<Node>({ ...props.node })
+const localNode = ref<Node>(structuredClone(props.node))
 const keyComponent = shallowRef(null)
 
 const hasKeyComponent = computed(() => keyComponent.value !== null)
@@ -49,7 +49,7 @@ const handleClose = () => {
       <div class="modal-body">
         <!-- Use the cipher's dedicated key component if available -->
         <div v-if="hasKeyComponent">
-          <component :is="keyComponent" v-model:cipher-key="localNode.data.cipherKey" />
+          <component :is="keyComponent" v-model:cipherKey="localNode.data.cipherKey" />
         </div>
 
         <!-- Fallback for nodes without key components -->
