@@ -38,7 +38,7 @@ const caesarCipherKey = ref({
       </p>
     </template>
     <template v-slot:cipherKey>
-      <KeyCaesar v-model:cipher-key="caesarCipherKey" />
+      <KeyCaesar v-model:cipherKey="caesarCipherKey" />
     </template>
   </CipherCard>
 </template>
