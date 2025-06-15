@@ -200,16 +200,35 @@ const updateNodeKey = () => {
 // Computed properties for different cipher key types
 const hasKeyComponent = computed(() => keyComponent.value !== null)
 
+let clickTimeout: ReturnType<typeof setTimeout> | null = null
+
 onNodeClick(({ event, node }) => {
   console.debug('On Node Click', event, node)
+
+  // Clear any existing timeout
+  if (clickTimeout) {
+    clearTimeout(clickTimeout)
+    clickTimeout = null
+  }
+
   // Only open modal for nodes with cipher data
   if (node.data && (node.data.encryptAlgorithm || node.data.decryptAlgorithm)) {
-    openNodeModal(node)
+    clickTimeout = setTimeout(() => {
+      openNodeModal(node)
+      clickTimeout = null
+    }, 200) // 200ms delay to allow double-click detection
   }
 })
 
 onNodeDoubleClick(({ event, node }) => {
   console.debug('On Node Double-Click', event, node)
+
+  // Clear the single-click timeout since we have a double-click
+  if (clickTimeout) {
+    clearTimeout(clickTimeout)
+    clickTimeout = null
+  }
+
   removeNodes(node)
 })
 /*
