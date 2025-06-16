@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 
 interface Props {
   text: string
@@ -41,7 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 function useTypewriter(speed: number = 50) {
   const displayText = ref('')
   const isTyping = ref(false)
-  let currentTimer: ReturnType<typeof setTimeout> | null = null
+  let currentTimer: ReturnType<typeof setInterval> | null = null
 
   const typeText = (newText: string) => {
     if (currentTimer) {
@@ -79,6 +79,11 @@ function useTypewriter(speed: number = 50) {
     isTyping.value = false
   }
 
+  // Ensure proper teardown
+  onUnmounted(() => {
+    if (currentTimer) clearInterval(currentTimer)
+  })
+
   return {
     displayText,
     isTyping,
@@ -113,15 +118,18 @@ const handleCopy = async () => {
     } else {
       // Fallback for non-secure contexts
       const textArea = document.createElement('textarea')
-      textArea.value = props.text
-      textArea.style.position = 'fixed'
-      textArea.style.left = '-999999px'
-      textArea.style.top = '-999999px'
-      document.body.appendChild(textArea)
-      textArea.focus()
-      textArea.select()
-      document.execCommand('copy')
-      textArea.remove()
+      try {
+        textArea.value = props.text
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-999999px'
+        textArea.style.top = '-999999px'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        document.execCommand('copy')
+      } finally {
+        textArea.remove()
+      }
     }
 
     showCopied.value = true
