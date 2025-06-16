@@ -2,63 +2,74 @@
   <div class="control-group">
     <label class="control-label">{{ label }}:</label>
     <div class="output-container">
-      <div class="output-area">{{ text }}</div>
-      <button :disabled="!text" :class="['copy-button', {
-        'copied': showCopied,
-        'disabled': !text
-      }]" @click="handleCopy">
+      <div class="output-area">
+        {{ text }}
+      </div>
+      <button
+        :disabled="!text"
+        :class="[
+          'copy-button',
+          {
+            copied: showCopied,
+            disabled: !text,
+          },
+        ]"
+        @click="handleCopy"
+      >
         📋
       </button>
-      <div v-if="showCopied" class="copy-tooltip">
-        Copied!
-      </div>
+      <div v-if="showCopied" class="copy-tooltip">Copied!</div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue'
 
 interface Props {
-  text: string;
-  label: string;
+  text: string
+  label: string
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
-const showCopied = ref(false);
+const chars = computed(() => props.text.length)
+
+const showCopied = ref(false)
 
 const handleCopy = async () => {
-  if (!props.text) return;
+  console.debug('Copying text')
+
+  if (!props.text) return
 
   try {
     // Try modern clipboard API first
     if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(props.text);
+      await navigator.clipboard.writeText(props.text)
     } else {
       // Fallback for non-secure contexts
-      const textArea = document.createElement('textarea');
-      textArea.value = props.text;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      document.execCommand('copy');
-      textArea.remove();
+      const textArea = document.createElement('textarea')
+      textArea.value = props.text
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-999999px'
+      textArea.style.top = '-999999px'
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      document.execCommand('copy')
+      textArea.remove()
     }
 
-    showCopied.value = true;
+    showCopied.value = true
 
     // Hide tooltip after 2 seconds
     setTimeout(() => {
-      showCopied.value = false;
-    }, 2000);
+      showCopied.value = false
+    }, 2000)
   } catch (err) {
-    console.error('Failed to copy text: ', err);
+    console.error('Failed to copy text: ', err)
   }
-};
+}
 </script>
 
 <style scoped>
@@ -83,17 +94,46 @@ const handleCopy = async () => {
 }
 
 .output-area {
+  height: 120px;
+  overflow: auto;
   background: rgba(0, 0, 0, 0.8);
   border: 1px solid var(--neon-green);
   border-radius: 6px;
   padding: 1rem;
   padding-right: 3rem;
-  /* Make room for copy button */
-  min-height: 100px;
   font-family: 'Space Mono', monospace;
   color: var(--neon-green);
   word-break: break-all;
   white-space: pre-wrap;
+}
+
+.terminal-text {
+  font-family: 'Space Mono', monospace;
+  color: var(--neon-green);
+  background: #000;
+  padding: 10px;
+  border-right: 2px solid var(--neon-green);
+  white-space: nowrap;
+  overflow: hidden;
+  animation:
+    typing 2s steps(v-bind('chars'), end),
+    blink 0.5s step-end infinite alternate;
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
 }
 
 .copy-button {
