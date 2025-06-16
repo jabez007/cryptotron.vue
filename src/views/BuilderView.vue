@@ -99,37 +99,24 @@ const handleAddNode = (nodeData: { label: string; type: string }) => {
     await nextTick()
     fitView()
   }, 100)
-  closeAddNodeModal()
+  // closeAddNodeModal()
 }
 
 const showNodeModal = ref(false)
 const selectedNode = ref<Node | null>(null)
-const keyComponent = shallowRef(null)
 
 // Modal key editing functionality
-const openNodeModal = async (node: Node) => {
+const openNodeModal = (node: Node) => {
   selectedNode.value = { ...node }
-
-  // Load the cipher key component if it exists
-  if (node.data?.cipherKeyComponent) {
-    try {
-      const component = await node.data.cipherKeyComponent()
-      keyComponent.value = component.default || component
-    } catch (error) {
-      console.error('Failed to load cipher key component:', error)
-      keyComponent.value = null
-    }
-  } else {
-    keyComponent.value = null
-  }
-
-  showNodeModal.value = true
+  setTimeout(async () => {
+    await nextTick()
+    showNodeModal.value = true
+  }, 20)
 }
 
 const closeNodeModal = () => {
   showNodeModal.value = false
   selectedNode.value = null
-  keyComponent.value = null
 }
 
 const handleUpdateNode = () => {
@@ -137,7 +124,7 @@ const handleUpdateNode = () => {
     updateNodeData(selectedNode.value.id, {
       data: selectedNode.value.data,
     })
-    closeNodeModal()
+    // closeNodeModal()
   }
 }
 
@@ -157,7 +144,7 @@ onNodeClick(({ event, node }) => {
     clickTimeout = setTimeout(() => {
       openNodeModal(node)
       clickTimeout = null
-    }, 250) // 250ms delay to allow double-click detection
+    }, 200) // 200ms delay to allow double-click detection
   }
 })
 
@@ -476,9 +463,9 @@ const decrypt = () => {
       <CipherOutput label="Output" :text="outputText" />
     </div>
 
-    <AddNodeModal v-if="showAddNodeModal" @close="closeAddNodeModal" @add-node="handleAddNode" />
+    <AddNodeModal :isOpen="showAddNodeModal" @close="closeAddNodeModal" @add-node="handleAddNode" />
 
-    <EditNodeModal v-if="showNodeModal && selectedNode" :node="selectedNode" @close="closeNodeModal"
+    <EditNodeModal v-if="selectedNode" :isOpen="showNodeModal" :node="selectedNode" @close="closeNodeModal"
       @update-node="handleUpdateNode" />
   </div>
 </template>

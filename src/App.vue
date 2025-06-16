@@ -401,16 +401,6 @@ nav a.router-link-exact-active:hover {
   }
 }
 
-@keyframes scan-lines-move {
-  0% {
-    transform: translateY(0);
-  }
-
-  100% {
-    transform: translateY(10px);
-  }
-}
-
 @keyframes glitch-enter {
   0% {
     opacity: 0;
