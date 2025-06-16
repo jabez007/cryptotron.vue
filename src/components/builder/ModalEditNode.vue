@@ -11,7 +11,7 @@ const emit = defineEmits<{
   'update-node': [node: Node]
 }>()
 
-const localNode = ref<Node>(structuredClone(props.node))
+const localNode = ref<Node>({ ...props.node })
 const keyComponent = shallowRef(null)
 
 const hasKeyComponent = computed(() => keyComponent.value !== null)
