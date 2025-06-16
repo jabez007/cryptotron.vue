@@ -6,8 +6,12 @@
         CryptoTron
       </div>
 
-      <button @click="toggleMenu" :class="['hamburger-button', { active: menuOpen }]"
-        aria-label="Toggle navigation menu">
+      <button
+        @click="toggleMenu"
+        :class="['hamburger-button', { active: menuOpen }]"
+        aria-label="Toggle navigation menu"
+        :aria-expanded="menuOpen"
+      >
         <span class="hamburger-line"></span>
         <span class="hamburger-line"></span>
         <span class="hamburger-line"></span>
@@ -36,8 +40,12 @@
     </div>
 
     <footer class="app-footer">
-      <button class="bug-report-btn" aria-label="Report a bug or issue" title="Report a bug or issue"
-        @click="openIssues">
+      <button
+        class="bug-report-btn"
+        aria-label="Report a bug or issue"
+        title="Report a bug or issue"
+        @click="openIssues"
+      >
         <IconBug />
       </button>
     </footer>
@@ -48,7 +56,7 @@
 import IconBug from '@/components/icons/IconBug.vue'
 import IconDocumentation from '@/components/icons/IconDocumentation.vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -67,14 +75,20 @@ const closeMenu = () => {
   menuOpen.value = false
 }
 
-watch(route, () => {
-  closeMenu()
-})
+watch(
+  () => route.fullPath,
+  () => {
+    closeMenu()
+  },
+)
 
 /* Check if runing as sub-app to avoid displaying duplicate home links */
-const rootName = router.resolve('/').name
-console.debug(`Root route resolved to ${rootName as string}`)
-const isSubApp = ref(rootName !== 'cryptotron-home')
+const isSubApp = ref(false)
+onMounted(() => {
+  const root = router.resolve({ path: '/' })
+  console.debug(`Root route resolved to ${root.name as string}`)
+  isSubApp.value = root.name !== 'cryptotron-home'
+})
 
 /* Bug report functionality */
 const openIssues = () => {
@@ -346,7 +360,6 @@ nav a.router-link-exact-active:hover {
 }
 
 @keyframes bug-wiggle {
-
   0%,
   100% {
     transform: rotate(0deg);
@@ -374,7 +387,6 @@ nav a.router-link-exact-active:hover {
 
 /* Keyframe Animations */
 @keyframes glitch-effect {
-
   0%,
   100% {
     transform: translateX(0);
