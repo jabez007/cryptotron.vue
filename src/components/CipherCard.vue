@@ -62,7 +62,7 @@
             <div class="button-group">
               <button @click="decrypt" class="cipher-button">Decrypt</button>
               <button @click="clearDecrypt" class="cipher-button">Clear</button>
-              <button class="cipher-button">Crack</button>
+              <button v-if="keysGenerator" class="cipher-button">Crack</button>
             </div>
 
             <CipherOutput label="Output" :text="decryptOutput" />
