@@ -7,7 +7,7 @@ const router = useRouter()
 
 <template>
   <div class="cipher-grid">
-    <div class="cipher-card" @click="router.push({ name: 'cryptotron-caesar' })">
+    <div class="cipher-card" role="link" @click="router.push({ name: 'cryptotron-caesar' })">
       <ScanLine delay="-1s" />
       <h3>Caesar Cipher</h3>
       <p>
@@ -22,7 +22,7 @@ const router = useRouter()
         across multiple "rails", then reads off the ciphertext row by row. Simple yet effective!
       </p>
     </div>
-    <div class="cipher-card" @click="router.push({ name: 'cryptotron-vigenere' })">
+    <div class="cipher-card" role="link" @click="router.push({ name: 'cryptotron-vigenere' })">
       <ScanLine delay="-3s" />
       <h3>Vigenère Cipher</h3>
       <p>
@@ -37,7 +37,7 @@ const router = useRouter()
         coordinates using a 5×5 grid of letters (I and J share a cell) based on a keyword.
       </p>
     </div>
-    <div class="cipher-card" @click="router.push({ name: 'cryptotron-builder' })">
+    <div class="cipher-card" role="link" @click="router.push({ name: 'cryptotron-builder' })">
       <ScanLine delay="-5s" />
       <h3>Interactive Cipher Chain Builder</h3>
       <p>
