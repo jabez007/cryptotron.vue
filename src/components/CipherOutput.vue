@@ -3,7 +3,8 @@
     <label class="control-label">{{ label }}:</label>
     <div class="output-container">
       <div class="output-area">
-        {{ text }}
+        <span class="terminal-text">{{ displayText }}</span>
+        <span v-if="text" class="cursor" :class="{ typing: isTyping }"></span>
       </div>
       <button
         :disabled="!text"
@@ -24,17 +25,80 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref, watch } from 'vue'
 
 interface Props {
   text: string
   label: string
+  typingSpeed?: number
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  typingSpeed: 50,
+})
 
-const chars = computed(() => props.text.length)
+// Typewriter composable
+function useTypewriter(speed: number = 50) {
+  const displayText = ref('')
+  const isTyping = ref(false)
+  let currentTimer: ReturnType<typeof setTimeout> | null = null
 
+  const typeText = (newText: string) => {
+    if (currentTimer) {
+      clearInterval(currentTimer)
+    }
+
+    if (!newText) {
+      displayText.value = ''
+      isTyping.value = false
+      return
+    }
+
+    isTyping.value = true
+    displayText.value = ''
+
+    let i = 0
+    currentTimer = setInterval(() => {
+      displayText.value += newText[i]
+      i++
+
+      if (i >= newText.length) {
+        clearInterval(currentTimer!)
+        currentTimer = null
+        isTyping.value = false
+      }
+    }, speed)
+  }
+
+  const clearText = () => {
+    if (currentTimer) {
+      clearInterval(currentTimer)
+      currentTimer = null
+    }
+    displayText.value = ''
+    isTyping.value = false
+  }
+
+  return {
+    displayText,
+    isTyping,
+    typeText,
+    clearText,
+  }
+}
+
+const { displayText, isTyping, typeText } = useTypewriter(props.typingSpeed)
+
+// Watch for text changes and trigger typewriter effect
+watch(
+  () => props.text,
+  (newText) => {
+    typeText(newText)
+  },
+  { immediate: true },
+)
+
+// Copy text to clipboard
 const showCopied = ref(false)
 
 const handleCopy = async () => {
@@ -107,33 +171,76 @@ const handleCopy = async () => {
   white-space: pre-wrap;
 }
 
+/* Terminal effects */
 .terminal-text {
-  font-family: 'Space Mono', monospace;
   color: var(--neon-green);
-  background: #000;
-  padding: 10px;
-  border-right: 2px solid var(--neon-green);
-  white-space: nowrap;
-  overflow: hidden;
-  animation:
-    typing 2s steps(v-bind('chars'), end),
-    blink 0.5s step-end infinite alternate;
+  text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
 }
 
-@keyframes typing {
-  from {
-    width: 0;
-  }
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background: var(--neon-green);
+  margin-left: 2px;
+  box-shadow: 0 0 8px var(--neon-green);
+  animation: blink 1.2s infinite;
+  vertical-align: text-bottom;
+}
 
-  to {
-    width: 100%;
-  }
+.cursor.typing {
+  animation: none;
+  opacity: 1;
 }
 
 @keyframes blink {
+  0%,
   50% {
-    border-color: transparent;
+    opacity: 1;
   }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Optional: Add scan line effect */
+.output-area::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 255, 65, 0.02) 50%,
+    rgba(0, 255, 65, 0.02) 51%,
+    transparent 51%
+  );
+  background-size: 100% 4px;
+  animation: scan 0.08s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(4px);
+  }
+}
+
+/* Ensure text content is above scan lines */
+.terminal-text,
+.cursor {
+  position: relative;
+  z-index: 2;
 }
 
 .copy-button {
