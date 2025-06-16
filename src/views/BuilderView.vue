@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, nextTick, ref, shallowRef } from 'vue'
+import { onMounted, nextTick, ref } from 'vue'
 import {
   MarkerType,
   useVueFlow,

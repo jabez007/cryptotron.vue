@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import ScanLine from '@/components/ScanLine.vue'
 
 const router = useRouter()
 </script>
@@ -7,6 +8,7 @@ const router = useRouter()
 <template>
   <div class="cipher-grid">
     <div class="cipher-card" @click="router.push({ name: 'cryptotron-caesar' })">
+      <ScanLine delay="-1s" />
       <h3>Caesar Cipher</h3>
       <p>
         One of the oldest known ciphers and simplest substitution cipher, used by Julius Caesar
@@ -21,6 +23,7 @@ const router = useRouter()
       </p>
     </div>
     <div class="cipher-card" @click="router.push({ name: 'cryptotron-vigenere' })">
+      <ScanLine delay="-3s" />
       <h3>Vigenère Cipher</h3>
       <p>
         A 16th-century polyalphabetic substitution cipher that resisted cracking for centuries! Uses
@@ -35,6 +38,7 @@ const router = useRouter()
       </p>
     </div>
     <div class="cipher-card" @click="router.push({ name: 'cryptotron-builder' })">
+      <ScanLine delay="-5s" />
       <h3>Interactive Cipher Chain Builder</h3>
       <p>
         Create visual encryption pipelines by connecting cipher blocks. Build complex multi-step

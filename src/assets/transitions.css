@@ -51,14 +51,3 @@
   opacity: 0;
   filter: hue-rotate(90deg) saturate(0.5);
 }
-
-/* Scan Lines Move */
-@keyframes scan-lines-move {
-  0% {
-    transform: translateY(0);
-  }
-
-  100% {
-    transform: translateY(10px);
-  }
-}

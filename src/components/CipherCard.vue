@@ -3,19 +3,20 @@
     <h1 class="page-title">{{ title }}</h1>
     <div class="cipher-container">
       <div class="tab-navigation">
-        <button @click="cipherActiveTab = 'theory'" :class="['tab-button', { active: cipherActiveTab === 'theory' }]">
+        <button @click="switchTab('theory')" :class="['tab-button', { active: cipherActiveTab === 'theory' }]">
           📚 Theory
         </button>
-        <button @click="cipherActiveTab = 'encrypt'" :class="['tab-button', { active: cipherActiveTab === 'encrypt' }]">
+        <button @click="switchTab('encrypt')" :class="['tab-button', { active: cipherActiveTab === 'encrypt' }]">
           🔒 Encrypt
         </button>
-        <button @click="cipherActiveTab = 'decrypt'" :class="['tab-button', { active: cipherActiveTab === 'decrypt' }]">
+        <button @click="switchTab('decrypt')" :class="['tab-button', { active: cipherActiveTab === 'decrypt' }]">
           🔓 Decrypt
         </button>
       </div>
 
       <div class="tab-content">
-        <div :class="['tab-panel', { active: cipherActiveTab === 'theory' }]">
+        <div id="theory" :class="['tab-panel']">
+          <ScanLine />
           <div class="cipher-theory">
             <h2 class="section-title">Theory & History</h2>
             <div class="theory-content">
@@ -24,7 +25,7 @@
           </div>
         </div>
 
-        <div :class="['tab-panel', { active: cipherActiveTab === 'encrypt' }]">
+        <div id="encrypt" :class="['tab-panel']">
           <div class="cipher-practice">
             <h2 class="section-title">Encrypt Messages</h2>
             <div class="control-group">
@@ -46,7 +47,7 @@
           </div>
         </div>
 
-        <div :class="['tab-panel', { active: cipherActiveTab === 'decrypt' }]">
+        <div id="decrypt" :class="['tab-panel']">
           <div class="cipher-practice">
             <h2 class="section-title">Decrypt Messages</h2>
             <div class="control-group">
@@ -74,8 +75,9 @@
 </template>
 
 <script setup lang="ts">
+import { nextTick, onMounted, ref } from 'vue'
 import CipherOutput from './CipherOutput.vue'
-import { ref } from 'vue'
+import ScanLine from './ScanLine.vue'
 
 const props = defineProps({
   title: {
@@ -101,6 +103,26 @@ const props = defineProps({
 })
 
 const cipherActiveTab = ref('theory')
+
+const switchTab = (newTabId: string) => {
+  cipherActiveTab.value = newTabId
+
+  // Add leaving class to current tab
+  document.querySelector('.tab-panel.active')?.classList.add('leaving')
+
+  // After exit animation, switch to new tab
+  setTimeout(async () => {
+    await nextTick()
+    document.querySelectorAll('.tab-panel').forEach((panel) => {
+      panel.classList.remove('active', 'leaving')
+    })
+    document.getElementById(newTabId)?.classList.add('active')
+  }, 600) // Match exit animation duration
+}
+
+onMounted(() => {
+  document.getElementById(cipherActiveTab.value)?.classList.add('active')
+})
 
 const encryptInput = ref('')
 const encryptOutput = ref('')
@@ -263,32 +285,99 @@ const clearDecrypt = () => {
   }
 }
 
+/* Enhanced Cyberpunk Tab System */
 .tab-panel {
-  display: none;
-  animation: cyberFade 0.3s ease-in-out;
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  pointer-events: none;
+  transform: translateX(100%);
+  transition: none;
 }
 
 .tab-panel.active {
-  display: block;
+  opacity: 1;
+  position: relative;
+  pointer-events: all;
+  transform: translateX(0);
+  animation: cyberDataStream 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-@keyframes cyberFade {
+.tab-panel.leaving {
+  animation: cyberDataExit 0.6s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+}
+
+@keyframes cyberDataStream {
   0% {
     opacity: 0;
-    filter: brightness(0) hue-rotate(180deg);
-    transform: translateY(10px);
+    transform: translateX(100%) rotateY(45deg) scale(0.8);
+    filter: hue-rotate(120deg) brightness(2) contrast(3) blur(5px);
+    clip-path: polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%);
   }
 
-  50% {
-    opacity: 0.5;
-    filter: brightness(0.5) hue-rotate(-180deg);
-    transform: translateY(-10px);
+  20% {
+    opacity: 0.3;
+    transform: translateX(60%) rotateY(25deg) scale(0.85);
+    filter: hue-rotate(80deg) brightness(1.8) contrast(2.5) blur(3px);
+    clip-path: polygon(80% 0%, 100% 0%, 100% 100%, 80% 100%);
+  }
+
+  40% {
+    opacity: 0.6;
+    transform: translateX(30%) rotateY(15deg) scale(0.9);
+    filter: hue-rotate(40deg) brightness(1.5) contrast(2) blur(2px);
+    clip-path: polygon(40% 0%, 100% 0%, 100% 100%, 40% 100%);
+  }
+
+  60% {
+    opacity: 0.8;
+    transform: translateX(10%) rotateY(5deg) scale(0.95);
+    filter: hue-rotate(20deg) brightness(1.2) contrast(1.5) blur(1px);
+    clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 20% 100%);
+  }
+
+  80% {
+    opacity: 0.95;
+    transform: translateX(2%) rotateY(1deg) scale(0.98);
+    filter: hue-rotate(5deg) brightness(1.05) contrast(1.2) blur(0.5px);
+    clip-path: polygon(5% 0%, 100% 0%, 100% 100%, 5% 100%);
   }
 
   100% {
     opacity: 1;
-    filter: brightness(1) hue-rotate(0deg);
-    transform: translateY(0);
+    transform: translateX(0%) rotateY(0deg) scale(1);
+    filter: hue-rotate(0deg) brightness(1) contrast(1) blur(0px);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+}
+
+@keyframes cyberDataExit {
+  0% {
+    opacity: 1;
+    transform: translateX(0%) rotateY(0deg) scale(1);
+    filter: hue-rotate(0deg) brightness(1) contrast(1) blur(0px);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+
+  30% {
+    opacity: 0.7;
+    transform: translateX(-20%) rotateY(-10deg) scale(1.02);
+    filter: hue-rotate(-30deg) brightness(1.3) contrast(1.5) blur(1px);
+    clip-path: polygon(0% 0%, 80% 0%, 80% 100%, 0% 100%);
+  }
+
+  60% {
+    opacity: 0.3;
+    transform: translateX(-60%) rotateY(-30deg) scale(1.05);
+    filter: hue-rotate(-80deg) brightness(1.8) contrast(2.5) blur(3px);
+    clip-path: polygon(0% 0%, 40% 0%, 40% 100%, 0% 100%);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(-100%) rotateY(-45deg) scale(1.1);
+    filter: hue-rotate(-120deg) brightness(2.5) contrast(3) blur(5px);
+    clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
   }
 }
 </style>
