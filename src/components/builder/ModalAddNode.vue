@@ -69,8 +69,12 @@ const closeModal = () => {
 
           <div class="form-group">
             <label class="modal-label">Custom Label (optional):</label>
-            <input type="text" v-model="newNodeData.label" class="modal-input"
-              :placeholder="`Default: ${availableCiphers.find((c) => c.type === newNodeData.type)?.label || ''}`" />
+            <input
+              type="text"
+              v-model="newNodeData.label"
+              class="modal-input"
+              :placeholder="`Default: ${availableCiphers.find((c) => c.type === newNodeData.type)?.label || ''}`"
+            />
             <small class="modal-help">Leave empty to use the default cipher name</small>
           </div>
         </div>

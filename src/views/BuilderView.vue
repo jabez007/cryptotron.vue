@@ -13,6 +13,7 @@ import { Controls } from '@vue-flow/controls'
 import { availableCiphers, defaultEdges, defaultNodes } from '@/components/builder/constants'
 import AddNodeModal from '@/components/builder/ModalAddNode.vue'
 import EditNodeModal from '@/components/builder/ModalEditNode.vue'
+import SaveGraphModal from '@/components/builder/ModalSaveGraph.vue'
 import CipherOutput from '@/components/CipherOutput.vue'
 
 const isReady = ref(false)
@@ -305,6 +306,9 @@ onEdgeDoubleClick(({ edge, event }) => {
   removeEdges(edge)
 })
 
+// Save/Load functionality
+const showSaveModal = ref(false)
+
 /* */
 const inputText = ref('')
 const outputText = ref('')
@@ -429,17 +433,56 @@ const decrypt = () => {
 
 <template>
   <div class="builder-container">
-    <VueFlow v-if="isReady" class="dark basic-flow" :nodes="nodes" :edges="edges" :connection-radius="53"
-      :edge-updater-radius="23" fit-view-on-init>
+    <VueFlow
+      v-if="isReady"
+      class="dark basic-flow"
+      :nodes="nodes"
+      :edges="edges"
+      :connection-radius="53"
+      :edge-updater-radius="23"
+      fit-view-on-init
+    >
       <Background />
       <Controls position="top-left"></Controls>
 
       <!-- Floating Add Node Button -->
       <div class="add-node-button" @click="openAddNodeModal">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 5V19M5 12H19"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
+      </div>
+
+      <!-- Save/Load Controls -->
+      <div class="save-load-controls">
+        <button class="control-btn save-btn" @click="showSaveModal = true" title="Save Cipher">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+              stroke="currentColor"
+              stroke-width="2"
+            />
+            <polyline points="17,21 17,13 7,13 7,21" stroke="currentColor" stroke-width="2" />
+            <polyline points="7,3 7,8 15,8" stroke="currentColor" stroke-width="2" />
+          </svg>
+        </button>
       </div>
     </VueFlow>
 
@@ -451,7 +494,11 @@ const decrypt = () => {
 
       <div class="control-group">
         <label class="control-label">Input Text:</label>
-        <textarea class="cipher-textarea" v-model="inputText" placeholder="Enter text to encrypt/decrypt..."></textarea>
+        <textarea
+          class="cipher-textarea"
+          v-model="inputText"
+          placeholder="Enter text to encrypt/decrypt..."
+        ></textarea>
       </div>
 
       <div class="button-group">
@@ -465,8 +512,15 @@ const decrypt = () => {
 
     <AddNodeModal :isOpen="showAddNodeModal" @close="closeAddNodeModal" @add-node="handleAddNode" />
 
-    <EditNodeModal v-if="selectedNode" :isOpen="showNodeModal" :node="selectedNode" @close="closeNodeModal"
-      @update-node="handleUpdateNode" />
+    <EditNodeModal
+      v-if="selectedNode"
+      :isOpen="showNodeModal"
+      :node="selectedNode"
+      @close="closeNodeModal"
+      @update-node="handleUpdateNode"
+    />
+
+    <SaveGraphModal :isOpen="showSaveModal" @close="showSaveModal = false" />
   </div>
 </template>
 
@@ -585,5 +639,64 @@ const decrypt = () => {
 
 .add-node-button:hover::before {
   left: 100%;
+}
+
+/* Save/Load Controls */
+.save-load-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+}
+
+.control-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.save-btn {
+  background: linear-gradient(45deg, rgba(34, 197, 94, 0.8), rgba(22, 163, 74, 0.8));
+}
+
+.save-btn:hover {
+  background: linear-gradient(45deg, rgba(34, 197, 94, 1), rgba(22, 163, 74, 1));
+  transform: translateY(-2px);
+}
+
+.load-btn {
+  background: linear-gradient(45deg, rgba(59, 130, 246, 0.8), rgba(37, 99, 235, 0.8));
+}
+
+.load-btn:hover {
+  background: linear-gradient(45deg, rgba(59, 130, 246, 1), rgba(37, 99, 235, 1));
+  transform: translateY(-2px);
+}
+
+.import-btn {
+  background: linear-gradient(45deg, rgba(168, 85, 247, 0.8), rgba(147, 51, 234, 0.8));
+}
+
+.import-btn:hover {
+  background: linear-gradient(45deg, rgba(168, 85, 247, 1), rgba(147, 51, 234, 1));
+  transform: translateY(-2px);
+}
+
+.clear-btn {
+  background: linear-gradient(45deg, rgba(239, 68, 68, 0.8), rgba(220, 38, 38, 0.8));
+}
+
+.clear-btn:hover {
+  background: linear-gradient(45deg, rgba(239, 68, 68, 1), rgba(220, 38, 38, 1));
+  transform: translateY(-2px);
 }
 </style>
