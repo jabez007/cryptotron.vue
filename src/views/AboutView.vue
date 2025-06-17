@@ -4,28 +4,33 @@
       <h1 class="page-title">About CryptoTron</h1>
       <p class="hero-subtitle">Decrypt the Past • Encrypt the Future</p>
       <p class="hero-description">
-        Welcome to CryptoTron, a cyberpunk-themed digital laboratory where the ancient art of cryptography meets
-        cutting-edge web technology. Journey through the shadows of history's most ingenious codes and ciphers, from
-        Caesar's battlefield communications to the sophisticated polyalphabetic puzzles that stumped codebreakers for
-        centuries.
+        Welcome to CryptoTron, a cyberpunk-themed digital laboratory where the ancient art of
+        cryptography meets cutting-edge web technology. Journey through the shadows of history's
+        most ingenious codes and ciphers, from Caesar's battlefield communications to the
+        sophisticated polyalphabetic puzzles that stumped codebreakers for centuries.
       </p>
     </div>
 
     <div class="about-grid">
-      <div class="about-card">
+      <div class="about-card" style="animation-delay: -2s">
         <h2 class="card-title">Mission Statement</h2>
         <div class="card-content">
-          <p>CryptoTron exists to bridge the gap between <span class="highlight">historical cryptography</span> and
-            modern digital literacy. Because understanding the evolution of secret communication is crucial to
-            comprehending today's cybersecurity landscape.</p>
+          <p>
+            CryptoTron exists to bridge the gap between
+            <span class="highlight">historical cryptography</span> and modern digital literacy.
+            Because understanding the evolution of secret communication is crucial to comprehending
+            today's cybersecurity landscape.
+          </p>
 
-          <p>The mission is to make classical cryptography <span class="highlight">accessible, interactive, and
-              engaging</span> for students, educators, security enthusiasts, and anyone curious about the hidden
-            language of codes.</p>
+          <p>
+            The mission is to make classical cryptography
+            <span class="highlight">accessible, interactive, and engaging</span> for students,
+            educators, security enthusiasts, and anyone curious about the hidden language of codes.
+          </p>
         </div>
       </div>
 
-      <div class="about-card">
+      <div class="about-card" style="animation-delay: -3s">
         <h2 class="card-title">What You'll Find</h2>
         <div class="card-content">
           <ul class="feature-list">
@@ -37,15 +42,20 @@
         </div>
       </div>
 
-      <div class="about-card">
+      <div class="about-card" style="animation-delay: -11s">
         <h2 class="card-title">Why Classical Ciphers Matter</h2>
         <div class="card-content">
-          <p>While modern encryption relies on complex mathematical algorithms, classical ciphers provide the <span
-              class="highlight">fundamental building blocks</span> of cryptographic thinking. They teach us about:</p>
+          <p>
+            While modern encryption relies on complex mathematical algorithms, classical ciphers
+            provide the <span class="highlight">fundamental building blocks</span> of cryptographic
+            thinking. They teach us about:
+          </p>
 
-          <p>Pattern recognition, frequency analysis, key management, and the eternal arms race between codemakers and
-            codebreakers. Understanding these principles is essential for anyone working in cybersecurity, digital
-            privacy, or information systems.</p>
+          <p>
+            Pattern recognition, frequency analysis, key management, and the eternal arms race
+            between codemakers and codebreakers. Understanding these principles is essential for
+            anyone working in cybersecurity, digital privacy, or information systems.
+          </p>
 
           <div class="quote-box">
             The best way to understand modern cryptography is to first master its ancient ancestors.
@@ -53,23 +63,30 @@
         </div>
       </div>
 
-      <div class="about-card">
+      <div class="about-card" style="animation-delay: -19s">
         <h2 class="card-title">Design Philosophy</h2>
         <div class="card-content">
-          <p>CryptoTron embraces a <span class="highlight">cyberpunk aesthetic</span> that reflects the underground
-            nature of cryptography throughout history. The neon-soaked interface pays homage to the digital
-            revolutionaries and cypherpunks who fought for encryption rights.</p>
+          <p>
+            CryptoTron embraces a <span class="highlight">cyberpunk aesthetic</span> that reflects
+            the underground nature of cryptography throughout history. The neon-soaked interface
+            pays homage to the digital revolutionaries and cypherpunks who fought for encryption
+            rights.
+          </p>
 
-          <p>The retro-futuristic design language symbolizes the timeless nature of cryptographic principles - ancient
-            wisdom presented through a lens of technological advancement.</p>
+          <p>
+            The retro-futuristic design language symbolizes the timeless nature of cryptographic
+            principles - ancient wisdom presented through a lens of technological advancement.
+          </p>
         </div>
       </div>
 
       <div class="about-card full-width-card">
         <h2 class="card-title">Technology Stack</h2>
         <div class="card-content">
-          <p>CryptoTron is built using cutting-edge web technologies to ensure a smooth, responsive experience across
-            all devices:</p>
+          <p>
+            CryptoTron is built using cutting-edge web technologies to ensure a smooth, responsive
+            experience across all devices:
+          </p>
           <div class="tech-grid">
             <div class="tech-badge">Vue.js 3</div>
             <div class="tech-badge">Modern CSS</div>
@@ -167,7 +184,8 @@
   right: 0;
   height: 2px;
   background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta), var(--neon-green));
-  animation: borderFlow 3s linear infinite;
+  animation: borderFlow 5s linear infinite;
+  animation-delay: inherit;
 }
 
 @keyframes borderFlow {

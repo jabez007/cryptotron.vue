@@ -22,7 +22,7 @@
   right: 0;
   height: 2px;
   background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta), var(--neon-green));
-  animation: borderFlow 3s linear infinite;
+  animation: borderFlow 5s linear infinite;
 }
 
 @keyframes borderFlow {
