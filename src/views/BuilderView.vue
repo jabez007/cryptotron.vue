@@ -84,6 +84,8 @@ const handleAddNode = (nodeData: { label: string; type: string }) => {
     id: nodeId,
     label,
     data: {
+      label,
+      type: nodeData.type,
       encryptAlgorithm: selectedCipher.encryptAlgorithm,
       decryptAlgorithm: selectedCipher.decryptAlgorithm,
       cipherKey: { ...selectedCipher.defaultKey },
@@ -309,6 +311,51 @@ onEdgeDoubleClick(({ edge, event }) => {
 // Save/Load functionality
 const showSaveModal = ref(false)
 
+const handleSaveGraph = (cipherName: string) => {
+  console.debug('Handling "save-graph" event, received named for cipher', cipherName)
+
+  const cipherGraph = {
+    nodes: getNodes.value.map((n) => ({
+      id: n.id,
+      label: n.label ?? n.data.label,
+      data: {
+        label: n.data.label ?? n.label,
+        type: n.data.type ?? 'foobar',
+        cipherKey: { ...n.data.cipherKey },
+      },
+      position: { ...n.position },
+    })),
+    edges: getEdges.value.map((e) => ({
+      id: e.id,
+      source: e.source,
+      target: e.target,
+    })),
+  }
+  console.debug('JSON of cipher graph', cipherGraph)
+
+  // Convert JSON to string with pretty-printing (2-space indent)
+  const cipherGraphStr = JSON.stringify(cipherGraph, null, 2)
+
+  // Create a Blob with the JSON data
+  const cipherGraphBlob = new Blob([cipherGraphStr], { type: 'application/json' })
+
+  // Create a download link
+  const url = URL.createObjectURL(cipherGraphBlob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${cipherName}.json`
+
+  // Trigger the download
+  document.body.appendChild(a)
+  a.click()
+
+  // Clean up
+  setTimeout(() => {
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, 10)
+}
+
 /* */
 const inputText = ref('')
 const outputText = ref('')
@@ -520,7 +567,11 @@ const decrypt = () => {
       @update-node="handleUpdateNode"
     />
 
-    <SaveGraphModal :isOpen="showSaveModal" @close="showSaveModal = false" />
+    <SaveGraphModal
+      :isOpen="showSaveModal"
+      @close="showSaveModal = false"
+      @save-graph="handleSaveGraph"
+    />
   </div>
 </template>
 

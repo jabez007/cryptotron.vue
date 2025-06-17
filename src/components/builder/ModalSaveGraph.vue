@@ -15,7 +15,7 @@
               type="text"
               class="modal-input"
               placeholder="Enter cipher name..."
-              @keyup.enter="handleSave"
+              @keyup.enter="handleSaveGraph"
               ref="nameInput"
             />
           </div>
@@ -23,7 +23,7 @@
 
         <div class="modal-footer">
           <button class="modal-button modal-button-cancel" @click="closeModal">Cancel</button>
-          <button class="cipher-button" @click="handleSave">Save</button>
+          <button class="cipher-button" @click="handleSaveGraph">Save</button>
         </div>
       </div>
     </Transition>
@@ -39,7 +39,7 @@ interface Props {
 
 interface Emits {
   (e: 'close'): void
-  (e: 'save', name: string): void
+  (e: 'save-graph', name: string): void
 }
 
 const props = defineProps<Props>()
@@ -76,13 +76,13 @@ watch(
   },
 )
 
-const handleSave = () => {
+const handleSaveGraph = () => {
   if (!cipherName.value.trim()) {
     alert('Please enter a name for your cipher')
     return
   }
 
-  emit('save', cipherName.value.trim())
+  emit('save-graph', cipherName.value.trim())
   closeModal()
 }
 

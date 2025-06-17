@@ -26,6 +26,8 @@ export const defaultNodes = [
     id: '1',
     label: 'Caesar',
     data: {
+      label: 'Caesar',
+      type: 'caesar',
       encryptAlgorithm: caesar.encrypt,
       decryptAlgorithm: caesar.decrypt,
       cipherKey: { shift: 3 },
@@ -37,6 +39,8 @@ export const defaultNodes = [
     id: '2',
     label: 'Vigenère',
     data: {
+      label: 'Vigenère',
+      type: 'vigenere',
       encryptAlgorithm: vigenere.encrypt,
       decryptAlgorithm: vigenere.decrypt,
       cipherKey: { keyword: 'foobar' },
