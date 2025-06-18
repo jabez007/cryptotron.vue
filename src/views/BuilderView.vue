@@ -279,6 +279,8 @@ const handleSaveGraph = (cipherName: string) => {
   }, 10)
 }
 
+const isDragging = ref(false)
+
 /* */
 const inputText = ref('')
 const outputText = ref('')
@@ -344,58 +346,64 @@ const decrypt = () => {
 
 <template>
   <div class="builder-container">
-    <VueFlow
-      v-if="isReady"
-      class="dark basic-flow"
-      :nodes="nodes"
-      :edges="edges"
-      :connection-radius="53"
-      :edge-updater-radius="23"
-      fit-view-on-init
+    <div
+      @dragover.prevent="isDragging = true"
+      @dragleave="isDragging = false"
+      :class="['drop-zone', { 'drag-active': isDragging }]"
     >
-      <Background />
-      <Controls position="top-left"></Controls>
+      <VueFlow
+        v-if="isReady"
+        class="dark basic-flow"
+        :nodes="nodes"
+        :edges="edges"
+        :connection-radius="53"
+        :edge-updater-radius="23"
+        fit-view-on-init
+      >
+        <Background />
+        <Controls position="top-left"></Controls>
 
-      <!-- Floating Add Node Button -->
-      <div class="add-node-button" @click="openAddNodeModal">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M12 5V19M5 12H19"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </div>
-
-      <!-- Save/Load Controls -->
-      <div class="save-load-controls">
-        <button class="control-btn save-btn" @click="showSaveModal = true" title="Save Cipher">
+        <!-- Floating Add Node Button -->
+        <div class="add-node-button" @click="openAddNodeModal">
           <svg
-            width="16"
-            height="16"
+            width="24"
+            height="24"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+              d="M12 5V19M5 12H19"
               stroke="currentColor"
               stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             />
-            <polyline points="17,21 17,13 7,13 7,21" stroke="currentColor" stroke-width="2" />
-            <polyline points="7,3 7,8 15,8" stroke="currentColor" stroke-width="2" />
           </svg>
-        </button>
-      </div>
-    </VueFlow>
+        </div>
+
+        <!-- Save/Load Controls -->
+        <div class="save-load-controls">
+          <button class="control-btn save-btn" @click="showSaveModal = true" title="Save Cipher">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <polyline points="17,21 17,13 7,13 7,21" stroke="currentColor" stroke-width="2" />
+              <polyline points="7,3 7,8 15,8" stroke="currentColor" stroke-width="2" />
+            </svg>
+          </button>
+        </div>
+      </VueFlow>
+    </div>
 
     <div class="cipher-practice">
       <h2 class="section-title">Encrypt/Decrypt Messages</h2>
@@ -504,6 +512,17 @@ const decrypt = () => {
 .builder-container {
   height: 100%;
   width: 100%;
+}
+
+.drop-zone {
+  padding: 1rem;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.drag-active {
+  background-color: var(--neon-cyan);
 }
 
 .vue-flow {
