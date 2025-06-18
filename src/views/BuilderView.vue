@@ -281,6 +281,16 @@ const handleSaveGraph = (cipherName: string) => {
 
 const isDragging = ref(false)
 
+const handleDrop = (e: DragEvent) => {
+  console.debug('Handling file drop', e.dataTransfer?.files)
+  isDragging.value = false
+  const file = e.dataTransfer?.files[0]
+  if (file) {
+    console.debug('Received file', file)
+    //handleFileUpload({ target: { files: [file] } });
+  }
+}
+
 /* */
 const inputText = ref('')
 const outputText = ref('')
@@ -350,6 +360,7 @@ const decrypt = () => {
       @dragover.prevent="isDragging = true"
       @dragleave="isDragging = false"
       :class="['drop-zone', { 'drag-active': isDragging }]"
+      @drop.prevent="handleDrop"
     >
       <VueFlow
         v-if="isReady"
