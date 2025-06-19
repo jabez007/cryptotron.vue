@@ -279,16 +279,36 @@ const handleSaveGraph = (cipherName: string) => {
   }, 10)
 }
 
+const handleLoadGraph = (cipherFile: File) => {
+  console.debug('Loading cipher graph from', cipherFile.name)
+}
+
 const isDragging = ref(false)
 
-const handleDrop = (e: DragEvent) => {
+const handleDropGraph = (e: DragEvent) => {
   console.debug('Handling file drop', e.dataTransfer?.files)
   isDragging.value = false
   const file = e.dataTransfer?.files[0]
   if (file) {
-    console.debug('Received file', file)
-    //handleFileUpload({ target: { files: [file] } });
+    console.debug('Received file for cipher', file)
+    handleLoadGraph(file)
   }
+}
+
+const handleSelectGraph = (e: Event) => {
+  console.debug('Handling "load-graph" event')
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (file) {
+    console.debug('Received file for cipher', file)
+    handleLoadGraph(file)
+  }
+}
+
+const cipherUpload = ref<HTMLElement | null>(null)
+
+const triggerCipherUpload = () => {
+  cipherUpload.value?.click()
 }
 
 /* */
@@ -360,7 +380,7 @@ const decrypt = () => {
       @dragover.prevent="isDragging = true"
       @dragleave="isDragging = false"
       :class="['drop-zone', { 'drag-active': isDragging }]"
-      @drop.prevent="handleDrop"
+      @drop.prevent="handleDropGraph"
     >
       <VueFlow
         v-if="isReady"
@@ -413,7 +433,7 @@ const decrypt = () => {
             </svg>
           </button>
 
-          <button class="control-btn load-btn" title="Load Cipher">
+          <button class="control-btn load-btn" title="Load Cipher" @click="triggerCipherUpload">
             <svg
               width="16"
               height="16"
@@ -474,6 +494,15 @@ const decrypt = () => {
       :isOpen="showSaveModal"
       @close="showSaveModal = false"
       @save-graph="handleSaveGraph"
+    />
+
+    <!-- Hidden file input -->
+    <input
+      ref="cipherUpload"
+      style="display: none"
+      type="file"
+      accept=".txt,.json,.cipher"
+      @change="handleSelectGraph"
     />
   </div>
 </template>
