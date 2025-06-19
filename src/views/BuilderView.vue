@@ -281,6 +281,37 @@ const handleSaveGraph = (cipherName: string) => {
 
 const handleLoadGraph = (cipherFile: File) => {
   console.debug('Loading cipher graph from', cipherFile.name)
+
+  // Validate file type if needed
+  const allowedTypes = ['.txt', '.json', '.cipher']
+  const fileExtension = '.' + cipherFile.name.split('.').pop()?.toLowerCase()
+
+  if (!allowedTypes.includes(fileExtension)) {
+    console.error('Invalid file type')
+    return
+  }
+
+  // Read and process file content
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const content = e.target?.result as string
+    console.log('Cipher graph content:', content)
+    /* Process cipher graph content here:
+     * 1. Update node objects with functions and component
+     *    - encryptAlgorithm
+     *    - decryptAlgorithm
+     *    - cipherKeyComponent
+     * 2. Update edge objects
+     *    - animated
+     *    - updatable
+     *    - arrow markerEnd
+     * 3. Splice in to nodes and edges bindings
+     */
+  }
+  reader.onerror = () => {
+    console.error('Error reading file')
+  }
+  reader.readAsText(cipherFile)
 }
 
 const isDragging = ref(false)
