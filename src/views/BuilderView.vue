@@ -412,6 +412,26 @@ const decrypt = () => {
               <polyline points="7,3 7,8 15,8" stroke="currentColor" stroke-width="2" />
             </svg>
           </button>
+
+          <button class="control-btn load-btn" title="Load Cipher">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" />
+              <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" />
+              <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" />
+              <polyline points="10,9 9,9 8,9" stroke="currentColor" stroke-width="2" />
+            </svg>
+          </button>
         </div>
       </VueFlow>
     </div>
@@ -549,22 +569,31 @@ const decrypt = () => {
   right: 20px;
   width: 56px;
   height: 56px;
-  background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+  background: linear-gradient(45deg, rgba(255, 0, 255, 0.2), rgba(255, 0, 255, 0.1));
+  border: 1px solid var(--neon-magenta);
   border-radius: 50%;
+  box-shadow:
+    0 0 10px rgba(255, 0, 255, 0.3),
+    inset 0 1px 0 rgba(255, 0, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(74, 158, 255, 0.3);
   transition: all 0.3s ease;
   z-index: 100;
-  color: white;
+  color: var(--neon-magenta);
+  text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
   overflow: hidden;
 }
 
 .add-node-button:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 25px rgba(74, 158, 255, 0.4);
+  background: linear-gradient(45deg, rgba(255, 0, 255, 0.3), rgba(255, 0, 255, 0.2));
+  box-shadow:
+    0 0 20px rgba(255, 0, 255, 0.6),
+    0 0 30px rgba(255, 0, 255, 0.4),
+    inset 0 1px 0 rgba(255, 0, 255, 0.3);
+  text-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
 }
 
 .add-node-button:active {
@@ -610,38 +639,65 @@ const decrypt = () => {
 }
 
 .save-btn {
-  background: linear-gradient(45deg, rgba(34, 197, 94, 0.8), rgba(22, 163, 74, 0.8));
+  background: linear-gradient(45deg, rgba(0, 255, 65, 0.2), rgba(0, 255, 65, 0.1));
+  border: 1px solid var(--neon-green);
+  box-shadow:
+    0 0 10px rgba(0, 255, 65, 0.3),
+    inset 0 1px 0 rgba(0, 255, 65, 0.2);
+  color: var(--neon-green);
+  text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+  transition: all 0.3s ease;
 }
 
 .save-btn:hover {
-  background: linear-gradient(45deg, rgba(34, 197, 94, 1), rgba(22, 163, 74, 1));
+  background: linear-gradient(45deg, rgba(0, 255, 65, 0.3), rgba(0, 255, 65, 0.2));
+  box-shadow:
+    0 0 20px rgba(0, 255, 65, 0.6),
+    0 0 30px rgba(0, 255, 65, 0.4),
+    inset 0 1px 0 rgba(0, 255, 65, 0.3);
   transform: translateY(-2px);
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
 }
 
 .load-btn {
-  background: linear-gradient(45deg, rgba(59, 130, 246, 0.8), rgba(37, 99, 235, 0.8));
+  background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.1));
+  border: 1px solid var(--neon-cyan);
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.3),
+    inset 0 1px 0 rgba(0, 255, 255, 0.2);
+  color: var(--neon-cyan);
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  transition: all 0.3s ease;
 }
 
 .load-btn:hover {
-  background: linear-gradient(45deg, rgba(59, 130, 246, 1), rgba(37, 99, 235, 1));
+  background: linear-gradient(45deg, rgba(0, 255, 255, 0.3), rgba(0, 255, 255, 0.2));
+  box-shadow:
+    0 0 20px rgba(0, 255, 255, 0.6),
+    0 0 30px rgba(0, 255, 255, 0.4),
+    inset 0 1px 0 rgba(0, 255, 255, 0.3);
   transform: translateY(-2px);
-}
-
-.import-btn {
-  background: linear-gradient(45deg, rgba(168, 85, 247, 0.8), rgba(147, 51, 234, 0.8));
-}
-
-.import-btn:hover {
-  background: linear-gradient(45deg, rgba(168, 85, 247, 1), rgba(147, 51, 234, 1));
-  transform: translateY(-2px);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
 }
 
 .clear-btn {
-  background: linear-gradient(45deg, rgba(239, 68, 68, 0.8), rgba(220, 38, 38, 0.8));
+  background: linear-gradient(45deg, rgba(255, 0, 255, 0.15), rgba(0, 255, 255, 0.15));
+  border: 1px solid rgba(255, 0, 0, 0.8);
+  box-shadow:
+    0 0 10px rgba(255, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 0, 0, 0.2);
+  color: #ff4444;
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  transition: all 0.3s ease;
 }
 
 .clear-btn:hover {
-  background: linear-gradient(45deg, rgba(239, 68, 68, 1), rgba(220, 38, 38, 1));
+  background: linear-gradient(45deg, rgba(255, 0, 255, 0.25), rgba(0, 255, 255, 0.25));
+  box-shadow:
+    0 0 20px rgba(255, 0, 0, 0.6),
+    0 0 30px rgba(255, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 0, 0, 0.3);
   transform: translateY(-2px);
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
 }
 </style>
