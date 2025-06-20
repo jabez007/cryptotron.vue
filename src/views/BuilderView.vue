@@ -362,10 +362,13 @@ const handleLoadGraph = (cipherFile: File) => {
     } catch (err) {
       console.error('Error loading graph:', err)
       // TODO: Show user-friendly error message
+      alert('Failed to load cipher graph. Please check the file format and try again.')
     }
   }
   reader.onerror = () => {
     console.error('Error reading file')
+    // TODO: Show user-friendly error message
+    alert('Failed to read the selected file. Please try again.')
   }
   reader.readAsText(cipherFile)
 }
