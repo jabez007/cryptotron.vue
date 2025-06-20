@@ -10,9 +10,16 @@ import {
 } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
-import { availableCiphers, defaultEdges, defaultNodes } from '@/components/builder/constants'
+import {
+  availableCiphers,
+  cipherLookup,
+  defaultEdges,
+  defaultNodes,
+} from '@/components/builder/constants'
+import { willCreateCycle, GraphAnalyzer } from '@/components/builder/utils'
 import AddNodeModal from '@/components/builder/ModalAddNode.vue'
 import EditNodeModal from '@/components/builder/ModalEditNode.vue'
+import SaveGraphModal from '@/components/builder/ModalSaveGraph.vue'
 import CipherOutput from '@/components/CipherOutput.vue'
 
 const isReady = ref(false)
@@ -83,6 +90,8 @@ const handleAddNode = (nodeData: { label: string; type: string }) => {
     id: nodeId,
     label,
     data: {
+      label,
+      type: nodeData.type,
       encryptAlgorithm: selectedCipher.encryptAlgorithm,
       decryptAlgorithm: selectedCipher.decryptAlgorithm,
       cipherKey: { ...selectedCipher.defaultKey },
@@ -164,65 +173,6 @@ onNodeDoubleClick(({ event, node }) => {
   }, 100)
 })
 
-/*
- * The Union-Find structure keeps track of connected components.
- */
-class UnionFind {
-  private parent: Record<string, string>
-  private rank: Record<string, number>
-  private nodes: Set<string>
-
-  constructor() {
-    this.parent = {}
-    this.rank = {}
-    this.nodes = new Set()
-  }
-
-  makeSet(x: string): void {
-    if (!this.nodes.has(x)) {
-      this.parent[x] = x
-      this.rank[x] = 0
-      this.nodes.add(x)
-    }
-  }
-
-  find(x: string): string {
-    if (this.parent[x] !== x) {
-      this.parent[x] = this.find(this.parent[x]) // Path compression
-    }
-    return this.parent[x]
-  }
-
-  union(x: string, y: string): boolean {
-    const rootX = this.find(x)
-    const rootY = this.find(y)
-
-    if (rootX === rootY) {
-      return false // Already in the same set
-    }
-
-    // Union by rank
-    if (this.rank[rootX] > this.rank[rootY]) {
-      this.parent[rootY] = rootX
-    } else if (this.rank[rootX] < this.rank[rootY]) {
-      this.parent[rootX] = rootY
-    } else {
-      this.parent[rootY] = rootX
-      this.rank[rootX]++
-    }
-    return true
-  }
-
-  // New method to find root nodes
-  getRootNodes(): string[] {
-    const roots = new Set<string>()
-    for (const node of this.nodes) {
-      roots.add(this.find(node))
-    }
-    return Array.from(roots)
-  }
-}
-
 const validateNewEdge = (
   existingEdges: Edge[],
   newEdge: Connection,
@@ -243,25 +193,6 @@ const validateNewEdge = (
     }
   }
   /* */
-  function willCreateCycle(edges: Edge[], newEdge: Connection): boolean {
-    const uf = new UnionFind()
-
-    // Add all nodes to the Union-Find structure
-    for (const edge of edges) {
-      uf.makeSet(edge.source)
-      uf.makeSet(edge.target)
-    }
-    uf.makeSet(newEdge.source)
-    uf.makeSet(newEdge.target)
-
-    // Union existing edges
-    for (const edge of edges) {
-      uf.union(edge.source, edge.target)
-    }
-
-    // Check if the new edge connects already connected components
-    return uf.find(newEdge.source) === uf.find(newEdge.target)
-  }
 
   if (willCreateCycle(existingEdges, newEdge)) {
     console.warn(`Connecting Node ${newEdge.source} to Node ${newEdge.target} will create a loop`)
@@ -305,6 +236,176 @@ onEdgeDoubleClick(({ edge, event }) => {
   removeEdges(edge)
 })
 
+// Save/Load functionality
+const showSaveModal = ref(false)
+
+const handleSaveGraph = (cipherName: string) => {
+  console.debug('Handling "save-graph" event, received named for cipher', cipherName)
+
+  const cipherGraph = {
+    nodes: getNodes.value.map((n) => ({
+      id: n.id,
+      label: n.label ?? n.data.label,
+      data: {
+        label: n.data.label ?? n.label,
+        type: n.data.type ?? 'foobar',
+        cipherKey: { ...n.data.cipherKey },
+      },
+      position: { ...n.position },
+    })),
+    edges: getEdges.value.map((e) => ({
+      id: e.id,
+      source: e.source,
+      target: e.target,
+    })),
+  }
+  console.debug('JSON of cipher graph', cipherGraph)
+
+  // Convert JSON to string with pretty-printing (2-space indent)
+  const cipherGraphStr = JSON.stringify(cipherGraph, null, 2)
+
+  // Create a Blob with the JSON data
+  const cipherGraphBlob = new Blob([cipherGraphStr], { type: 'application/json' })
+
+  // Create a download link
+  const url = URL.createObjectURL(cipherGraphBlob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${cipherName}.json`
+
+  // Trigger the download
+  document.body.appendChild(a)
+  a.click()
+
+  // Clean up
+  setTimeout(() => {
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }, 10)
+}
+
+const handleLoadGraph = (cipherFile: File) => {
+  console.debug('Loading cipher graph from', cipherFile.name)
+
+  // Validate file type using MIME type and extension
+  const allowedMimeTypes = ['text/plain', 'application/json', 'text/json']
+  const allowedTypes = ['.txt', '.json', '.cipher']
+  const fileExtension = '.' + cipherFile.name.split('.').pop()?.toLowerCase()
+
+  if (
+    !allowedTypes.includes(fileExtension) ||
+    (!allowedMimeTypes.includes(cipherFile.type) && cipherFile.type !== '')
+  ) {
+    console.error('Invalid file type. Only .txt, .json, and .cipher files are allowed.')
+    alert('Invalid file type. Please select a .txt, .json, or .cipher file.')
+    return
+  }
+
+  // Read and process file content
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const content = e.target?.result as string
+    console.log('Cipher graph content:', content)
+    try {
+      const graphData: { nodes: Node[]; edges: Edge[] } = JSON.parse(content)
+      // Validate the structure
+      if (
+        !graphData.nodes ||
+        !Array.isArray(graphData.nodes) ||
+        !graphData.edges ||
+        !Array.isArray(graphData.edges)
+      ) {
+        throw new Error('Invalid graph structure')
+      }
+      /* Process cipher graph content here:
+       * 1. Update node objects with functions and component
+       *    - encryptAlgorithm
+       *    - decryptAlgorithm
+       *    - cipherKeyComponent
+       * 2. Update edge objects
+       *    - animated
+       *    - updatable
+       *    - arrow markerEnd
+       * 3. Splice in to nodes and edges bindings
+       */
+      const enhancedNodes = graphData.nodes.map((node) => {
+        const cipherData = cipherLookup.get(node.data.type)
+
+        if (!cipherData) {
+          console.warn(`Unknown cipher type: ${node.data.type}`)
+          return node // Return original node if cipher type not found
+        }
+
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            encryptAlgorithm: cipherData.encryptAlgorithm,
+            decryptAlgorithm: cipherData.decryptAlgorithm,
+            cipherKeyComponent: cipherData.cipherKeyComponent,
+          },
+        }
+      })
+      console.debug('Enhanced nodes from cipher file data', enhancedNodes)
+
+      const enhancedEdges = graphData.edges.map((edge) => {
+        return {
+          ...edge,
+          updatable: true,
+          animated: true,
+          markerEnd: MarkerType.Arrow,
+        }
+      })
+      console.debug('Enhanced edges from cipher file data', enhancedEdges)
+
+      nodes.value = [...enhancedNodes]
+      edges.value = [...enhancedEdges]
+      setTimeout(async () => {
+        await nextTick()
+        fitView()
+      }, 100)
+    } catch (err) {
+      console.error('Error loading graph:', err)
+      // TODO: Show user-friendly error message
+      alert('Failed to load cipher graph. Please check the file format and try again.')
+    }
+  }
+  reader.onerror = () => {
+    console.error('Error reading file')
+    // TODO: Show user-friendly error message
+    alert('Failed to read the selected file. Please try again.')
+  }
+  reader.readAsText(cipherFile)
+}
+
+const isDragging = ref(false)
+
+const handleDropGraph = (e: DragEvent) => {
+  console.debug('Handling file drop', e.dataTransfer?.files)
+  isDragging.value = false
+  const file = e.dataTransfer?.files[0]
+  if (file) {
+    console.debug('Received file for cipher', file)
+    handleLoadGraph(file)
+  }
+}
+
+const handleSelectGraph = (e: Event) => {
+  console.debug('Handling "load-graph" event')
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (file) {
+    console.debug('Received file for cipher', file)
+    handleLoadGraph(file)
+  }
+}
+
+const cipherUpload = ref<HTMLElement | null>(null)
+
+const triggerCipherUpload = () => {
+  cipherUpload.value?.click()
+}
+
 /* */
 const inputText = ref('')
 const outputText = ref('')
@@ -312,65 +413,6 @@ const outputText = ref('')
 const clear = () => {
   inputText.value = ''
   outputText.value = ''
-}
-
-class GraphAnalyzer {
-  private unionFind = new UnionFind()
-  private adjacencyList: Record<string, string[]> = {}
-  private rootNodes: string[] = []
-
-  constructor(edges: Edge[]) {
-    // Build adjacency list and union find structure
-    for (const edge of edges) {
-      this.unionFind.makeSet(edge.source)
-      this.unionFind.makeSet(edge.target)
-      this.unionFind.union(edge.source, edge.target)
-
-      if (!this.adjacencyList[edge.source]) {
-        this.adjacencyList[edge.source] = []
-      }
-      this.adjacencyList[edge.source].push(edge.target)
-
-      // For undirected graph, add reverse connection
-      if (!this.adjacencyList[edge.target]) {
-        this.adjacencyList[edge.target] = []
-      }
-      this.adjacencyList[edge.target].push(edge.source)
-    }
-
-    this.rootNodes = this.unionFind.getRootNodes()
-  }
-
-  getRootNodes(): string[] {
-    return this.rootNodes
-  }
-
-  getConnectedNodes(root?: string): string[] {
-    const startNode = root || this.rootNodes[0]
-    if (!startNode) return []
-
-    const visited = new Set<string>()
-    const result: string[] = []
-
-    // Depth-First Search to traverse connections
-    const dfs = (node: string) => {
-      visited.add(node)
-      result.push(node)
-
-      for (const neighbor of this.adjacencyList[node] || []) {
-        if (!visited.has(neighbor)) {
-          dfs(neighbor)
-        }
-      }
-    }
-
-    dfs(startNode)
-    return result
-  }
-
-  getAllConnectedComponents(): string[][] {
-    return this.rootNodes.map((root) => this.getConnectedNodes(root))
-  }
 }
 
 const getTraversedNodedata = () => {
@@ -429,19 +471,85 @@ const decrypt = () => {
 
 <template>
   <div class="builder-container">
-    <VueFlow v-if="isReady" class="dark basic-flow" :nodes="nodes" :edges="edges" :connection-radius="53"
-      :edge-updater-radius="23" fit-view-on-init>
-      <Background />
-      <Controls position="top-left"></Controls>
+    <div
+      @dragover.prevent="isDragging = true"
+      @dragleave="isDragging = false"
+      :class="['drop-zone', { 'drag-active': isDragging }]"
+      @drop.prevent="handleDropGraph"
+    >
+      <VueFlow
+        v-if="isReady"
+        class="dark basic-flow"
+        :nodes="nodes"
+        :edges="edges"
+        :connection-radius="53"
+        :edge-updater-radius="23"
+        fit-view-on-init
+      >
+        <Background />
+        <Controls position="top-left"></Controls>
 
-      <!-- Floating Add Node Button -->
-      <div class="add-node-button" @click="openAddNodeModal">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
-      </div>
-    </VueFlow>
+        <!-- Floating Add Node Button -->
+        <div class="add-node-button" @click="openAddNodeModal">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 5V19M5 12H19"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+
+        <!-- Save/Load Controls -->
+        <div class="save-load-controls">
+          <button class="control-btn save-btn" @click="showSaveModal = true" title="Save Cipher">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <polyline points="17,21 17,13 7,13 7,21" stroke="currentColor" stroke-width="2" />
+              <polyline points="7,3 7,8 15,8" stroke="currentColor" stroke-width="2" />
+            </svg>
+          </button>
+
+          <button class="control-btn load-btn" title="Load Cipher" @click="triggerCipherUpload">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" />
+              <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" stroke-width="2" />
+              <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="2" />
+              <polyline points="10,9 9,9 8,9" stroke="currentColor" stroke-width="2" />
+            </svg>
+          </button>
+        </div>
+      </VueFlow>
+    </div>
 
     <div class="cipher-practice">
       <h2 class="section-title">Encrypt/Decrypt Messages</h2>
@@ -451,7 +559,11 @@ const decrypt = () => {
 
       <div class="control-group">
         <label class="control-label">Input Text:</label>
-        <textarea class="cipher-textarea" v-model="inputText" placeholder="Enter text to encrypt/decrypt..."></textarea>
+        <textarea
+          class="cipher-textarea"
+          v-model="inputText"
+          placeholder="Enter text to encrypt/decrypt..."
+        ></textarea>
       </div>
 
       <div class="button-group">
@@ -465,8 +577,28 @@ const decrypt = () => {
 
     <AddNodeModal :isOpen="showAddNodeModal" @close="closeAddNodeModal" @add-node="handleAddNode" />
 
-    <EditNodeModal v-if="selectedNode" :isOpen="showNodeModal" :node="selectedNode" @close="closeNodeModal"
-      @update-node="handleUpdateNode" />
+    <EditNodeModal
+      v-if="selectedNode"
+      :isOpen="showNodeModal"
+      :node="selectedNode"
+      @close="closeNodeModal"
+      @update-node="handleUpdateNode"
+    />
+
+    <SaveGraphModal
+      :isOpen="showSaveModal"
+      @close="showSaveModal = false"
+      @save-graph="handleSaveGraph"
+    />
+
+    <!-- Hidden file input -->
+    <input
+      ref="cipherUpload"
+      style="display: none"
+      type="file"
+      accept=".txt,.json,.cipher"
+      @change="handleSelectGraph"
+    />
   </div>
 </template>
 
@@ -537,6 +669,17 @@ const decrypt = () => {
   width: 100%;
 }
 
+.drop-zone {
+  padding: 1rem;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.drag-active {
+  background-color: var(--neon-cyan);
+}
+
 .vue-flow {
   height: 33vh;
   border: 1px solid var(--cryptotron-border-glow);
@@ -550,22 +693,31 @@ const decrypt = () => {
   right: 20px;
   width: 56px;
   height: 56px;
-  background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+  background: linear-gradient(45deg, rgba(255, 0, 255, 0.2), rgba(255, 0, 255, 0.1));
+  border: 1px solid var(--neon-magenta);
   border-radius: 50%;
+  box-shadow:
+    0 0 10px rgba(255, 0, 255, 0.3),
+    inset 0 1px 0 rgba(255, 0, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(74, 158, 255, 0.3);
   transition: all 0.3s ease;
   z-index: 100;
-  color: white;
+  color: var(--neon-magenta);
+  text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
   overflow: hidden;
 }
 
 .add-node-button:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 25px rgba(74, 158, 255, 0.4);
+  background: linear-gradient(45deg, rgba(255, 0, 255, 0.3), rgba(255, 0, 255, 0.2));
+  box-shadow:
+    0 0 20px rgba(255, 0, 255, 0.6),
+    0 0 30px rgba(255, 0, 255, 0.4),
+    inset 0 1px 0 rgba(255, 0, 255, 0.3);
+  text-shadow: 0 0 10px rgba(255, 0, 255, 0.8);
 }
 
 .add-node-button:active {
@@ -585,5 +737,91 @@ const decrypt = () => {
 
 .add-node-button:hover::before {
   left: 100%;
+}
+
+/* Save/Load Controls */
+.save-load-controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+}
+
+.control-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.save-btn {
+  background: linear-gradient(45deg, rgba(0, 255, 65, 0.2), rgba(0, 255, 65, 0.1));
+  border: 1px solid var(--neon-green);
+  box-shadow:
+    0 0 10px rgba(0, 255, 65, 0.3),
+    inset 0 1px 0 rgba(0, 255, 65, 0.2);
+  color: var(--neon-green);
+  text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  background: linear-gradient(45deg, rgba(0, 255, 65, 0.3), rgba(0, 255, 65, 0.2));
+  box-shadow:
+    0 0 20px rgba(0, 255, 65, 0.6),
+    0 0 30px rgba(0, 255, 65, 0.4),
+    inset 0 1px 0 rgba(0, 255, 65, 0.3);
+  transform: translateY(-2px);
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+}
+
+.load-btn {
+  background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.1));
+  border: 1px solid var(--neon-cyan);
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.3),
+    inset 0 1px 0 rgba(0, 255, 255, 0.2);
+  color: var(--neon-cyan);
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.load-btn:hover {
+  background: linear-gradient(45deg, rgba(0, 255, 255, 0.3), rgba(0, 255, 255, 0.2));
+  box-shadow:
+    0 0 20px rgba(0, 255, 255, 0.6),
+    0 0 30px rgba(0, 255, 255, 0.4),
+    inset 0 1px 0 rgba(0, 255, 255, 0.3);
+  transform: translateY(-2px);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+}
+
+.clear-btn {
+  background: linear-gradient(45deg, rgba(255, 0, 255, 0.15), rgba(0, 255, 255, 0.15));
+  border: 1px solid rgba(255, 0, 0, 0.8);
+  box-shadow:
+    0 0 10px rgba(255, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 0, 0, 0.2);
+  color: #ff4444;
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.clear-btn:hover {
+  background: linear-gradient(45deg, rgba(255, 0, 255, 0.25), rgba(0, 255, 255, 0.25));
+  box-shadow:
+    0 0 20px rgba(255, 0, 0, 0.6),
+    0 0 30px rgba(255, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 0, 0, 0.3);
+  transform: translateY(-2px);
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
 }
 </style>
