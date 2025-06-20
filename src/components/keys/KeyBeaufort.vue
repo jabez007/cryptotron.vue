@@ -11,22 +11,22 @@
 <script setup lang="ts">
 import { useCipherKey, validationRules } from './mixin'
 
-interface VigenereCipherKey {
+interface BeaufortCipherKey {
   keyword: string
 }
 
 interface Props {
-  cipherKey: VigenereCipherKey
+  cipherKey: BeaufortCipherKey
 }
 
 const props = withDefaults(defineProps<Props>(), {
   cipherKey: () => ({
-    keyword: 'mockraven',
+    keyword: 'lumberjack',
   }),
 })
 
 const emit = defineEmits<{
-  'update:cipherKey': [cipherKey: VigenereCipherKey]
+  'update:cipherKey': [cipherKey: BeaufortCipherKey]
 }>()
 
 const { createPropertyComputed } = useCipherKey(props, emit, {

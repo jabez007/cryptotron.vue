@@ -1,19 +1,51 @@
 import { MarkerType } from '@vue-flow/core'
-import { caesar, vigenere } from '@jabez007/cryptotron.js'
+import { affine, autokey, beaufort, caesar, substitution, vigenere } from '@jabez007/cryptotron.js'
 
 export const availableCiphers = [
   {
+    type: 'affine',
+    label: 'Affine Cipher',
+    defaultKey: { alpha: 3, beta: 1 },
+    encryptAlgorithm: affine.encrypt,
+    decryptAlgorithm: affine.decrypt,
+    cipherKeyComponent: () => import('@/components/keys/KeyAffine.vue'),
+  },
+  {
+    type: 'autokey',
+    label: 'Autokey Cipher',
+    defaultKey: { primer: 'bytewalker' },
+    encryptAlgorithm: autokey.encrypt,
+    decryptAlgorithm: autokey.decrypt,
+    cipherKeyComponent: () => import('@/components/keys/KeyAutokey.vue'),
+  },
+  {
+    type: 'beaufort',
+    label: 'Beaufort Cipher',
+    defaultKey: { keyword: 'lumberjack' },
+    encryptAlgorithm: beaufort.encrypt,
+    decryptAlgorithm: beaufort.decrypt,
+    cipherKeyComponent: () => import('@/components/keys/KeyBeaufort.vue'),
+  },
+  {
     type: 'caesar',
     label: 'Caesar Cipher',
-    defaultKey: { shift: 3 },
+    defaultKey: { shift: 13 },
     encryptAlgorithm: caesar.encrypt,
     decryptAlgorithm: caesar.decrypt,
     cipherKeyComponent: () => import('@/components/keys/KeyCaesar.vue'),
   },
   {
+    type: 'substitution',
+    label: 'Substitution Cipher',
+    defaultKey: { cipherAlphabet: 'qwertyuiopasdfghjklzxcvbnm' },
+    encryptAlgorithm: substitution.encrypt,
+    decryptAlgorithm: substitution.decrypt,
+    cipherKeyComponent: () => import('@/components/keys/KeySubstitution.vue'),
+  },
+  {
     type: 'vigenere',
     label: 'Vigenère Cipher',
-    defaultKey: { keyword: 'secret' },
+    defaultKey: { keyword: 'mockraven' },
     encryptAlgorithm: vigenere.encrypt,
     decryptAlgorithm: vigenere.decrypt,
     cipherKeyComponent: () => import('@/components/keys/KeyVigenere.vue'),
@@ -41,7 +73,7 @@ export const defaultNodes = [
       type: 'caesar',
       encryptAlgorithm: caesar.encrypt,
       decryptAlgorithm: caesar.decrypt,
-      cipherKey: { shift: 3 },
+      cipherKey: { shift: 13 },
       cipherKeyComponent: () => import('@/components/keys/KeyCaesar.vue'),
     },
     position: { x: 250, y: 5 },
@@ -54,7 +86,7 @@ export const defaultNodes = [
       type: 'vigenere',
       encryptAlgorithm: vigenere.encrypt,
       decryptAlgorithm: vigenere.decrypt,
-      cipherKey: { keyword: 'foobar' },
+      cipherKey: { keyword: 'mockraven' },
       cipherKeyComponent: () => import('@/components/keys/KeyVigenere.vue'),
     },
     position: { x: 100, y: 100 },

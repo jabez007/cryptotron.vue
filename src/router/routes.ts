@@ -16,10 +16,31 @@ export default (parentRouteName?: string) => {
       path: `${rootPath}builder`,
       component: () => import('@/views/BuilderView.vue'),
     },
+    /***************************************************/
+    {
+      name: 'cryptotron-affine',
+      path: `${rootPath}affine`,
+      component: () => import('@/views/AffineView.vue'),
+    },
+    {
+      name: 'cryptotron-autokey',
+      path: `${rootPath}autokey`,
+      component: () => import('@/views/AutokeyView.vue'),
+    },
+    {
+      name: 'cryptotron-beaufort',
+      path: `${rootPath}beaufort`,
+      component: () => import('@/views/BeaufortView.vue'),
+    },
     {
       name: 'cryptotron-caesar',
       path: `${rootPath}caesar`,
       component: () => import('@/views/CaesarView.vue'),
+    },
+    {
+      name: 'cryptotron-substitution',
+      path: `${rootPath}substitution`,
+      component: () => import('@/views/SubstitutionView.vue'),
     },
     {
       name: 'cryptotron-vigenere',
