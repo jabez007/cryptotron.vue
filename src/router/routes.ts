@@ -23,6 +23,11 @@ export default (parentRouteName?: string) => {
       component: () => import('@/views/AffineView.vue'),
     },
     {
+      name: 'cryptotron-autokey',
+      path: `${rootPath}autokey`,
+      component: () => import('@/views/AutokeyView.vue'),
+    },
+    {
       name: 'cryptotron-caesar',
       path: `${rootPath}caesar`,
       component: () => import('@/views/CaesarView.vue'),
