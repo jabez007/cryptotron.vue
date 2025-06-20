@@ -29,7 +29,7 @@ export default (parentRouteName?: string) => {
     },
     {
       name: 'cryptotron-beaufort',
-      path: `${rootPath}cryptotron-beaufort`,
+      path: `${rootPath}beaufort`,
       component: () => import('@/views/BeaufortView.vue'),
     },
     {
