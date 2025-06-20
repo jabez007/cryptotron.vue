@@ -1,5 +1,5 @@
 import { MarkerType } from '@vue-flow/core'
-import { affine, autokey, caesar, vigenere } from '@jabez007/cryptotron.js'
+import { affine, autokey, beaufort, caesar, vigenere } from '@jabez007/cryptotron.js'
 
 export const availableCiphers = [
   {
@@ -17,6 +17,14 @@ export const availableCiphers = [
     encryptAlgorithm: autokey.encrypt,
     decryptAlgorithm: autokey.decrypt,
     cipherKeyComponent: () => import('@/components/keys/KeyAutokey.vue'),
+  },
+  {
+    type: 'beaufort',
+    label: 'Beaufort Cipher',
+    defaultKey: { keyword: 'lumberjack' },
+    encryptAlgorithm: beaufort.encrypt,
+    decryptAlgorithm: beaufort.decrypt,
+    cipherKeyComponent: () => import('@/components/keys/KeyBeaufort.vue'),
   },
   {
     type: 'caesar',

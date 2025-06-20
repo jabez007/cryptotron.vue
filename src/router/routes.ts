@@ -28,6 +28,11 @@ export default (parentRouteName?: string) => {
       component: () => import('@/views/AutokeyView.vue'),
     },
     {
+      name: 'cryptotron-beaufort',
+      path: `${rootPath}cryptotron-beaufort`,
+      component: () => import('@/views/BeaufortView.vue'),
+    },
+    {
       name: 'cryptotron-caesar',
       path: `${rootPath}caesar`,
       component: () => import('@/views/CaesarView.vue'),

@@ -32,6 +32,7 @@
       <RouterLink :to="{ name: 'cryptotron-caesar' }">Caesar</RouterLink>
       <div class="nav-category">Polyalphabetic Ciphers</div>
       <RouterLink :to="{ name: 'cryptotron-autokey' }">Autokey</RouterLink>
+      <RouterLink :to="{ name: 'cryptotron-beaufort' }">Beaufort</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-vigenere' }">Vigenère</RouterLink>
     </nav>
 
