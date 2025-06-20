@@ -5,13 +5,17 @@ import KeyCaesar from '@/components/keys/KeyCaesar.vue'
 import { ref } from 'vue'
 
 const caesarCipherKey = ref({
-  shift: 0,
+  shift: 13,
 })
 </script>
 
 <template>
-  <CipherCard title="Caesar Cipher" :encrypt-algorithm="caesar.encrypt(caesarCipherKey)"
-    :decrypt-algorithm="caesar.decrypt(caesarCipherKey)" :cipher-key="caesarCipherKey">
+  <CipherCard
+    title="Caesar Cipher"
+    :encrypt-algorithm="caesar.encrypt(caesarCipherKey)"
+    :decrypt-algorithm="caesar.decrypt(caesarCipherKey)"
+    :cipher-key="caesarCipherKey"
+  >
     <template v-slot:theory>
       <p>
         The Caesar cipher is one of the earliest known encryption techniques, named after Julius

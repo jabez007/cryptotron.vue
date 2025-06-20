@@ -27,7 +27,10 @@
       <RouterLink :to="{ name: 'cryptotron-home' }">Home</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-about' }">About</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-builder' }">BYOA</RouterLink>
+      <div class="nav-category">Substitution Ciphers</div>
+      <RouterLink :to="{ name: 'cryptotron-affine' }">Affine</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-caesar' }">Caesar</RouterLink>
+      <div class="nav-category">Polyalphabetic Ciphers</div>
       <RouterLink :to="{ name: 'cryptotron-vigenere' }">Vigenère</RouterLink>
     </nav>
 

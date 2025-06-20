@@ -5,13 +5,17 @@ import KeyVigenere from '@/components/keys/KeyVigenere.vue'
 import { ref } from 'vue'
 
 const vigenereCipherKey = ref({
-  keyword: '',
+  keyword: 'mockraven',
 })
 </script>
 
 <template>
-  <CipherCard title="Vigenère Cipher" :encrypt-algorithm="vigenere.encrypt(vigenereCipherKey)"
-    :decrypt-algorithm="vigenere.decrypt(vigenereCipherKey)" :cipher-key="vigenereCipherKey">
+  <CipherCard
+    title="Vigenère Cipher"
+    :encrypt-algorithm="vigenere.encrypt(vigenereCipherKey)"
+    :decrypt-algorithm="vigenere.decrypt(vigenereCipherKey)"
+    :cipher-key="vigenereCipherKey"
+  >
     <template v-slot:theory>
       <p>
         The Vigenère cipher is a more advanced encryption method that emerged in the 16th century,

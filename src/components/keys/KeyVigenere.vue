@@ -21,7 +21,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   cipherKey: () => ({
-    keyword: '',
+    keyword: 'mockraven',
   }),
 })
 

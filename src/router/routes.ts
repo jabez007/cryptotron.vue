@@ -16,6 +16,12 @@ export default (parentRouteName?: string) => {
       path: `${rootPath}builder`,
       component: () => import('@/views/BuilderView.vue'),
     },
+    /***************************************************/
+    {
+      name: 'cryptotron-affine',
+      path: `${rootPath}affine`,
+      component: () => import('@/views/AffineView.vue'),
+    },
     {
       name: 'cryptotron-caesar',
       path: `${rootPath}caesar`,
