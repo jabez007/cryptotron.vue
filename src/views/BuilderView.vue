@@ -10,7 +10,12 @@ import {
 } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { Controls } from '@vue-flow/controls'
-import { availableCiphers, defaultEdges, defaultNodes } from '@/components/builder/constants'
+import {
+  availableCiphers,
+  cipherLookup,
+  defaultEdges,
+  defaultNodes,
+} from '@/components/builder/constants'
 import { willCreateCycle, GraphAnalyzer } from '@/components/builder/utils'
 import AddNodeModal from '@/components/builder/ModalAddNode.vue'
 import EditNodeModal from '@/components/builder/ModalEditNode.vue'
@@ -296,6 +301,7 @@ const handleLoadGraph = (cipherFile: File) => {
   reader.onload = (e) => {
     const content = e.target?.result as string
     console.log('Cipher graph content:', content)
+    const graphData: { nodes: Node[]; edges: Edge[] } = JSON.parse(content)
     /* Process cipher graph content here:
      * 1. Update node objects with functions and component
      *    - encryptAlgorithm
@@ -307,6 +313,42 @@ const handleLoadGraph = (cipherFile: File) => {
      *    - arrow markerEnd
      * 3. Splice in to nodes and edges bindings
      */
+    const enhancedNodes = graphData.nodes.map((node) => {
+      const cipherData = cipherLookup.get(node.data.type)
+
+      if (!cipherData) {
+        console.warn(`Unknown cipher type: ${node.data.type}`)
+        return node // Return original node if cipher type not found
+      }
+
+      return {
+        ...node,
+        data: {
+          ...node.data,
+          encryptAlgorithm: cipherData.encryptAlgorithm,
+          decryptAlgorithm: cipherData.decryptAlgorithm,
+          cipherKeyComponent: cipherData.cipherKeyComponent,
+        },
+      }
+    })
+    console.debug('Enhanced nodes from cipher file data', enhancedNodes)
+
+    const enhancedEdges = graphData.edges.map((edge) => {
+      return {
+        ...edge,
+        updatable: true,
+        animated: true,
+        markerEnd: MarkerType.Arrow,
+      }
+    })
+    console.debug('Enhanced edges from cipher file data', enhancedEdges)
+
+    nodes.value = [...enhancedNodes]
+    edges.value = [...enhancedEdges]
+    setTimeout(async () => {
+      await nextTick()
+      fitView()
+    }, 100)
   }
   reader.onerror = () => {
     console.error('Error reading file')

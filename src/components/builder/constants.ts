@@ -21,6 +21,17 @@ export const availableCiphers = [
   // Add more cipher types as needed
 ]
 
+export const cipherLookup = new Map(
+  availableCiphers.map((cipher) => [
+    cipher.type,
+    {
+      encryptAlgorithm: cipher.encryptAlgorithm,
+      decryptAlgorithm: cipher.decryptAlgorithm,
+      cipherKeyComponent: cipher.cipherKeyComponent,
+    },
+  ]),
+)
+
 export const defaultNodes = [
   {
     id: '1',
