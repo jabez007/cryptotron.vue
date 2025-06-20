@@ -301,54 +301,68 @@ const handleLoadGraph = (cipherFile: File) => {
   reader.onload = (e) => {
     const content = e.target?.result as string
     console.log('Cipher graph content:', content)
-    const graphData: { nodes: Node[]; edges: Edge[] } = JSON.parse(content)
-    /* Process cipher graph content here:
-     * 1. Update node objects with functions and component
-     *    - encryptAlgorithm
-     *    - decryptAlgorithm
-     *    - cipherKeyComponent
-     * 2. Update edge objects
-     *    - animated
-     *    - updatable
-     *    - arrow markerEnd
-     * 3. Splice in to nodes and edges bindings
-     */
-    const enhancedNodes = graphData.nodes.map((node) => {
-      const cipherData = cipherLookup.get(node.data.type)
-
-      if (!cipherData) {
-        console.warn(`Unknown cipher type: ${node.data.type}`)
-        return node // Return original node if cipher type not found
+    try {
+      const graphData: { nodes: Node[]; edges: Edge[] } = JSON.parse(content)
+      // Validate the structure
+      if (
+        !graphData.nodes ||
+        !Array.isArray(graphData.nodes) ||
+        !graphData.edges ||
+        !Array.isArray(graphData.edges)
+      ) {
+        throw new Error('Invalid graph structure')
       }
+      /* Process cipher graph content here:
+       * 1. Update node objects with functions and component
+       *    - encryptAlgorithm
+       *    - decryptAlgorithm
+       *    - cipherKeyComponent
+       * 2. Update edge objects
+       *    - animated
+       *    - updatable
+       *    - arrow markerEnd
+       * 3. Splice in to nodes and edges bindings
+       */
+      const enhancedNodes = graphData.nodes.map((node) => {
+        const cipherData = cipherLookup.get(node.data.type)
 
-      return {
-        ...node,
-        data: {
-          ...node.data,
-          encryptAlgorithm: cipherData.encryptAlgorithm,
-          decryptAlgorithm: cipherData.decryptAlgorithm,
-          cipherKeyComponent: cipherData.cipherKeyComponent,
-        },
-      }
-    })
-    console.debug('Enhanced nodes from cipher file data', enhancedNodes)
+        if (!cipherData) {
+          console.warn(`Unknown cipher type: ${node.data.type}`)
+          return node // Return original node if cipher type not found
+        }
 
-    const enhancedEdges = graphData.edges.map((edge) => {
-      return {
-        ...edge,
-        updatable: true,
-        animated: true,
-        markerEnd: MarkerType.Arrow,
-      }
-    })
-    console.debug('Enhanced edges from cipher file data', enhancedEdges)
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            encryptAlgorithm: cipherData.encryptAlgorithm,
+            decryptAlgorithm: cipherData.decryptAlgorithm,
+            cipherKeyComponent: cipherData.cipherKeyComponent,
+          },
+        }
+      })
+      console.debug('Enhanced nodes from cipher file data', enhancedNodes)
 
-    nodes.value = [...enhancedNodes]
-    edges.value = [...enhancedEdges]
-    setTimeout(async () => {
-      await nextTick()
-      fitView()
-    }, 100)
+      const enhancedEdges = graphData.edges.map((edge) => {
+        return {
+          ...edge,
+          updatable: true,
+          animated: true,
+          markerEnd: MarkerType.Arrow,
+        }
+      })
+      console.debug('Enhanced edges from cipher file data', enhancedEdges)
+
+      nodes.value = [...enhancedNodes]
+      edges.value = [...enhancedEdges]
+      setTimeout(async () => {
+        await nextTick()
+        fitView()
+      }, 100)
+    } catch (err) {
+      console.error('Error loading graph:', err)
+      // TODO: Show user-friendly error message
+    }
   }
   reader.onerror = () => {
     console.error('Error reading file')
