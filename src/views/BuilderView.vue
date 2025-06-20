@@ -287,12 +287,17 @@ const handleSaveGraph = (cipherName: string) => {
 const handleLoadGraph = (cipherFile: File) => {
   console.debug('Loading cipher graph from', cipherFile.name)
 
-  // Validate file type if needed
+  // Validate file type using MIME type and extension
+  const allowedMimeTypes = ['text/plain', 'application/json', 'text/json']
   const allowedTypes = ['.txt', '.json', '.cipher']
   const fileExtension = '.' + cipherFile.name.split('.').pop()?.toLowerCase()
 
-  if (!allowedTypes.includes(fileExtension)) {
-    console.error('Invalid file type')
+  if (
+    !allowedTypes.includes(fileExtension) ||
+    (!allowedMimeTypes.includes(cipherFile.type) && cipherFile.type !== '')
+  ) {
+    console.error('Invalid file type. Only .txt, .json, and .cipher files are allowed.')
+    alert('Invalid file type. Please select a .txt, .json, or .cipher file.')
     return
   }
 
