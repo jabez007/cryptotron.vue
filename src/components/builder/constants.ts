@@ -1,5 +1,5 @@
 import { MarkerType } from '@vue-flow/core'
-import { affine, autokey, beaufort, caesar, vigenere } from '@jabez007/cryptotron.js'
+import { affine, autokey, beaufort, caesar, substitution, vigenere } from '@jabez007/cryptotron.js'
 
 export const availableCiphers = [
   {
@@ -33,6 +33,14 @@ export const availableCiphers = [
     encryptAlgorithm: caesar.encrypt,
     decryptAlgorithm: caesar.decrypt,
     cipherKeyComponent: () => import('@/components/keys/KeyCaesar.vue'),
+  },
+  {
+    type: 'substitution',
+    label: 'Substitution Cipher',
+    defaultKey: { cipherAlphabet: 'qwertyuiopasdfghjklzxcvbnm' },
+    encryptAlgorithm: substitution.encrypt,
+    decryptAlgorithm: substitution.decrypt,
+    cipherKeyComponent: () => import('@/components/keys/KeySubstitution.vue'),
   },
   {
     type: 'vigenere',

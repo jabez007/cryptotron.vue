@@ -38,6 +38,11 @@ export default (parentRouteName?: string) => {
       component: () => import('@/views/CaesarView.vue'),
     },
     {
+      name: 'cryptotron-substitution',
+      path: `${rootPath}substitution`,
+      component: () => import('@/views/SubstitutionView.vue'),
+    },
+    {
       name: 'cryptotron-vigenere',
       path: `${rootPath}vigenere`,
       component: () => import('@/views/VigenereView.vue'),
