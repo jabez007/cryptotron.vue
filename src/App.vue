@@ -35,24 +35,21 @@
     <!-- Navigation Overlay -->
     <div :class="['nav-overlay-bg', { active: menuOpen }]" @click="closeMenu"></div>
     <nav :class="['nav-overlay', { active: menuOpen }]">
-      <RouterLink v-if="isSubApp" to="/">
-        <IconDocumentation />
-      </RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-home' }">Home</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-about' }">About</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-builder' }">BYOA</RouterLink>
-      <div class="nav-category">Substitution Ciphers</div>
-      <RouterLink :to="{ name: 'cryptotron-affine' }">Affine</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-caesar' }">Caesar</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-substitution' }">Simple</RouterLink>
-      <div class="nav-category">Polyalphabetic Ciphers</div>
-      <RouterLink :to="{ name: 'cryptotron-autokey' }">Autokey</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-beaufort' }">Beaufort</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-vigenere' }">Vigenère</RouterLink>
-      <div class="nav-category">Grid & Fractionation</div>
-      <RouterLink :to="{ name: 'cryptotron-polybius' }">Polybius</RouterLink>
-      <div class="nav-category">Transposition Ciphers</div>
-      <RouterLink :to="{ name: 'cryptotron-rail-fence' }">Rail-Fence</RouterLink>
+      <template v-for="(item, index) in menuItems" :key="item.name">
+        <div 
+          v-if="item.category && (index === 0 || menuItems[index-1].category !== item.category)" 
+          class="nav-category"
+        >
+          {{ item.category }}
+        </div>
+        <RouterLink 
+          :to="{ name: item.name }" 
+          :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }"
+        >
+          <span v-if="menuOpen && menuSelectedIndex === index" class="menu-selection-indicator">&gt;</span>
+          {{ item.label }}
+        </RouterLink>
+      </template>
     </nav>
 
     <div id="app-content">
@@ -94,11 +91,63 @@ const toggleCrt = () => {
   localStorage.setItem('crt-enabled', isCrtEnabled.value.toString())
 }
 
+/* nav menu */
+const menuOpen = ref(false)
+const menuSelectedIndex = ref(0)
+
+const menuItems = [
+  { name: 'cryptotron-home', label: 'Home' },
+  { name: 'cryptotron-about', label: 'About' },
+  { name: 'cryptotron-builder', label: 'BYOA' },
+  { name: 'cryptotron-affine', label: 'Affine', category: 'Substitution Ciphers' },
+  { name: 'cryptotron-caesar', label: 'Caesar' },
+  { name: 'cryptotron-polybius', label: 'Polybius', category: 'Grid & Fractionation' },
+  { name: 'cryptotron-substitution', label: 'Simple', category: 'Substitution Ciphers' }, // Reordered slightly for logic
+  { name: 'cryptotron-autokey', label: 'Autokey', category: 'Polyalphabetic Ciphers' },
+  { name: 'cryptotron-beaufort', label: 'Beaufort' },
+  { name: 'cryptotron-vigenere', label: 'Vigenère' },
+  { name: 'cryptotron-rail-fence', label: 'Rail-Fence', category: 'Transposition Ciphers' },
+]
+
+const toggleMenu = () => {
+  menuOpen.value = !menuOpen.value
+  if (menuOpen.value) {
+    // Find index of current route or default to 0
+    const currentIndex = menuItems.findIndex(item => item.name === route.name)
+    menuSelectedIndex.value = currentIndex !== -1 ? currentIndex : 0
+  }
+}
+
+const closeMenu = () => {
+  menuOpen.value = false
+}
+
 const handleGlobalKeydown = (e: KeyboardEvent) => {
   // Ignore if typing in an input
   if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
 
   const key = e.key.toLowerCase()
+
+  // Menu Navigation
+  if (menuOpen.value) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      menuSelectedIndex.value = (menuSelectedIndex.value + 1) % menuItems.length
+      return
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      menuSelectedIndex.value = (menuSelectedIndex.value - 1 + menuItems.length) % menuItems.length
+      return
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const item = menuItems[menuSelectedIndex.value]
+      router.push({ name: item.name })
+      closeMenu()
+      return
+    }
+  }
 
   // Terminal Shortcuts (Alt + Key)
   if (e.altKey) {
@@ -115,28 +164,6 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
     if (menuOpen.value) closeMenu()
     else router.push({ name: 'cryptotron-home' })
   }
-}
-
-onMounted(() => {
-  window.addEventListener('keydown', handleGlobalKeydown)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('keydown', handleGlobalKeydown)
-})
-
-console.debug(`Current router is`, router)
-console.debug(`Current route is`, route)
-
-/* nav menu */
-const menuOpen = ref(false)
-
-const toggleMenu = () => {
-  menuOpen.value = !menuOpen.value
-}
-
-const closeMenu = () => {
-  menuOpen.value = false
 }
 
 watch(
@@ -445,11 +472,25 @@ nav a {
 }
 
 nav a:hover,
-nav a.router-link-exact-active {
+nav a.router-link-exact-active,
+nav a.keyboard-selected {
   border-color: var(--neon-cyan);
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   background: rgba(0, 255, 255, 0.1);
   transform: translateX(10px);
+}
+
+.menu-selection-indicator {
+  position: absolute;
+  left: 10px;
+  color: var(--neon-magenta);
+  font-weight: 900;
+  animation: menu-pulse 1s infinite alternate;
+}
+
+@keyframes menu-pulse {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
 }
 
 nav a::before {
