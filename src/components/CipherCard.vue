@@ -2,10 +2,10 @@
   <div class="cipher-content">
     <h1 class="page-title">{{ title }}</h1>
     <div class="cipher-container">
-      <div class="vim-status-bar" :class="{ 'mode-insert': isInsertMode }">
-        <span class="mode-tag">{{ isInsertMode ? '-- INSERT --' : '-- NORMAL --' }}</span>
+      <div class="vim-status-bar" :class="{ 'mode-insert': isInsertMode, 'mode-key': isKeyMode }">
+        <span class="mode-tag">{{ isKeyMode ? '-- KEY --' : isInsertMode ? '-- INSERT --' : '-- NORMAL --' }}</span>
         <span class="mode-hint">
-          {{ isInsertMode ? 'Press ESC to exit' : 'i: type | 1-3: tabs | e: encrypt | d: decrypt | c: crack | x: clear' }}
+          {{ isInsertMode ? 'Press ESC to exit' : 'i: text | k: key | 1-3: tabs | e: encrypt | d: decrypt | c: crack | x: clear' }}
         </span>
       </div>
       <div class="tab-navigation">
@@ -148,9 +148,11 @@ const switchTab = (newTabId: string) => {
 }
 
 const isInsertMode = ref(false)
+const isKeyMode = ref(false)
 
 const handleKeydown = (e: KeyboardEvent) => {
   const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)
+  const isKeyInput = (e.target as HTMLElement).classList.contains('cipher-input')
 
   // Handle Escape to leave insert mode
   if (e.key === 'Escape') {
@@ -158,12 +160,14 @@ const handleKeydown = (e: KeyboardEvent) => {
       ;(e.target as HTMLElement).blur()
     }
     isInsertMode.value = false
+    isKeyMode.value = false
     return
   }
 
-  // If typing in an input, we are in insert mode
+  // If typing in an input, update modes
   if (isInput) {
     isInsertMode.value = true
+    isKeyMode.value = isKeyInput
     return
   }
 
@@ -175,11 +179,23 @@ const handleKeydown = (e: KeyboardEvent) => {
       case 'i':
         e.preventDefault()
         isInsertMode.value = true
+        isKeyMode.value = false
         // Focus the first available textarea in the active panel
         setTimeout(() => {
           const panel = document.getElementById(cipherActiveTab.value)
           const textarea = panel?.querySelector('textarea') as HTMLTextAreaElement
           textarea?.focus()
+        }, 0)
+        break
+      case 'k':
+        e.preventDefault()
+        isInsertMode.value = true
+        isKeyMode.value = true
+        // Focus the first available cipher-input in the active panel
+        setTimeout(() => {
+          const panel = document.getElementById(cipherActiveTab.value)
+          const keyInput = panel?.querySelector('.cipher-input') as HTMLInputElement
+          keyInput?.focus()
         }, 0)
         break
       case '1': switchTab('theory'); break
@@ -321,6 +337,11 @@ const crack = async () => {
   border-bottom-color: var(--neon-magenta);
 }
 
+.vim-status-bar.mode-key {
+  background: rgba(0, 255, 65, 0.15);
+  border-bottom-color: var(--neon-green);
+}
+
 .mode-tag {
   color: var(--neon-cyan);
   font-weight: 700;
@@ -330,6 +351,11 @@ const crack = async () => {
 .mode-insert .mode-tag {
   color: var(--neon-magenta);
   text-shadow: 0 0 5px var(--neon-magenta);
+}
+
+.mode-key .mode-tag {
+  color: var(--neon-green);
+  text-shadow: 0 0 5px var(--neon-green);
 }
 
 .mode-hint {
