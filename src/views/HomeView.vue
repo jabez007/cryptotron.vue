@@ -109,9 +109,12 @@ const router = useRouter()
   overflow: hidden;
 }
 
-.cipher-card:hover {
+.cipher-card:hover,
+.cipher-card:focus-visible {
   transform: translateY(-5px);
   box-shadow: 0 15px 40px rgba(0, 255, 255, 0.2);
+  outline: none;
+  border-color: var(--neon-cyan);
 }
 
 .cipher-card h3 {
