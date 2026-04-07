@@ -15,7 +15,8 @@ const router = useRouter()
         himself! Shift each letter by a fixed number of positions in the alphabet (e.g., ROT13).
       </p>
     </div>
-    <div class="cipher-card">
+    <div class="cipher-card" role="link" @click="router.push({ name: 'cryptotron-rail-fence' })">
+      <ScanLine delay="-2s" />
       <h3>Rail-Fence Cipher</h3>
       <p>
         A transposition cipher from the 19th-century that writes the message in a zigzag pattern
@@ -30,7 +31,8 @@ const router = useRouter()
         a keyword to create multiple shifting alphabets, making it much harder to crack.
       </p>
     </div>
-    <div class="cipher-card">
+    <div class="cipher-card" role="link" @click="router.push({ name: 'cryptotron-polybius' })">
+      <ScanLine delay="-4s" />
       <h3>Polybius Square</h3>
       <p>
         Invented by the ancient Greeks! A digraph substitution cipher that turn letters into

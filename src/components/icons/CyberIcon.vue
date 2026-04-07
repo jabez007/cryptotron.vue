@@ -2,7 +2,19 @@
 import { computed } from 'vue'
 
 const props = defineProps<{
-  type: 'theory' | 'encrypt' | 'decrypt' | 'copy' | 'crack' | 'save' | 'load' | 'home' | 'about' | 'builder'
+  type:
+    | 'theory'
+    | 'encrypt'
+    | 'decrypt'
+    | 'copy'
+    | 'crack'
+    | 'save'
+    | 'load'
+    | 'home'
+    | 'about'
+    | 'builder'
+    | 'display'
+    | 'display-off'
   size?: number | string
 }>()
 

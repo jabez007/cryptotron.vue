@@ -1,5 +1,14 @@
 import { MarkerType } from '@vue-flow/core'
-import { affine, autokey, beaufort, caesar, substitution, vigenere } from '@jabez007/cryptotron.js'
+import {
+  affine,
+  autokey,
+  beaufort,
+  caesar,
+  polybius,
+  railFence,
+  substitution,
+  vigenere,
+} from '@jabez007/cryptotron.js'
 
 export const availableCiphers = [
   {
@@ -37,6 +46,24 @@ export const availableCiphers = [
     decryptAlgorithm: caesar.decrypt,
     crackAlgorithm: caesar.crack,
     cipherKeyComponent: () => import('@/components/keys/KeyCaesar.vue'),
+  },
+  {
+    type: 'polybius',
+    label: 'Polybius Square',
+    defaultKey: { keyword: '', cipherChars: '12345' },
+    encryptAlgorithm: polybius.encrypt,
+    decryptAlgorithm: polybius.decrypt,
+    crackAlgorithm: polybius.crack,
+    cipherKeyComponent: () => import('@/components/keys/KeyPolybius.vue'),
+  },
+  {
+    type: 'rail-fence',
+    label: 'Rail-Fence Cipher',
+    defaultKey: { rails: 3 },
+    encryptAlgorithm: railFence.encrypt,
+    decryptAlgorithm: railFence.decrypt,
+    crackAlgorithm: railFence.crack,
+    cipherKeyComponent: () => import('@/components/keys/KeyRailFence.vue'),
   },
   {
     type: 'substitution',
