@@ -26,6 +26,10 @@ const getColumns = () => {
 const handleKeyDown = (e: KeyboardEvent) => {
   if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
 
+  // Prevent collision with global navigation menu
+  const isMenuOpen = document.querySelector('.nav-overlay.active') !== null
+  if (isMenuOpen) return
+
   const cols = getColumns()
 
   switch (e.key) {

@@ -154,6 +154,10 @@ const handleKeydown = (e: KeyboardEvent) => {
   const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)
   const isKeyInput = (e.target as HTMLElement).classList.contains('cipher-input')
 
+  // Prevent collision with global navigation menu
+  const isMenuOpen = document.querySelector('.nav-overlay.active') !== null
+  if (isMenuOpen) return
+
   // Handle Escape to leave insert mode
   if (e.key === 'Escape') {
     if (isInput) {
