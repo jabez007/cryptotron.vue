@@ -81,7 +81,7 @@ import IconBug from '@/components/icons/IconBug.vue'
 import IconDocumentation from '@/components/icons/IconDocumentation.vue'
 import CyberIcon from '@/components/icons/CyberIcon.vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 const router = useRouter()
 const route = useRoute()

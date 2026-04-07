@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import CipherOutput from './CipherOutput.vue'
 import ScanLine from './ScanLine.vue'
 import CyberIcon from './icons/CyberIcon.vue'
