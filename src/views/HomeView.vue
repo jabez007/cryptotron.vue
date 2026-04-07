@@ -24,6 +24,7 @@ const getColumns = () => {
 }
 
 const handleKeyDown = (e: KeyboardEvent) => {
+  if (e.defaultPrevented) return
   if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
 
   // Prevent collision with global navigation menu

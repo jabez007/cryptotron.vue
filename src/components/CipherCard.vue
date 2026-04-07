@@ -151,6 +151,7 @@ const isInsertMode = ref(false)
 const isKeyMode = ref(false)
 
 const handleKeydown = (e: KeyboardEvent) => {
+  if (e.defaultPrevented) return
   const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)
   const isKeyInput = (e.target as HTMLElement).classList.contains('cipher-input')
 

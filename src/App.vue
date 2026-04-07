@@ -132,16 +132,19 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
   if (menuOpen.value) {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
+      e.stopImmediatePropagation()
       menuSelectedIndex.value = (menuSelectedIndex.value + 1) % menuItems.length
       return
     }
     if (e.key === 'ArrowUp') {
       e.preventDefault()
+      e.stopImmediatePropagation()
       menuSelectedIndex.value = (menuSelectedIndex.value - 1 + menuItems.length) % menuItems.length
       return
     }
     if (e.key === 'Enter') {
       e.preventDefault()
+      e.stopImmediatePropagation()
       const item = menuItems[menuSelectedIndex.value]
       router.push({ name: item.name })
       closeMenu()
@@ -152,15 +155,17 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
   // Terminal Shortcuts (Alt + Key)
   if (e.altKey) {
     switch (key) {
-      case 'h': e.preventDefault(); router.push({ name: 'cryptotron-home' }); break
-      case 'b': e.preventDefault(); router.push({ name: 'cryptotron-builder' }); break
-      case 'm': e.preventDefault(); toggleMenu(); break
-      case 't': e.preventDefault(); toggleCrt(); break
+      case 'h': e.preventDefault(); e.stopImmediatePropagation(); router.push({ name: 'cryptotron-home' }); break
+      case 'b': e.preventDefault(); e.stopImmediatePropagation(); router.push({ name: 'cryptotron-builder' }); break
+      case 'm': e.preventDefault(); e.stopImmediatePropagation(); toggleMenu(); break
+      case 't': e.preventDefault(); e.stopImmediatePropagation(); toggleCrt(); break
     }
   }
 
   // Escape to Home
   if (e.key === 'Escape') {
+    e.preventDefault()
+    e.stopImmediatePropagation()
     if (menuOpen.value) closeMenu()
     else router.push({ name: 'cryptotron-home' })
   }
@@ -180,11 +185,12 @@ onMounted(() => {
   console.debug(`Root route resolved to ${root.name as string}`)
   isSubApp.value = root.name !== 'cryptotron-home'
   
-  window.addEventListener('keydown', handleGlobalKeydown)
+  // Use capture: true so the global listener (menu shortcuts) runs BEFORE component listeners
+  window.addEventListener('keydown', handleGlobalKeydown, { capture: true })
 })
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleGlobalKeydown)
+  window.removeEventListener('keydown', handleGlobalKeydown, { capture: true })
 })
 
 /* Bug report functionality */
