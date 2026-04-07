@@ -121,7 +121,7 @@ const toggleMenu = () => {
     // Ensure selection is visible on open
     nextTick(() => {
       const activeLink = document.querySelector('nav.nav-overlay a.keyboard-selected')
-      activeLink?.scrollIntoView({ block: 'nearest' })
+      activeLink?.scrollIntoView({ block: 'center' })
     })
   }
 }
@@ -131,7 +131,7 @@ watch(menuSelectedIndex, () => {
   if (menuOpen.value) {
     nextTick(() => {
       const activeLink = document.querySelector('nav.nav-overlay a.keyboard-selected')
-      activeLink?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      activeLink?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     })
   }
 })
@@ -445,7 +445,7 @@ header {
   top: 50px;
   right: -100%;
   width: 350px;
-  height: 100vh;
+  height: calc(100vh - 50px);
   background: linear-gradient(135deg, var(--cryptotron-darker-bg) 0%, rgba(15, 15, 25, 0.98) 100%);
   backdrop-filter: blur(20px);
   border-left: 2px solid var(--neon-cyan);
@@ -453,10 +453,9 @@ header {
   transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1000;
   padding: 2rem;
-  padding-bottom: 150px; /* Extra space for bottom items */
+  padding-bottom: 5rem; /* Standard bottom padding */
   overflow-y: auto;
   scroll-behavior: smooth;
-  scroll-padding: 20px;
 }
 
 .nav-overlay.active {
