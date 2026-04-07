@@ -5,7 +5,7 @@
       <div class="vim-status-bar" :class="{ 'mode-insert': isInsertMode }">
         <span class="mode-tag">{{ isInsertMode ? '-- INSERT --' : '-- NORMAL --' }}</span>
         <span class="mode-hint">
-          {{ isInsertMode ? 'Press ESC to exit' : 'Press "i" to type, "1-3" to switch tabs' }}
+          {{ isInsertMode ? 'Press ESC to exit' : 'i: type | 1-3: tabs | e: encrypt | d: decrypt | c: crack | x: clear' }}
         </span>
       </div>
       <div class="tab-navigation">
@@ -185,6 +185,19 @@ const handleKeydown = (e: KeyboardEvent) => {
       case '1': switchTab('theory'); break
       case '2': switchTab('encrypt'); break
       case '3': switchTab('decrypt'); break
+      case 'e': 
+        if (cipherActiveTab.value === 'encrypt') encrypt(); 
+        break
+      case 'd': 
+        if (cipherActiveTab.value === 'decrypt') decrypt(); 
+        break
+      case 'c': 
+        if (cipherActiveTab.value === 'decrypt' && props.crackAlgorithm) crack(); 
+        break
+      case 'x': 
+        if (cipherActiveTab.value === 'encrypt') clearEncrypt();
+        else if (cipherActiveTab.value === 'decrypt') clearDecrypt();
+        break
     }
   }
 }
