@@ -32,15 +32,15 @@ const polybiusCipherKey = ref({
       </p>
 
       <div class="cipher-example">
-        &nbsp;&nbsp;1 2 3 4 5<br />
-        1 A B C D E<br />
-        2 F G H I K<br />
-        3 L M N O P<br />
-        4 Q R S T U<br />
-        5 V W X Y Z
+        &nbsp;&nbsp;A B C D E<br />
+        A A B C D E<br />
+        B F G H I K<br />
+        C L M N O P<br />
+        D Q R S T U<br />
+        E V W X Y Z
       </div>
 
-      <p>Example: "HELLO" → "23 15 31 31 34"</p>
+      <p>Example: "HELLO" → "BD AE CB CB CD"</p>
 
       <h3>Keyed Square</h3>
       <p>

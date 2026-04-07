@@ -7,7 +7,14 @@ const router = useRouter()
 
 <template>
   <div class="cipher-grid">
-    <div class="cipher-card" role="link" @click="router.push({ name: 'cryptotron-caesar' })">
+    <div
+      class="cipher-card"
+      role="link"
+      tabindex="0"
+      @click="router.push({ name: 'cryptotron-caesar' })"
+      @keydown.enter="router.push({ name: 'cryptotron-caesar' })"
+      @keydown.space.prevent="router.push({ name: 'cryptotron-caesar' })"
+    >
       <ScanLine delay="-1s" />
       <h3>Caesar Cipher</h3>
       <p>
@@ -15,7 +22,14 @@ const router = useRouter()
         himself! Shift each letter by a fixed number of positions in the alphabet (e.g., ROT13).
       </p>
     </div>
-    <div class="cipher-card" role="link" @click="router.push({ name: 'cryptotron-rail-fence' })">
+    <div
+      class="cipher-card"
+      role="link"
+      tabindex="0"
+      @click="router.push({ name: 'cryptotron-rail-fence' })"
+      @keydown.enter="router.push({ name: 'cryptotron-rail-fence' })"
+      @keydown.space.prevent="router.push({ name: 'cryptotron-rail-fence' })"
+    >
       <ScanLine delay="-2s" />
       <h3>Rail-Fence Cipher</h3>
       <p>
@@ -23,7 +37,14 @@ const router = useRouter()
         across multiple "rails", then reads off the ciphertext row by row. Simple yet effective!
       </p>
     </div>
-    <div class="cipher-card" role="link" @click="router.push({ name: 'cryptotron-vigenere' })">
+    <div
+      class="cipher-card"
+      role="link"
+      tabindex="0"
+      @click="router.push({ name: 'cryptotron-vigenere' })"
+      @keydown.enter="router.push({ name: 'cryptotron-vigenere' })"
+      @keydown.space.prevent="router.push({ name: 'cryptotron-vigenere' })"
+    >
       <ScanLine delay="-3s" />
       <h3>Vigenère Cipher</h3>
       <p>
@@ -31,7 +52,14 @@ const router = useRouter()
         a keyword to create multiple shifting alphabets, making it much harder to crack.
       </p>
     </div>
-    <div class="cipher-card" role="link" @click="router.push({ name: 'cryptotron-polybius' })">
+    <div
+      class="cipher-card"
+      role="link"
+      tabindex="0"
+      @click="router.push({ name: 'cryptotron-polybius' })"
+      @keydown.enter="router.push({ name: 'cryptotron-polybius' })"
+      @keydown.space.prevent="router.push({ name: 'cryptotron-polybius' })"
+    >
       <ScanLine delay="-4s" />
       <h3>Polybius Square</h3>
       <p>
@@ -39,7 +67,14 @@ const router = useRouter()
         coordinates using a 5×5 grid of letters (I and J share a cell) based on a keyword.
       </p>
     </div>
-    <div class="cipher-card" role="link" @click="router.push({ name: 'cryptotron-builder' })">
+    <div
+      class="cipher-card"
+      role="link"
+      tabindex="0"
+      @click="router.push({ name: 'cryptotron-builder' })"
+      @keydown.enter="router.push({ name: 'cryptotron-builder' })"
+      @keydown.space.prevent="router.push({ name: 'cryptotron-builder' })"
+    >
       <ScanLine delay="-5s" />
       <h3>Interactive Cipher Chain Builder</h3>
       <p>

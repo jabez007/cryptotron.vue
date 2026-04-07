@@ -24,6 +24,7 @@ const colors = {
   cyan: 'var(--neon-cyan)',
   magenta: 'var(--neon-magenta)',
   green: 'var(--neon-green)',
+  secondary: 'var(--cryptotron-text-secondary)',
 }
 </script>
 
@@ -112,8 +113,8 @@ const colors = {
 
     <!-- Display Off / Clean Mode -->
     <g v-if="type === 'display-off'">
-      <rect x="3" y="4" width="18" height="12" stroke="var(--cryptotron-text-secondary)" stroke-width="1.5" opacity="0.6" />
-      <path d="M7 20H17M12 16V20" stroke="var(--cryptotron-text-secondary)" stroke-width="1.5" opacity="0.6" />
+      <rect x="3" y="4" width="18" height="12" :stroke="colors.secondary" stroke-width="1.5" opacity="0.6" />
+      <path d="M7 20H17M12 16V20" :stroke="colors.secondary" stroke-width="1.5" opacity="0.6" />
       <path d="M3 3L21 21" :stroke="colors.magenta" stroke-width="1.5" />
     </g>
 
@@ -131,8 +132,20 @@ const colors = {
   transition: all 0.3s ease;
 }
 
-.cyber-icon:hover {
-  filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.6));
-  transform: scale(1.1);
+@media (hover: hover) {
+  .cyber-icon:hover {
+    filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.6));
+    transform: scale(1.1);
+  }
+}
+
+/* Accessibility: Respect OS-level reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .cyber-icon,
+  .cyber-icon:hover {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
 }
 </style>

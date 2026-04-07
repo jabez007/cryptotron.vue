@@ -183,9 +183,9 @@ const crack = async () => {
 
   isCracking.value = true
   try {
-    // Crack algorithms in the library are synchronous but might be heavy
-    // Use nextTick to allow UI update if needed
-    await nextTick()
+    // Crack algorithms in the library are synchronous but might be heavy.
+    // We yield to the event loop to allow the "Cracking..." UI to paint.
+    await new Promise((resolve) => setTimeout(resolve, 0))
     const result = props.crackAlgorithm(decryptInput.value)
     if (result && result.key) {
       // Update the cipher key object properties
@@ -343,6 +343,22 @@ const crack = async () => {
   50% {
     transform: scale(1.2);
     opacity: 0.7;
+  }
+}
+
+/* Accessibility: Respect OS-level reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .tab-button.active::after,
+  .tab-panel.active,
+  .pulse,
+  .cipher-button::before {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .tab-panel.active {
+    transform: none !important;
+    opacity: 1 !important;
   }
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div class="form-control">
     <label class="control-label">Number of Rails:</label>
-    <input class="cipher-input" type="number" v-model.lazy.number="rails.value" min="2" max="10" />
+    <input class="cipher-input" type="number" v-model.lazy.number="rails.value" min="2" max="100" />
     <div v-if="rails.hasError" class="error-messages">
       <p v-for="error in rails.errors" :key="error">{{ error }}</p>
     </div>

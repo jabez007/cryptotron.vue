@@ -13,6 +13,8 @@
           class="crt-toggle-btn"
           @click="toggleCrt"
           :title="isCrtEnabled ? 'Disable CRT Effects (Clean Mode)' : 'Enable CRT Effects (Cyber Mode)'"
+          :aria-label="isCrtEnabled ? 'Disable CRT Effects' : 'Enable CRT Effects'"
+          :aria-pressed="isCrtEnabled"
         >
           <CyberIcon :type="isCrtEnabled ? 'display' : 'display-off'" size="24" />
         </button>
@@ -131,6 +133,48 @@ const openIssues = () => {
 
 <style>
 @import '@/assets/base.css';
+
+/* Accessibility: Respect OS-level reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  /* CRT effects */
+  .crt-overlay,
+  .scanlines,
+  .crt-overlay::after {
+    display: none !important;
+  }
+
+  /* Glitch text */
+  .glitch-text::before,
+  .glitch-text::after {
+    display: none !important;
+  }
+
+  /* Global animations and transitions */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Specific theme elements */
+  .logo,
+  .nav-overlay,
+  .cipher-button::before,
+  .tab-panel.active {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Route transitions */
+  .cyber-glitch-enter-active,
+  .cyber-glitch-leave-active {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 </style>
 
 <style scoped>
@@ -207,28 +251,6 @@ const openIssues = () => {
   }
   100% {
     opacity: 0.1;
-  }
-}
-
-/* Accessibility: Respect OS-level reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  .crt-overlay,
-  .scanlines,
-  .crt-overlay::after {
-    display: none !important;
-  }
-
-  .glitch-text::before,
-  .glitch-text::after {
-    display: none !important;
-  }
-
-  .logo,
-  .nav-overlay,
-  .cipher-button::before,
-  .tab-panel.active {
-    animation: none !important;
-    transition: none !important;
   }
 }
 

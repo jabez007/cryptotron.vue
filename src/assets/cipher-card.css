@@ -219,6 +219,17 @@
   100% { clip-path: inset(25% 0 25% 0); }
 }
 
+/* Accessibility: Respect OS-level reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .glitch-text::before,
+  .glitch-text::after {
+    animation: none !important;
+    clip-path: none !important;
+    left: 0 !important;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5) !important;
+  }
+}
+
 .button-group {
   display: flex;
   flex-wrap: wrap;
