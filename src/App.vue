@@ -100,14 +100,16 @@ const menuItems = [
   { name: 'cryptotron-about', label: 'About' },
   { name: 'cryptotron-builder', label: 'BYOA' },
   { name: 'cryptotron-affine', label: 'Affine', category: 'Substitution Ciphers' },
-  { name: 'cryptotron-caesar', label: 'Caesar' },
+  { name: 'cryptotron-caesar', label: 'Caesar', category: 'Substitution Ciphers' },
+  { name: 'cryptotron-substitution', label: 'Simple', category: 'Substitution Ciphers' },
   { name: 'cryptotron-polybius', label: 'Polybius', category: 'Grid & Fractionation' },
-  { name: 'cryptotron-substitution', label: 'Simple', category: 'Substitution Ciphers' }, // Reordered slightly for logic
   { name: 'cryptotron-autokey', label: 'Autokey', category: 'Polyalphabetic Ciphers' },
-  { name: 'cryptotron-beaufort', label: 'Beaufort' },
-  { name: 'cryptotron-vigenere', label: 'Vigenère' },
+  { name: 'cryptotron-beaufort', label: 'Beaufort', category: 'Polyalphabetic Ciphers' },
+  { name: 'cryptotron-vigenere', label: 'Vigenère', category: 'Polyalphabetic Ciphers' },
   { name: 'cryptotron-rail-fence', label: 'Rail-Fence', category: 'Transposition Ciphers' },
 ]
+
+// ... (logic remains same until toggleMenu)
 
 const toggleMenu = () => {
   menuOpen.value = !menuOpen.value
@@ -115,8 +117,24 @@ const toggleMenu = () => {
     // Find index of current route or default to 0
     const currentIndex = menuItems.findIndex(item => item.name === route.name)
     menuSelectedIndex.value = currentIndex !== -1 ? currentIndex : 0
+    
+    // Ensure selection is visible on open
+    nextTick(() => {
+      const activeLink = document.querySelector('nav.nav-overlay a.keyboard-selected')
+      activeLink?.scrollIntoView({ block: 'nearest' })
+    })
   }
 }
+
+// Watch selection to handle scrolling
+watch(menuSelectedIndex, () => {
+  if (menuOpen.value) {
+    nextTick(() => {
+      const activeLink = document.querySelector('nav.nav-overlay a.keyboard-selected')
+      activeLink?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    })
+  }
+})
 
 const closeMenu = () => {
   menuOpen.value = false
@@ -435,7 +453,10 @@ header {
   transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1000;
   padding: 2rem;
+  padding-bottom: 150px; /* Extra space for bottom items */
   overflow-y: auto;
+  scroll-behavior: smooth;
+  scroll-padding: 20px;
 }
 
 .nav-overlay.active {
