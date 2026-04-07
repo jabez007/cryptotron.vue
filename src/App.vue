@@ -42,12 +42,13 @@
       <div class="nav-category">Substitution Ciphers</div>
       <RouterLink :to="{ name: 'cryptotron-affine' }">Affine</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-caesar' }">Caesar</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-polybius' }">Polybius</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-substitution' }">Simple</RouterLink>
       <div class="nav-category">Polyalphabetic Ciphers</div>
       <RouterLink :to="{ name: 'cryptotron-autokey' }">Autokey</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-beaufort' }">Beaufort</RouterLink>
       <RouterLink :to="{ name: 'cryptotron-vigenere' }">Vigenère</RouterLink>
+      <div class="nav-category">Grid & Fractionation</div>
+      <RouterLink :to="{ name: 'cryptotron-polybius' }">Polybius</RouterLink>
       <div class="nav-category">Transposition Ciphers</div>
       <RouterLink :to="{ name: 'cryptotron-rail-fence' }">Rail-Fence</RouterLink>
     </nav>
