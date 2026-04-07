@@ -6,7 +6,7 @@ import { ref } from 'vue'
 
 const polybiusCipherKey = ref({
   keyword: '',
-  cipherChars: '12345',
+  cipherChars: 'ABCDE',
 })
 </script>
 

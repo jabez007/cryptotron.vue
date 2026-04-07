@@ -50,7 +50,7 @@ export const availableCiphers = [
   {
     type: 'polybius',
     label: 'Polybius Square',
-    defaultKey: { keyword: '', cipherChars: '12345' },
+    defaultKey: { keyword: '', cipherChars: 'ABCDE' },
     encryptAlgorithm: polybius.encrypt,
     decryptAlgorithm: polybius.decrypt,
     crackAlgorithm: polybius.crack,

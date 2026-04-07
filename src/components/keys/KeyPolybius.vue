@@ -30,7 +30,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   cipherKey: () => ({
     keyword: '',
-    cipherChars: '12345',
+    cipherChars: 'ABCDE',
   }),
 })
 
