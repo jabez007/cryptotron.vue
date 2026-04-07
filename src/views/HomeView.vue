@@ -14,27 +14,45 @@ const ciphers = [
 ]
 
 const selectedIndex = ref(0)
+const gridElement = ref<HTMLElement | null>(null)
+
+const getColumns = () => {
+  if (!gridElement.value) return 3
+  return window.getComputedStyle(gridElement.value).display === 'flex' 
+    ? Math.floor(gridElement.value.offsetWidth / 450) || 1 // 450 is approx card width + margin
+    : 1
+}
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  // Only handle navigation if no input is focused
   if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
+
+  const cols = getColumns()
 
   switch (e.key) {
     case 'ArrowRight':
+      e.preventDefault()
       selectedIndex.value = (selectedIndex.value + 1) % ciphers.length
       break
     case 'ArrowLeft':
+      e.preventDefault()
       selectedIndex.value = (selectedIndex.value - 1 + ciphers.length) % ciphers.length
       break
     case 'ArrowDown':
-      // Simplified grid logic: assume 3 columns max based on flex-wrap
-      if (selectedIndex.value + 3 < ciphers.length) {
-        selectedIndex.value += 3
+      e.preventDefault()
+      if (selectedIndex.value + cols < ciphers.length) {
+        selectedIndex.value += cols
+      } else {
+        // Wrap to top of next column or just stay at bottom
+        selectedIndex.value = (selectedIndex.value + 1) % ciphers.length
       }
       break
     case 'ArrowUp':
-      if (selectedIndex.value - 3 >= 0) {
-        selectedIndex.value -= 3
+      e.preventDefault()
+      if (selectedIndex.value - cols >= 0) {
+        selectedIndex.value -= cols
+      } else {
+        // Wrap to bottom
+        selectedIndex.value = (selectedIndex.value - 1 + ciphers.length) % ciphers.length
       }
       break
     case 'Enter':
@@ -54,7 +72,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="cipher-grid">
+  <div class="cipher-grid" ref="gridElement">
     <div
       v-for="(cipher, index) in ciphers"
       :key="cipher.name"

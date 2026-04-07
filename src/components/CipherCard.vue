@@ -2,6 +2,12 @@
   <div class="cipher-content">
     <h1 class="page-title">{{ title }}</h1>
     <div class="cipher-container">
+      <div class="vim-status-bar" :class="{ 'mode-insert': isInsertMode }">
+        <span class="mode-tag">{{ isInsertMode ? '-- INSERT --' : '-- NORMAL --' }}</span>
+        <span class="mode-hint">
+          {{ isInsertMode ? 'Press ESC to exit' : 'Press "i" to type, "1-3" to switch tabs' }}
+        </span>
+      </div>
       <div class="tab-navigation">
         <button @click="switchTab('theory')" :class="['tab-button', { active: cipherActiveTab === 'theory' }]">
           <CyberIcon type="theory" size="16" class="tab-icon" />
@@ -141,13 +147,45 @@ const switchTab = (newTabId: string) => {
   }, 600) // Match exit animation duration
 }
 
-const handleKeydown = (e: KeyboardEvent) => {
-  if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
+const isInsertMode = ref(false)
 
-  switch (e.key) {
-    case '1': switchTab('theory'); break
-    case '2': switchTab('encrypt'); break
-    case '3': switchTab('decrypt'); break
+const handleKeydown = (e: KeyboardEvent) => {
+  const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)
+
+  // Handle Escape to leave insert mode
+  if (e.key === 'Escape') {
+    if (isInput) {
+      ;(e.target as HTMLElement).blur()
+    }
+    isInsertMode.value = false
+    return
+  }
+
+  // If typing in an input, we are in insert mode
+  if (isInput) {
+    isInsertMode.value = true
+    return
+  }
+
+  const key = e.key.toLowerCase()
+
+  // Normal Mode Shortcuts
+  if (!isInsertMode.value) {
+    switch (key) {
+      case 'i':
+        e.preventDefault()
+        isInsertMode.value = true
+        // Focus the first available textarea in the active panel
+        setTimeout(() => {
+          const panel = document.getElementById(cipherActiveTab.value)
+          const textarea = panel?.querySelector('textarea') as HTMLTextAreaElement
+          textarea?.focus()
+        }, 0)
+        break
+      case '1': switchTab('theory'); break
+      case '2': switchTab('encrypt'); break
+      case '3': switchTab('decrypt'); break
+    }
   }
 }
 
@@ -251,6 +289,39 @@ const crack = async () => {
   position: relative;
   overflow: hidden;
   /* margin-bottom: 2rem; */
+}
+
+.vim-status-bar {
+  background: rgba(0, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-glow);
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.vim-status-bar.mode-insert {
+  background: rgba(255, 0, 255, 0.15);
+  border-bottom-color: var(--neon-magenta);
+}
+
+.mode-tag {
+  color: var(--neon-cyan);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.mode-insert .mode-tag {
+  color: var(--neon-magenta);
+  text-shadow: 0 0 5px var(--neon-magenta);
+}
+
+.mode-hint {
+  color: var(--text-secondary);
+  opacity: 0.8;
 }
 
 .cipher-container::before {
