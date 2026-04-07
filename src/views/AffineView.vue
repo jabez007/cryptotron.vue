@@ -15,6 +15,7 @@ const affineCipherKey = ref({
     title="Affine Cipher"
     :encrypt-algorithm="affine.encrypt(affineCipherKey)"
     :decrypt-algorithm="affine.decrypt(affineCipherKey)"
+    :crack-algorithm="affine.crack"
     :cipher-key="affineCipherKey"
   >
     <template v-slot:theory>

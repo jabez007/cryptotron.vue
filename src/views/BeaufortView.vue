@@ -14,6 +14,7 @@ const beaufortCipherKey = ref({
     title="Beaufort Cipher"
     :encrypt-algorithm="beaufort.encrypt(beaufortCipherKey)"
     :decrypt-algorithm="beaufort.decrypt(beaufortCipherKey)"
+    :crack-algorithm="beaufort.crack"
     :cipher-key="beaufortCipherKey"
   >
     <template v-slot:theory>

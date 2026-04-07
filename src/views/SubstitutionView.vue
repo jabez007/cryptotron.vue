@@ -14,6 +14,7 @@ const substitutionCipherKey = ref({
     title="Simple Substitution Cipher"
     :encrypt-algorithm="substitution.encrypt(substitutionCipherKey)"
     :decrypt-algorithm="substitution.decrypt(substitutionCipherKey)"
+    :crack-algorithm="substitution.crack"
     :cipher-key="substitutionCipherKey"
   >
     <template v-slot:theory>

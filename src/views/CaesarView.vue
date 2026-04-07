@@ -14,6 +14,7 @@ const caesarCipherKey = ref({
     title="Caesar Cipher"
     :encrypt-algorithm="caesar.encrypt(caesarCipherKey)"
     :decrypt-algorithm="caesar.decrypt(caesarCipherKey)"
+    :crack-algorithm="caesar.crack"
     :cipher-key="caesarCipherKey"
   >
     <template v-slot:theory>

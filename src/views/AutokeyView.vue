@@ -14,6 +14,7 @@ const autokeyCipherKey = ref({
     title="Autokey Cipher"
     :encrypt-algorithm="autokey.encrypt(autokeyCipherKey)"
     :decrypt-algorithm="autokey.decrypt(autokeyCipherKey)"
+    :crack-algorithm="autokey.crack"
     :cipher-key="autokeyCipherKey"
   >
     <template v-slot:theory>

@@ -4,13 +4,16 @@
     <div class="cipher-container">
       <div class="tab-navigation">
         <button @click="switchTab('theory')" :class="['tab-button', { active: cipherActiveTab === 'theory' }]">
-          📚 Theory
+          <CyberIcon type="theory" size="16" class="tab-icon" />
+          <span class="tab-label">Theory</span>
         </button>
         <button @click="switchTab('encrypt')" :class="['tab-button', { active: cipherActiveTab === 'encrypt' }]">
-          🔒 Encrypt
+          <CyberIcon type="encrypt" size="16" class="tab-icon" />
+          <span class="tab-label">Encrypt</span>
         </button>
         <button @click="switchTab('decrypt')" :class="['tab-button', { active: cipherActiveTab === 'decrypt' }]">
-          🔓 Decrypt
+          <CyberIcon type="decrypt" size="16" class="tab-icon" />
+          <span class="tab-label">Decrypt</span>
         </button>
       </div>
 
@@ -63,7 +66,21 @@
             <div class="button-group">
               <button @click="decrypt" class="cipher-button">Decrypt</button>
               <button @click="clearDecrypt" class="cipher-button">Clear</button>
-              <button v-if="keysGenerator" class="cipher-button">Crack</button>
+              <button
+                v-if="crackAlgorithm"
+                @click="crack"
+                class="cipher-button crack"
+                :disabled="isCracking || !decryptInput"
+              >
+                <span v-if="isCracking" class="glitch-text" data-text="Cracking...">
+                  <CyberIcon type="crack" size="18" class="button-icon pulse" />
+                  Cracking...
+                </span>
+                <span v-else class="button-content">
+                  <CyberIcon type="crack" size="18" class="button-icon" />
+                  Crack
+                </span>
+              </button>
             </div>
 
             <CipherOutput label="Output" :text="decryptOutput" />
@@ -78,6 +95,7 @@
 import { nextTick, onMounted, ref } from 'vue'
 import CipherOutput from './CipherOutput.vue'
 import ScanLine from './ScanLine.vue'
+import CyberIcon from './icons/CyberIcon.vue'
 
 const props = defineProps({
   title: {
@@ -96,7 +114,7 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  keysGenerator: {
+  crackAlgorithm: {
     type: Function,
     required: false,
   },
@@ -156,6 +174,31 @@ const decrypt = () => {
 const clearDecrypt = () => {
   decryptInput.value = ''
   decryptOutput.value = ''
+}
+
+const isCracking = ref(false)
+
+const crack = async () => {
+  if (!props.crackAlgorithm || !decryptInput.value) return
+
+  isCracking.value = true
+  try {
+    // Crack algorithms in the library are synchronous but might be heavy
+    // Use nextTick to allow UI update if needed
+    await nextTick()
+    const result = props.crackAlgorithm(decryptInput.value)
+    if (result && result.key) {
+      // Update the cipher key object properties
+      Object.assign(props.cipherKey, result.key)
+      // Update decrypt output with the recovered plaintext
+      decryptOutput.value = result.plaintext
+    }
+  } catch (err) {
+    console.error(err)
+    decryptOutput.value = '⚠️  cracking failed'
+  } finally {
+    isCracking.value = false
+  }
 }
 </script>
 
@@ -226,7 +269,7 @@ const clearDecrypt = () => {
   border: none;
   color: var(--text-secondary);
   font-family: 'Orbitron', monospace;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -234,6 +277,73 @@ const clearDecrypt = () => {
   transition: all 0.3s ease;
   position: relative;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.tab-label::before {
+  content: '[';
+  margin-right: 4px;
+  opacity: 0.5;
+}
+
+.tab-label::after {
+  content: ']';
+  margin-left: 4px;
+  opacity: 0.5;
+}
+
+.tab-button.active .tab-label {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.tab-button.active .tab-label::before {
+  content: '> [';
+  opacity: 1;
+  color: var(--neon-magenta);
+}
+
+.tab-button.active .tab-label::after {
+  content: '] <';
+  opacity: 1;
+  color: var(--neon-magenta);
+}
+
+.tab-icon {
+  filter: drop-shadow(0 0 2px rgba(0, 255, 255, 0.3));
+}
+
+.tab-button.active .tab-icon {
+  filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.8));
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button-icon {
+  vertical-align: middle;
+}
+
+.pulse {
+  animation: icon-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes icon-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
 }
 
 .tab-button:hover {

@@ -17,7 +17,7 @@
         ]"
         @click="handleCopy"
       >
-        📋
+        <CyberIcon type="copy" size="18" />
       </button>
       <div v-if="showCopied" class="copy-tooltip">Copied!</div>
     </div>
@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 import { onUnmounted, ref, watch } from 'vue'
+import CyberIcon from './icons/CyberIcon.vue'
 
 interface Props {
   text: string

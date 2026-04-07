@@ -14,6 +14,7 @@ const vigenereCipherKey = ref({
     title="Vigenère Cipher"
     :encrypt-algorithm="vigenere.encrypt(vigenereCipherKey)"
     :decrypt-algorithm="vigenere.decrypt(vigenereCipherKey)"
+    :crack-algorithm="vigenere.crack"
     :cipher-key="vigenereCipherKey"
   >
     <template v-slot:theory>

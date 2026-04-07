@@ -1,21 +1,33 @@
 <template>
   <div class="cryptotron-app">
+    <div v-if="isCrtEnabled" class="crt-overlay"></div>
+    <div v-if="isCrtEnabled" class="scanlines"></div>
     <header>
       <div class="logo" @click="router.push({ name: 'cryptotron-home' })">
         <img alt="Vue logo" src="@/assets/logo.png" width="50" height="50" />
         CryptoTron
       </div>
 
-      <button
-        @click="toggleMenu"
-        :class="['hamburger-button', { active: menuOpen }]"
-        aria-label="Toggle navigation menu"
-        :aria-expanded="menuOpen"
-      >
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
+      <div class="header-actions">
+        <button
+          class="crt-toggle-btn"
+          @click="toggleCrt"
+          :title="isCrtEnabled ? 'Disable CRT Effects (Clean Mode)' : 'Enable CRT Effects (Cyber Mode)'"
+        >
+          <CyberIcon :type="isCrtEnabled ? 'display' : 'display-off'" size="24" />
+        </button>
+
+        <button
+          @click="toggleMenu"
+          :class="['hamburger-button', { active: menuOpen }]"
+          aria-label="Toggle navigation menu"
+          :aria-expanded="menuOpen"
+        >
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
     </header>
 
     <!-- Navigation Overlay -->
@@ -61,11 +73,20 @@
 <script setup lang="ts">
 import IconBug from '@/components/icons/IconBug.vue'
 import IconDocumentation from '@/components/icons/IconDocumentation.vue'
+import CyberIcon from '@/components/icons/CyberIcon.vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, watch } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
+
+// CRT Persistence and Logic
+const isCrtEnabled = ref(localStorage.getItem('crt-enabled') !== 'false')
+
+const toggleCrt = () => {
+  isCrtEnabled.value = !isCrtEnabled.value
+  localStorage.setItem('crt-enabled', isCrtEnabled.value.toString())
+}
 
 console.debug(`Current router is`, router)
 console.debug(`Current route is`, route)
@@ -111,6 +132,102 @@ const openIssues = () => {
 <style scoped>
 @import '@/assets/main.css';
 
+/* CRT Screen Effects (Scoped) */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, rgba(18, 16, 16, 0) 40%, rgba(0, 0, 0, 0.4) 100%),
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+  background-size:
+    100% 100%,
+    100% 4px,
+    3px 100%;
+  pointer-events: none;
+  z-index: 9999;
+  animation: crt-flicker 0.12s infinite;
+}
+
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.15) 50%
+  );
+  background-size: 100% 8px;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Subtle Vignette */
+.crt-overlay::after {
+  content: ' ';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(18, 16, 16, 0.1);
+  opacity: 0;
+  z-index: 10000;
+  pointer-events: none;
+  animation: crt-pulse 5s infinite;
+}
+
+@keyframes crt-flicker {
+  0% {
+    opacity: 0.97;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.98;
+  }
+}
+
+@keyframes crt-pulse {
+  0% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 0.1;
+  }
+}
+
+/* Accessibility: Respect OS-level reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .crt-overlay,
+  .scanlines,
+  .crt-overlay::after {
+    display: none !important;
+  }
+
+  .glitch-text::before,
+  .glitch-text::after {
+    display: none !important;
+  }
+
+  .logo,
+  .nav-overlay,
+  .cipher-button::before,
+  .tab-panel.active {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 header {
   min-width: 100%;
   background: linear-gradient(135deg, var(--cryptotron-darker-bg) 0%, rgba(15, 15, 25, 0.95) 100%);
@@ -126,6 +243,28 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.crt-toggle-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: all 0.3s ease;
+}
+
+.crt-toggle-btn:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 5px var(--neon-cyan));
 }
 
 .logo {
@@ -316,8 +455,8 @@ nav a.router-link-exact-active:hover {
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   padding: 0.5rem 2rem;
   display: flex;
-  justify-content: start;
-  align-items: start;
+  justify-content: flex-start;
+  align-items: flex-start;
   backdrop-filter: blur(10px);
   position: sticky;
   bottom: 0;
