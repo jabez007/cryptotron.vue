@@ -94,6 +94,37 @@ const toggleCrt = () => {
   localStorage.setItem('crt-enabled', isCrtEnabled.value.toString())
 }
 
+const handleGlobalKeydown = (e: KeyboardEvent) => {
+  // Ignore if typing in an input
+  if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
+
+  const key = e.key.toLowerCase()
+
+  // Terminal Shortcuts (Alt + Key)
+  if (e.altKey) {
+    switch (key) {
+      case 'h': router.push({ name: 'cryptotron-home' }); break
+      case 'b': router.push({ name: 'cryptotron-builder' }); break
+      case 'm': toggleMenu(); break
+      case 't': toggleCrt(); break
+    }
+  }
+
+  // Escape to Home
+  if (e.key === 'Escape') {
+    if (menuOpen.value) closeMenu()
+    else router.push({ name: 'cryptotron-home' })
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleGlobalKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleGlobalKeydown)
+})
+
 console.debug(`Current router is`, router)
 console.debug(`Current route is`, route)
 

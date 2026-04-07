@@ -1,87 +1,74 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import ScanLine from '@/components/ScanLine.vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 const router = useRouter()
+
+const ciphers = [
+  { name: 'cryptotron-caesar', label: 'Caesar Cipher', delay: '-1s', text: 'One of the oldest known ciphers and simplest substitution cipher, used by Julius Caesar himself! Shift each letter by a fixed number of positions in the alphabet (e.g., ROT13).' },
+  { name: 'cryptotron-rail-fence', label: 'Rail-Fence Cipher', delay: '-2s', text: 'A transposition cipher from the 19th-century that writes the message in a zigzag pattern across multiple "rails", then reads off the ciphertext row by row. Simple yet effective!' },
+  { name: 'cryptotron-vigenere', label: 'Vigenère Cipher', delay: '-3s', text: 'A 16th-century polyalphabetic substitution cipher that resisted cracking for centuries! Uses a keyword to create multiple shifting alphabets, making it much harder to crack.' },
+  { name: 'cryptotron-polybius', label: 'Polybius Square', delay: '-4s', text: 'Invented by the ancient Greeks! A digraph substitution cipher that turn letters into coordinates using a 5×5 grid of letters (I and J share a cell) based on a keyword.' },
+  { name: 'cryptotron-builder', label: 'Interactive Cipher Chain Builder', delay: '-5s', text: 'Create visual encryption pipelines by connecting cipher blocks. Build complex multi-step sequences with Caesar, Vigenère, and other classical ciphers. Discover how combining different encryption methods strengthens security through hands-on experimentation.' },
+]
+
+const selectedIndex = ref(0)
+
+const handleKeyDown = (e: KeyboardEvent) => {
+  // Only handle navigation if no input is focused
+  if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
+
+  switch (e.key) {
+    case 'ArrowRight':
+      selectedIndex.value = (selectedIndex.value + 1) % ciphers.length
+      break
+    case 'ArrowLeft':
+      selectedIndex.value = (selectedIndex.value - 1 + ciphers.length) % ciphers.length
+      break
+    case 'ArrowDown':
+      // Simplified grid logic: assume 3 columns max based on flex-wrap
+      if (selectedIndex.value + 3 < ciphers.length) {
+        selectedIndex.value += 3
+      }
+      break
+    case 'ArrowUp':
+      if (selectedIndex.value - 3 >= 0) {
+        selectedIndex.value -= 3
+      }
+      break
+    case 'Enter':
+    case ' ':
+      router.push({ name: ciphers[selectedIndex.value].name })
+      break
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <template>
   <div class="cipher-grid">
     <div
+      v-for="(cipher, index) in ciphers"
+      :key="cipher.name"
       class="cipher-card"
+      :class="{ 'keyboard-selected': selectedIndex === index }"
       role="link"
-      tabindex="0"
-      @click="router.push({ name: 'cryptotron-caesar' })"
-      @keydown.enter="router.push({ name: 'cryptotron-caesar' })"
-      @keydown.space.prevent="router.push({ name: 'cryptotron-caesar' })"
+      @click="router.push({ name: cipher.name })"
     >
-      <ScanLine delay="-1s" />
-      <h3>Caesar Cipher</h3>
-      <p>
-        One of the oldest known ciphers and simplest substitution cipher, used by Julius Caesar
-        himself! Shift each letter by a fixed number of positions in the alphabet (e.g., ROT13).
-      </p>
-    </div>
-    <div
-      class="cipher-card"
-      role="link"
-      tabindex="0"
-      @click="router.push({ name: 'cryptotron-rail-fence' })"
-      @keydown.enter="router.push({ name: 'cryptotron-rail-fence' })"
-      @keydown.space.prevent="router.push({ name: 'cryptotron-rail-fence' })"
-    >
-      <ScanLine delay="-2s" />
-      <h3>Rail-Fence Cipher</h3>
-      <p>
-        A transposition cipher from the 19th-century that writes the message in a zigzag pattern
-        across multiple "rails", then reads off the ciphertext row by row. Simple yet effective!
-      </p>
-    </div>
-    <div
-      class="cipher-card"
-      role="link"
-      tabindex="0"
-      @click="router.push({ name: 'cryptotron-vigenere' })"
-      @keydown.enter="router.push({ name: 'cryptotron-vigenere' })"
-      @keydown.space.prevent="router.push({ name: 'cryptotron-vigenere' })"
-    >
-      <ScanLine delay="-3s" />
-      <h3>Vigenère Cipher</h3>
-      <p>
-        A 16th-century polyalphabetic substitution cipher that resisted cracking for centuries! Uses
-        a keyword to create multiple shifting alphabets, making it much harder to crack.
-      </p>
-    </div>
-    <div
-      class="cipher-card"
-      role="link"
-      tabindex="0"
-      @click="router.push({ name: 'cryptotron-polybius' })"
-      @keydown.enter="router.push({ name: 'cryptotron-polybius' })"
-      @keydown.space.prevent="router.push({ name: 'cryptotron-polybius' })"
-    >
-      <ScanLine delay="-4s" />
-      <h3>Polybius Square</h3>
-      <p>
-        Invented by the ancient Greeks! A digraph substitution cipher that turn letters into
-        coordinates using a 5×5 grid of letters (I and J share a cell) based on a keyword.
-      </p>
-    </div>
-    <div
-      class="cipher-card"
-      role="link"
-      tabindex="0"
-      @click="router.push({ name: 'cryptotron-builder' })"
-      @keydown.enter="router.push({ name: 'cryptotron-builder' })"
-      @keydown.space.prevent="router.push({ name: 'cryptotron-builder' })"
-    >
-      <ScanLine delay="-5s" />
-      <h3>Interactive Cipher Chain Builder</h3>
-      <p>
-        Create visual encryption pipelines by connecting cipher blocks. Build complex multi-step
-        sequences with Caesar, Vigenère, and other classical ciphers. Discover how combining
-        different encryption methods strengthens security through hands-on experimentation.
-      </p>
+      <ScanLine :delay="cipher.delay" />
+      <div class="selection-indicator" v-if="selectedIndex === index">
+        <span>&gt;</span>
+      </div>
+      <h3>{{ cipher.label }}</h3>
+      <p>{{ cipher.text }}</p>
     </div>
   </div>
 </template>
@@ -110,11 +97,29 @@ const router = useRouter()
 }
 
 .cipher-card:hover,
-.cipher-card:focus-visible {
+.cipher-card:focus-visible,
+.cipher-card.keyboard-selected {
   transform: translateY(-5px);
   box-shadow: 0 15px 40px rgba(0, 255, 255, 0.2);
   outline: none;
   border-color: var(--neon-cyan);
+}
+
+.selection-indicator {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  color: var(--neon-magenta);
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 1.5rem;
+  animation: pulse 1s infinite alternate;
+  z-index: 10;
+}
+
+@keyframes pulse {
+  from { opacity: 0.5; transform: translateX(0); }
+  to { opacity: 1; transform: translateX(5px); }
 }
 
 .cipher-card h3 {

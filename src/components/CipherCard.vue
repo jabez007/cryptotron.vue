@@ -123,10 +123,13 @@ const props = defineProps({
 const cipherActiveTab = ref('theory')
 
 const switchTab = (newTabId: string) => {
+  if (cipherActiveTab.value === newTabId) return
+  
+  const oldTabId = cipherActiveTab.value
   cipherActiveTab.value = newTabId
 
   // Add leaving class to current tab
-  document.querySelector('.tab-panel.active')?.classList.add('leaving')
+  document.getElementById(oldTabId)?.classList.add('leaving')
 
   // After exit animation, switch to new tab
   setTimeout(async () => {
@@ -138,8 +141,23 @@ const switchTab = (newTabId: string) => {
   }, 600) // Match exit animation duration
 }
 
+const handleKeydown = (e: KeyboardEvent) => {
+  if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
+
+  switch (e.key) {
+    case '1': switchTab('theory'); break
+    case '2': switchTab('encrypt'); break
+    case '3': switchTab('decrypt'); break
+  }
+}
+
 onMounted(() => {
   document.getElementById(cipherActiveTab.value)?.classList.add('active')
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
 })
 
 const encryptInput = ref('')
