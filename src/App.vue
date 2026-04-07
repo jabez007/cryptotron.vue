@@ -152,10 +152,10 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
   // Terminal Shortcuts (Alt + Key)
   if (e.altKey) {
     switch (key) {
-      case 'h': router.push({ name: 'cryptotron-home' }); break
-      case 'b': router.push({ name: 'cryptotron-builder' }); break
-      case 'm': toggleMenu(); break
-      case 't': toggleCrt(); break
+      case 'h': e.preventDefault(); router.push({ name: 'cryptotron-home' }); break
+      case 'b': e.preventDefault(); router.push({ name: 'cryptotron-builder' }); break
+      case 'm': e.preventDefault(); toggleMenu(); break
+      case 't': e.preventDefault(); toggleCrt(); break
     }
   }
 
@@ -179,6 +179,12 @@ onMounted(() => {
   const root = router.resolve({ path: '/' })
   console.debug(`Root route resolved to ${root.name as string}`)
   isSubApp.value = root.name !== 'cryptotron-home'
+  
+  window.addEventListener('keydown', handleGlobalKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleGlobalKeydown)
 })
 
 /* Bug report functionality */
