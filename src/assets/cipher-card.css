@@ -156,6 +156,7 @@
   cursor: not-allowed;
   border-color: #555;
   box-shadow: none;
+  transform: none !important;
 }
 
 .cipher-button:disabled::before {

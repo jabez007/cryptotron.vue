@@ -17,10 +17,24 @@ const selectedIndex = ref(0)
 const gridElement = ref<HTMLElement | null>(null)
 
 const getColumns = () => {
-  if (!gridElement.value) return 3
-  return window.getComputedStyle(gridElement.value).display === 'flex' 
-    ? Math.floor(gridElement.value.offsetWidth / 450) || 1 // 450 is approx card width + margin
-    : 1
+  if (!gridElement.value || gridElement.value.children.length === 0) return 1
+  
+  const cards = Array.from(gridElement.value.children) as HTMLElement[]
+  const firstTop = cards[0].offsetTop
+  let cols = 0
+  
+  for (const card of cards) {
+    if (card.offsetTop === firstTop) {
+      cols++
+    } else {
+      break
+    }
+  }
+  return cols || 1
+}
+
+const navigateToCipher = (name: string) => {
+  router.push({ name })
 }
 
 const handleKeyDown = (e: KeyboardEvent) => {
@@ -47,7 +61,6 @@ const handleKeyDown = (e: KeyboardEvent) => {
       if (selectedIndex.value + cols < ciphers.length) {
         selectedIndex.value += cols
       } else {
-        // Wrap to top of next column or just stay at bottom
         selectedIndex.value = (selectedIndex.value + 1) % ciphers.length
       }
       break
@@ -56,13 +69,16 @@ const handleKeyDown = (e: KeyboardEvent) => {
       if (selectedIndex.value - cols >= 0) {
         selectedIndex.value -= cols
       } else {
-        // Wrap to bottom
         selectedIndex.value = (selectedIndex.value - 1 + ciphers.length) % ciphers.length
       }
       break
     case 'Enter':
+      e.preventDefault()
+      navigateToCipher(ciphers[selectedIndex.value].name)
+      break
     case ' ':
-      router.push({ name: ciphers[selectedIndex.value].name })
+      e.preventDefault()
+      navigateToCipher(ciphers[selectedIndex.value].name)
       break
   }
 }
@@ -78,13 +94,14 @@ onUnmounted(() => {
 
 <template>
   <div class="cipher-grid" ref="gridElement">
-    <div
+    <button
       v-for="(cipher, index) in ciphers"
       :key="cipher.name"
       class="cipher-card"
       :class="{ 'keyboard-selected': selectedIndex === index }"
-      role="link"
-      @click="router.push({ name: cipher.name })"
+      :aria-label="`Navigate to ${cipher.label}`"
+      @click="navigateToCipher(cipher.name)"
+      @focus="selectedIndex = index"
     >
       <ScanLine :delay="cipher.delay" />
       <div class="selection-indicator" v-if="selectedIndex === index">
@@ -92,7 +109,7 @@ onUnmounted(() => {
       </div>
       <h3>{{ cipher.label }}</h3>
       <p>{{ cipher.text }}</p>
-    </div>
+    </button>
   </div>
 </template>
 
@@ -117,6 +134,9 @@ onUnmounted(() => {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: block; /* Ensure it behaves like a block */
+  font-family: inherit; /* Reset button font */
+  color: var(--cryptotron-text-primary); /* Fix button text color */
 }
 
 .cipher-card:hover,

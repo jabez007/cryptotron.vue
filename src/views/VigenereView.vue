@@ -32,10 +32,19 @@ const vigenereCipherKey = ref({
         with the keyword "KEY":
       </p>
 
-      <div class="cipher-example">
-        Plaintext: A T T A C K A T D A W N<br />
-        Key: K E Y K E Y K E Y K E Y<br />
-        Ciphertext: K X R C E M K B D K B Y
+      <div class="cipher-example aligned">
+        <div class="example-row">
+          <span class="row-label">Plaintext:</span>
+          <span class="char-cell">A</span><span class="char-cell">T</span><span class="char-cell">T</span><span class="char-cell">A</span><span class="char-cell">C</span><span class="char-cell">K</span><span class="char-cell">A</span><span class="char-cell">T</span><span class="char-cell">D</span><span class="char-cell">A</span><span class="char-cell">W</span><span class="char-cell">N</span>
+        </div>
+        <div class="example-row">
+          <span class="row-label">Key:</span>
+          <span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span><span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span><span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span><span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span>
+        </div>
+        <div class="example-row">
+          <span class="row-label">Ciphertext:</span>
+          <span class="char-cell result">K</span><span class="char-cell result">X</span><span class="char-cell result">R</span><span class="char-cell result">C</span><span class="char-cell result">E</span><span class="char-cell result">M</span><span class="char-cell result">K</span><span class="char-cell result">B</span><span class="char-cell result">D</span><span class="char-cell result">K</span><span class="char-cell result">B</span><span class="char-cell result">Y</span>
+        </div>
       </div>
 
       <h3>Mathematical Formula</h3>
@@ -67,3 +76,60 @@ const vigenereCipherKey = ref({
     </template>
   </CipherCard>
 </template>
+
+<style scoped>
+.cipher-example.aligned {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--cryptotron-grid-color);
+  margin: 1.5rem 0;
+  font-family: 'Space Mono', monospace;
+  overflow-x: auto;
+}
+
+.example-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+}
+
+.example-row:last-child {
+  margin-bottom: 0;
+}
+
+.row-label {
+  display: inline-block;
+  width: 120px;
+  color: var(--cryptotron-text-secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.char-cell {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 30px;
+  border: 1px solid rgba(0, 255, 255, 0.1);
+  margin-right: 2px;
+  color: var(--cryptotron-text-primary);
+  font-weight: 700;
+}
+
+.char-cell.highlighted {
+  color: var(--neon-magenta);
+  border-color: rgba(255, 0, 255, 0.2);
+  background: rgba(255, 0, 255, 0.05);
+}
+
+.char-cell.result {
+  color: var(--neon-green);
+  border-color: rgba(0, 255, 65, 0.2);
+  background: rgba(0, 255, 65, 0.05);
+  text-shadow: 0 0 5px var(--neon-green);
+}
+</style>

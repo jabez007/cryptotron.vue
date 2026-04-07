@@ -32,12 +32,12 @@ const polybiusCipherKey = ref({
       </p>
 
       <div class="cipher-example">
-        &nbsp;&nbsp;A B C D E<br />
-        A A B C D E<br />
-        B F G H I K<br />
-        C L M N O P<br />
-        D Q R S T U<br />
-        E V W X Y Z
+        &nbsp;&nbsp;<span class="header-char">A</span> <span class="header-char">B</span> <span class="header-char">C</span> <span class="header-char">D</span> <span class="header-char">E</span><br />
+        <span class="header-char">A</span> A B C D E<br />
+        <span class="header-char">B</span> F G H I K<br />
+        <span class="header-char">C</span> L M N O P<br />
+        <span class="header-char">D</span> Q R S T U<br />
+        <span class="header-char">E</span> V W X Y Z
       </div>
 
       <p>Example: "HELLO" → "BD AE CB CB CD"</p>
@@ -47,6 +47,18 @@ const polybiusCipherKey = ref({
         To increase security, the grid can be filled starting with a secret keyword (removing
         duplicate letters), followed by the remaining letters of the alphabet in order.
       </p>
+
+      <p>Example with keyword "CYBERPUNK":</p>
+      <div class="cipher-example">
+        &nbsp;&nbsp;<span class="header-char">A</span> <span class="header-char">B</span> <span class="header-char">C</span> <span class="header-char">D</span> <span class="header-char">E</span><br />
+        <span class="header-char">A</span> C Y B E R<br />
+        <span class="header-char">B</span> P U N K A<br />
+        <span class="header-char">C</span> D F G H I<br />
+        <span class="header-char">D</span> L M O Q S<br />
+        <span class="header-char">E</span> T V W X Z
+      </div>
+
+      <p>Note how duplicate letters are removed and "I/J" are treated as a single unit.</p>
 
       <h3>Security</h3>
       <p>
@@ -59,3 +71,22 @@ const polybiusCipherKey = ref({
     </template>
   </CipherCard>
 </template>
+
+<style scoped>
+.header-char {
+  color: var(--neon-magenta);
+  font-weight: 900;
+  text-shadow: 0 0 5px var(--neon-magenta);
+}
+
+.cipher-example {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--cryptotron-grid-color);
+  margin: 1rem 0;
+  line-height: 1.8;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 2px;
+}
+</style>

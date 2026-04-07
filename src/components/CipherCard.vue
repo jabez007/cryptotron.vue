@@ -127,6 +127,7 @@ const props = defineProps({
 })
 
 const cipherActiveTab = ref('theory')
+let switchTabTimer: ReturnType<typeof setTimeout> | null = null
 
 const switchTab = (newTabId: string) => {
   if (cipherActiveTab.value === newTabId) return
@@ -134,16 +135,20 @@ const switchTab = (newTabId: string) => {
   const oldTabId = cipherActiveTab.value
   cipherActiveTab.value = newTabId
 
+  // Clear any existing timer
+  if (switchTabTimer) clearTimeout(switchTabTimer)
+
   // Add leaving class to current tab
   document.getElementById(oldTabId)?.classList.add('leaving')
 
   // After exit animation, switch to new tab
-  setTimeout(async () => {
+  switchTabTimer = setTimeout(async () => {
     await nextTick()
     document.querySelectorAll('.tab-panel').forEach((panel) => {
       panel.classList.remove('active', 'leaving')
     })
     document.getElementById(newTabId)?.classList.add('active')
+    switchTabTimer = null
   }, 600) // Match exit animation duration
 }
 
@@ -181,28 +186,28 @@ const handleKeydown = (e: KeyboardEvent) => {
   // Normal Mode Shortcuts
   if (!isInsertMode.value) {
     switch (key) {
-      case 'i':
-        e.preventDefault()
-        isInsertMode.value = true
-        isKeyMode.value = false
-        // Focus the first available textarea in the active panel
-        setTimeout(() => {
-          const panel = document.getElementById(cipherActiveTab.value)
-          const textarea = panel?.querySelector('textarea') as HTMLTextAreaElement
-          textarea?.focus()
-        }, 0)
+      case 'i': {
+        const panel = document.getElementById(cipherActiveTab.value)
+        const textarea = panel?.querySelector('textarea') as HTMLTextAreaElement
+        if (textarea) {
+          e.preventDefault()
+          isInsertMode.value = true
+          isKeyMode.value = false
+          setTimeout(() => textarea.focus(), 0)
+        }
         break
-      case 'k':
-        e.preventDefault()
-        isInsertMode.value = true
-        isKeyMode.value = true
-        // Focus the first available cipher-input in the active panel
-        setTimeout(() => {
-          const panel = document.getElementById(cipherActiveTab.value)
-          const keyInput = panel?.querySelector('.cipher-input') as HTMLInputElement
-          keyInput?.focus()
-        }, 0)
+      }
+      case 'k': {
+        const panel = document.getElementById(cipherActiveTab.value)
+        const keyInput = panel?.querySelector('.cipher-input') as HTMLInputElement
+        if (keyInput) {
+          e.preventDefault()
+          isInsertMode.value = true
+          isKeyMode.value = true
+          setTimeout(() => keyInput.focus(), 0)
+        }
         break
+      }
       case '1': switchTab('theory'); break
       case '2': switchTab('encrypt'); break
       case '3': switchTab('decrypt'); break
@@ -213,7 +218,7 @@ const handleKeydown = (e: KeyboardEvent) => {
         if (cipherActiveTab.value === 'decrypt') decrypt(); 
         break
       case 'c': 
-        if (cipherActiveTab.value === 'decrypt' && props.crackAlgorithm) crack(); 
+        if (cipherActiveTab.value === 'decrypt' && props.crackAlgorithm && !isCracking.value) crack(); 
         break
       case 'x': 
         if (cipherActiveTab.value === 'encrypt') clearEncrypt();
@@ -230,6 +235,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
+  if (switchTabTimer) clearTimeout(switchTabTimer)
+  if (crackTimer) clearTimeout(crackTimer)
 })
 
 const encryptInput = ref('')
@@ -267,26 +274,35 @@ const clearDecrypt = () => {
 }
 
 const isCracking = ref(false)
+let crackTimer: ReturnType<typeof setTimeout> | null = null
 
 const crack = async () => {
-  if (!props.crackAlgorithm || !decryptInput.value) return
+  if (!props.crackAlgorithm || !decryptInput.value || isCracking.value) return
 
   isCracking.value = true
   try {
     // Crack algorithms in the library are synchronous but might be heavy.
     // We yield to the event loop to allow the "Cracking..." UI to paint.
-    await new Promise((resolve) => setTimeout(resolve, 0))
-    const result = props.crackAlgorithm(decryptInput.value)
-    if (result && result.key) {
-      // Update the cipher key object properties
-      Object.assign(props.cipherKey, result.key)
-      // Update decrypt output with the recovered plaintext
-      decryptOutput.value = result.plaintext
-    }
+    crackTimer = setTimeout(() => {
+      try {
+        const result = props.crackAlgorithm!(decryptInput.value)
+        if (result && result.key) {
+          // Update the cipher key object properties
+          Object.assign(props.cipherKey, result.key)
+          // Update decrypt output with the recovered plaintext
+          decryptOutput.value = result.plaintext
+        }
+      } catch (err) {
+        console.error(err)
+        decryptOutput.value = '⚠️  cracking failed'
+      } finally {
+        isCracking.value = false
+        crackTimer = null
+      }
+    }, 0)
   } catch (err) {
     console.error(err)
     decryptOutput.value = '⚠️  cracking failed'
-  } finally {
     isCracking.value = false
   }
 }
