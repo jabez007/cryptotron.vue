@@ -395,6 +395,7 @@ const crack = async () => {
 .cipher-content {
   min-width: 100%;
   max-width: calc(100vw - 5rem);
+  outline: none; /* Remove focus outline */
 }
 
 .page-title {
