@@ -9,8 +9,7 @@
           <span v-if="showYankedTooltip" class="yank-alert">SYSTEM: DATA YANKED</span>
         </div>
         <span class="mode-hint">
-          {{ isInsertMode ? 'Press ESC to exit' : 'i: text | k: key | 1-3: tabs | e: enc | d: dec | c: crack | x: clr |
-          y: yank' }}
+          {{ isInsertMode ? 'Press ESC to exit' : 'i: text | k: key | 1-3: tabs | e: enc | d: dec | c: crack | x: clr | y: yank' }}
         </span>
       </div>
       <div class="tab-navigation">
