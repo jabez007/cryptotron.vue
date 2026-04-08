@@ -1,10 +1,6 @@
 <template>
-  <div 
-    ref="root"
-    class="cipher-content" 
-    tabindex="-1"
-    :data-vim-mode="isKeyMode ? 'key' : isInsertMode ? 'insert' : 'normal'"
-  >
+  <div ref="root" class="cipher-content" tabindex="-1"
+    :data-vim-mode="isKeyMode ? 'key' : isInsertMode ? 'insert' : 'normal'">
     <h1 class="page-title">{{ title }}</h1>
     <div class="cipher-container">
       <div class="vim-status-bar" :class="{ 'mode-insert': isInsertMode, 'mode-key': isKeyMode }">
@@ -13,7 +9,8 @@
           <span v-if="showYankedTooltip" class="yank-alert">SYSTEM: DATA YANKED</span>
         </div>
         <span class="mode-hint">
-          {{ isInsertMode ? 'Press ESC to exit' : 'i: text | k: key | 1-3: tabs | e: enc | d: dec | c: crack | x: clr | y: yank' }}
+          {{ isInsertMode ? 'Press ESC to exit' : 'i: text | k: key | 1-3: tabs | e: enc | d: dec | c: crack | x: clr |
+          y: yank' }}
         </span>
       </div>
       <div class="tab-navigation">
@@ -85,12 +82,8 @@
             <div class="button-group">
               <button @click="decrypt" class="cipher-button">Decrypt</button>
               <button @click="clearDecrypt" class="cipher-button">Clear</button>
-              <button
-                v-if="crackAlgorithm"
-                @click="crack"
-                class="cipher-button crack"
-                :disabled="isCracking || !decryptInput"
-              >
+              <button v-if="crackAlgorithm" @click="crack" class="cipher-button crack"
+                :disabled="isCracking || !decryptInput">
                 <span v-if="isCracking" class="glitch-text" data-text="Cracking...">
                   <CyberIcon type="crack" size="18" class="button-icon pulse" />
                   Cracking...
@@ -165,11 +158,11 @@ let switchTabTimer: ReturnType<typeof setTimeout> | null = null
 
 const switchTab = (newTabId: string) => {
   if (cipherActiveTab.value === newTabId) return
-  
+
   const oldTabId = cipherActiveTab.value
   const oldPanel = getPanel(oldTabId)
   const newPanel = getPanel(newTabId)
-  
+
   cipherActiveTab.value = newTabId
 
   // Clear any existing timer
@@ -204,7 +197,7 @@ const isKeyMode = ref(false)
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.defaultPrevented) return
-  
+
   // Ignore shortcuts if Ctrl, Meta (Cmd), or Alt are pressed
   if (e.ctrlKey || e.metaKey || e.altKey) return
 
@@ -218,7 +211,7 @@ const handleKeydown = (e: KeyboardEvent) => {
   // Handle Escape to leave insert mode
   if (e.key === 'Escape') {
     if (isInput) {
-      ;(e.target as HTMLElement).blur()
+      ; (e.target as HTMLElement).blur()
       // Return focus to the root so shortcuts continue to work
       nextTick(() => {
         root.value?.focus()
@@ -266,16 +259,16 @@ const handleKeydown = (e: KeyboardEvent) => {
       case '1': switchTab('theory'); break
       case '2': switchTab('encrypt'); break
       case '3': switchTab('decrypt'); break
-      case 'e': 
-        if (cipherActiveTab.value === 'encrypt') encrypt(); 
+      case 'e':
+        if (cipherActiveTab.value === 'encrypt') encrypt();
         break
-      case 'd': 
-        if (cipherActiveTab.value === 'decrypt') decrypt(); 
+      case 'd':
+        if (cipherActiveTab.value === 'decrypt') decrypt();
         break
-      case 'c': 
-        if (cipherActiveTab.value === 'decrypt' && props.crackAlgorithm && !isCracking.value) crack(); 
+      case 'c':
+        if (cipherActiveTab.value === 'decrypt' && props.crackAlgorithm && !isCracking.value) crack();
         break
-      case 'x': 
+      case 'x':
         if (cipherActiveTab.value === 'encrypt') clearEncrypt();
         else if (cipherActiveTab.value === 'decrypt') clearDecrypt();
         break
@@ -289,7 +282,7 @@ const handleKeydown = (e: KeyboardEvent) => {
 onMounted(() => {
   getPanel(cipherActiveTab.value)?.classList.add('active')
   root.value?.addEventListener('keydown', handleKeydown)
-  
+
   // Focus the card automatically so keyboard shortcuts work immediately
   nextTick(() => {
     root.value?.focus()
@@ -364,7 +357,7 @@ const crack = async () => {
   const ciphertext = decryptInput.value
   isCracking.value = true
   decryptError.value = ''
-  
+
   // Crack algorithms in the library are synchronous but might be heavy.
   // We yield to the event loop to allow the "Cracking..." UI to paint.
   crackTimer = setTimeout(() => {
@@ -383,7 +376,7 @@ const crack = async () => {
           decryptError.value = 'invalid key recovered'
         }
       } else {
-        decryptOutput.value = '⚠️  no key found'
+        decryptError.value = 'no key found'
       }
     } catch (err) {
       console.error(err)
@@ -402,7 +395,8 @@ const crack = async () => {
 .cipher-content {
   min-width: 100%;
   max-width: calc(100vw - 5rem);
-  outline: none; /* Remove focus outline */
+  outline: none;
+  /* Remove focus outline */
 }
 
 .page-title {
@@ -456,8 +450,15 @@ const crack = async () => {
 }
 
 @keyframes yank-flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
 }
 
 .vim-status-bar.mode-insert {
@@ -505,8 +506,15 @@ const crack = async () => {
 }
 
 @keyframes error-flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .cipher-container::before {
@@ -609,11 +617,13 @@ const crack = async () => {
 }
 
 @keyframes icon-pulse {
+
   0%,
   100% {
     transform: scale(1);
     opacity: 1;
   }
+
   50% {
     transform: scale(1.2);
     opacity: 0.7;
@@ -622,6 +632,7 @@ const crack = async () => {
 
 /* Accessibility: Respect OS-level reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
+
   .tab-button.active::after,
   .tab-panel.active,
   .pulse,
