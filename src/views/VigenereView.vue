@@ -2,6 +2,7 @@
 import { vigenere } from '@jabez007/cryptotron.js'
 import CipherCard from '@/components/CipherCard.vue'
 import KeyVigenere from '@/components/keys/KeyVigenere.vue'
+import ExampleGrid from '@/components/ExampleGrid.vue'
 import { ref } from 'vue'
 
 const vigenereCipherKey = ref({
@@ -29,18 +30,9 @@ const vigenereCipherKey = ref({
       </p>
 
       <div class="cipher-example aligned">
-        <div class="example-row">
-          <span class="row-label">Plaintext:</span>
-          <span class="char-cell">A</span><span class="char-cell">T</span><span class="char-cell">T</span><span class="char-cell">A</span><span class="char-cell">C</span><span class="char-cell">K</span><span class="char-cell">A</span><span class="char-cell">T</span><span class="char-cell">D</span><span class="char-cell">A</span><span class="char-cell">W</span><span class="char-cell">N</span>
-        </div>
-        <div class="example-row">
-          <span class="row-label">Key:</span>
-          <span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span><span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span><span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span><span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span>
-        </div>
-        <div class="example-row">
-          <span class="row-label">Ciphertext:</span>
-          <span class="char-cell result">K</span><span class="char-cell result">X</span><span class="char-cell result">R</span><span class="char-cell result">K</span><span class="char-cell result">G</span><span class="char-cell result">I</span><span class="char-cell result">K</span><span class="char-cell result">X</span><span class="char-cell result">B</span><span class="char-cell result">K</span><span class="char-cell result">A</span><span class="char-cell result">L</span>
-        </div>
+        <ExampleGrid label="Plaintext:" text="ATTACKATDAWN" />
+        <ExampleGrid label="Key:" text="KEYKEYKEYKEY" type="highlighted" />
+        <ExampleGrid label="Ciphertext:" text="KXRKGIKXBKAL" type="result" />
       </div>
 
       <p>

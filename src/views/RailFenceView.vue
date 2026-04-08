@@ -28,11 +28,11 @@ const railFenceCipherKey = ref({
         To encrypt a message, you write the plaintext in a diagonal, zigzag pattern across a set number of "rails" (the key). Once the pattern is complete, you read the characters off row by row. For example, with 3 rails and the message "WEAREDISCOVERED":
       </p>
 
-      <div class="cipher-example">
-        W . . . E . . . C . . . R<br />
-        . E . R . D . S . O . E . E<br />
-        . . A . . . I . . . V . . . D
-      </div>
+      <pre class="cipher-example">
+W . . . E . . . C . . . R
+. E . R . D . S . O . E . E
+. . A . . . I . . . V . . . D
+      </pre>
 
       <p>By reading the rows left-to-right, the ciphertext becomes: "WECR ERDSOEE AIVD"</p>
 
@@ -60,3 +60,18 @@ const railFenceCipherKey = ref({
     </template>
   </CipherCard>
 </template>
+
+<style scoped>
+pre.cipher-example {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--cryptotron-grid-color);
+  margin: 1.5rem 0;
+  font-family: 'Space Mono', monospace;
+  line-height: 1.5;
+  color: var(--cryptotron-text-primary);
+  overflow-x: auto;
+  white-space: pre;
+}
+</style>

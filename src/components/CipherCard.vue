@@ -371,13 +371,21 @@ const crack = async () => {
     try {
       const result = props.crackAlgorithm!(ciphertext)
       if (result && result.key) {
-        // Emit updated key instead of mutating prop
-        emit('update:cipherKey', result.key)
-        // Update decrypt output with the recovered plaintext
-        decryptOutput.value = result.plaintext
+        // Validate that the key has at least one property (is an object)
+        const isValidKey = typeof result.key === 'object' && Object.keys(result.key).length > 0
+
+        if (isValidKey) {
+          // Emit updated key instead of mutating prop
+          emit('update:cipherKey', result.key)
+          // Update decrypt output with the recovered plaintext
+          decryptOutput.value = result.plaintext
+        } else {
+          decryptError.value = 'invalid key recovered'
+        }
       } else {
-        decryptError.value = 'no key found'
-      }    } catch (err) {
+        decryptOutput.value = '⚠️  no key found'
+      }
+    } catch (err) {
       console.error(err)
       decryptError.value = 'cracking failed'
     } finally {
