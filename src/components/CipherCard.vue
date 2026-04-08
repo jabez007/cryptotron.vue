@@ -299,12 +299,14 @@ const encryptOutput = ref('')
 const encryptError = ref('')
 
 const encrypt = () => {
+  if (!encryptInput.value) return
   encryptError.value = ''
   try {
     encryptOutput.value = props.encryptAlgorithm(encryptInput.value)
   } catch (err) {
     console.error(err)
     encryptError.value = 'encryption failed'
+    encryptOutput.value = ''
   }
 }
 
@@ -319,12 +321,14 @@ const decryptOutput = ref('')
 const decryptError = ref('')
 
 const decrypt = () => {
+  if (!decryptInput.value) return
   decryptError.value = ''
   try {
     decryptOutput.value = props.decryptAlgorithm(decryptInput.value)
   } catch (err) {
     console.error(err)
     decryptError.value = 'decryption failed'
+    decryptOutput.value = ''
   }
 }
 
