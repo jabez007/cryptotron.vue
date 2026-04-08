@@ -285,6 +285,11 @@ const handleKeydown = (e: KeyboardEvent) => {
 onMounted(() => {
   getPanel(cipherActiveTab.value)?.classList.add('active')
   root.value?.addEventListener('keydown', handleKeydown)
+  
+  // Focus the card automatically so keyboard shortcuts work immediately
+  nextTick(() => {
+    root.value?.focus()
+  })
 })
 
 onUnmounted(() => {
