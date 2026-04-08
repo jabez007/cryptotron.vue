@@ -39,7 +39,7 @@ const vigenereCipherKey = ref({
         </div>
         <div class="example-row">
           <span class="row-label">Ciphertext:</span>
-          <span class="char-cell result">K</span><span class="char-cell result">X</span><span class="char-cell result">R</span><span class="char-cell result">C</span><span class="char-cell result">E</span><span class="char-cell result">M</span><span class="char-cell result">K</span><span class="char-cell result">B</span><span class="char-cell result">D</span><span class="char-cell result">K</span><span class="char-cell result">B</span><span class="char-cell result">Y</span>
+          <span class="char-cell result">K</span><span class="char-cell result">X</span><span class="char-cell result">R</span><span class="char-cell result">K</span><span class="char-cell result">G</span><span class="char-cell result">I</span><span class="char-cell result">K</span><span class="char-cell result">X</span><span class="char-cell result">B</span><span class="char-cell result">K</span><span class="char-cell result">A</span><span class="char-cell result">L</span>
         </div>
       </div>
 

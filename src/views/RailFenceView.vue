@@ -34,7 +34,7 @@ const railFenceCipherKey = ref({
         . . A . . . C . . . R . . . R . .
       </div>
 
-      <p>By reading the rows left-to-right, the ciphertext becomes: "WEIVEE RDSOEED ACR R"</p>
+      <p>By reading the rows left-to-right, the ciphertext becomes: "WEIVE ERDSOEED ACRR"</p>
 
       <h3>The Mathematics</h3>
       <p>

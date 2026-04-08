@@ -1,6 +1,8 @@
 <template>
   <div 
+    ref="root"
     class="cipher-content" 
+    tabindex="-1"
     :data-vim-mode="isKeyMode ? 'key' : isInsertMode ? 'insert' : 'normal'"
   >
     <h1 class="page-title">{{ title }}</h1>
@@ -30,7 +32,7 @@
       </div>
 
       <div class="tab-content">
-        <div id="theory" :class="['tab-panel']">
+        <div ref="theoryPanel" class="tab-panel">
           <ScanLine />
           <div class="cipher-theory">
             <h2 class="section-title">Theory & History</h2>
@@ -40,7 +42,7 @@
           </div>
         </div>
 
-        <div id="encrypt" :class="['tab-panel']">
+        <div ref="encryptPanel" class="tab-panel">
           <div class="cipher-practice">
             <h2 class="section-title">Encrypt Messages</h2>
             <div class="control-group">
@@ -67,7 +69,7 @@
           </div>
         </div>
 
-        <div id="decrypt" :class="['tab-panel']">
+        <div ref="decryptPanel" class="tab-panel">
           <div class="cipher-practice">
             <h2 class="section-title">Decrypt Messages</h2>
             <div class="control-group">
@@ -147,27 +149,52 @@ const emit = defineEmits<{
 }>()
 
 const cipherActiveTab = ref('theory')
+const root = ref<HTMLElement | null>(null)
+const theoryPanel = ref<HTMLElement | null>(null)
+const encryptPanel = ref<HTMLElement | null>(null)
+const decryptPanel = ref<HTMLElement | null>(null)
+
+const getPanel = (tabId: string) => {
+  if (tabId === 'theory') return theoryPanel.value
+  if (tabId === 'encrypt') return encryptPanel.value
+  if (tabId === 'decrypt') return decryptPanel.value
+  return null
+}
+
 let switchTabTimer: ReturnType<typeof setTimeout> | null = null
 
 const switchTab = (newTabId: string) => {
   if (cipherActiveTab.value === newTabId) return
   
   const oldTabId = cipherActiveTab.value
+  const oldPanel = getPanel(oldTabId)
+  const newPanel = getPanel(newTabId)
+  
   cipherActiveTab.value = newTabId
 
   // Clear any existing timer
   if (switchTabTimer) clearTimeout(switchTabTimer)
 
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  if (prefersReducedMotion) {
+    const panels = [theoryPanel.value, encryptPanel.value, decryptPanel.value]
+    panels.forEach(p => p?.classList.remove('active', 'leaving'))
+    newPanel?.classList.add('active')
+    return
+  }
+
   // Add leaving class to current tab
-  document.getElementById(oldTabId)?.classList.add('leaving')
+  oldPanel?.classList.add('leaving')
 
   // After exit animation, switch to new tab
   switchTabTimer = setTimeout(async () => {
     await nextTick()
-    document.querySelectorAll('.tab-panel').forEach((panel) => {
-      panel.classList.remove('active', 'leaving')
+    const panels = [theoryPanel.value, encryptPanel.value, decryptPanel.value]
+    panels.forEach((panel) => {
+      panel?.classList.remove('active', 'leaving')
     })
-    document.getElementById(newTabId)?.classList.add('active')
+    newPanel?.classList.add('active')
     switchTabTimer = null
   }, 600) // Match exit animation duration
 }
@@ -177,6 +204,10 @@ const isKeyMode = ref(false)
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.defaultPrevented) return
+  
+  // Ignore shortcuts if Ctrl, Meta (Cmd), or Alt are pressed
+  if (e.ctrlKey || e.metaKey || e.altKey) return
+
   const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)
   const isKeyInput = (e.target as HTMLElement).classList.contains('cipher-input')
 
@@ -207,7 +238,7 @@ const handleKeydown = (e: KeyboardEvent) => {
   if (!isInsertMode.value) {
     switch (key) {
       case 'i': {
-        const panel = document.getElementById(cipherActiveTab.value)
+        const panel = getPanel(cipherActiveTab.value)
         const textarea = panel?.querySelector('textarea') as HTMLTextAreaElement
         if (textarea) {
           e.preventDefault()
@@ -218,7 +249,7 @@ const handleKeydown = (e: KeyboardEvent) => {
         break
       }
       case 'k': {
-        const panel = document.getElementById(cipherActiveTab.value)
+        const panel = getPanel(cipherActiveTab.value)
         const keyInput = panel?.querySelector('.cipher-input') as HTMLInputElement
         if (keyInput) {
           e.preventDefault()
@@ -252,12 +283,12 @@ const handleKeydown = (e: KeyboardEvent) => {
 }
 
 onMounted(() => {
-  document.getElementById(cipherActiveTab.value)?.classList.add('active')
-  window.addEventListener('keydown', handleKeydown)
+  getPanel(cipherActiveTab.value)?.classList.add('active')
+  root.value?.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown)
+  root.value?.removeEventListener('keydown', handleKeydown)
   if (switchTabTimer) clearTimeout(switchTabTimer)
   if (crackTimer) clearTimeout(crackTimer)
 })
@@ -321,6 +352,7 @@ const yankOutput = () => {
 const crack = async () => {
   if (!props.crackAlgorithm || !decryptInput.value || isCracking.value) return
 
+  const ciphertext = decryptInput.value
   isCracking.value = true
   decryptError.value = ''
   
@@ -328,7 +360,7 @@ const crack = async () => {
   // We yield to the event loop to allow the "Cracking..." UI to paint.
   crackTimer = setTimeout(() => {
     try {
-      const result = props.crackAlgorithm!(decryptInput.value)
+      const result = props.crackAlgorithm!(ciphertext)
       if (result && result.key) {
         // Emit updated key instead of mutating prop
         emit('update:cipherKey', result.key)
