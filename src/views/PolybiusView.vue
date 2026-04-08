@@ -19,18 +19,17 @@ const polybiusCipherKey = ref({
     :cipher-key="polybiusCipherKey"
   >
     <template v-slot:theory>
+      <h3>The Origin Story</h3>
       <p>
-        The Polybius Square is a technique for telegraphy that represents each letter of the
-        alphabet with its coordinates in a 5x5 grid. It was originally invented by the Greek
-        historian Polybius around 150 BCE.
+        The Polybius Square is one of the earliest examples of <strong>fractionation</strong> in cryptography. It was invented by the Greek historian Polybius around 150 BCE. While modern users see it as an encryption tool, Polybius originally designed it as a system for <strong>telegraphy</strong>—allowing soldiers to signal letters across long distances using pairs of torches held in each hand.
       </p>
 
-      <h3>How It Works</h3>
+      <h3>The Mechanics</h3>
       <p>
-        A 5x5 grid is filled with the letters of the alphabet (usually combining I and J into one
-        cell). The coordinates of each letter (Row, Column) then represent that letter.
+        The system uses a 5x5 grid filled with the letters of the alphabet. Since the English alphabet has 26 letters, 'I' and 'J' are typically combined into a single cell. Each letter is then represented by its coordinates (Row, Column). For example, in a standard square, 'A' is 11, 'B' is 12, and so on.
       </p>
 
+      <p>Standard Polybius Square Example:</p>
       <div class="cipher-example">
         &nbsp;&nbsp;<span class="header-char">A</span> <span class="header-char">B</span> <span class="header-char">C</span> <span class="header-char">D</span> <span class="header-char">E</span><br />
         <span class="header-char">A</span> A B C D E<br />
@@ -40,12 +39,11 @@ const polybiusCipherKey = ref({
         <span class="header-char">E</span> V W X Y Z
       </div>
 
-      <p>Example: "HELLO" → "BD AE CB CB CD"</p>
+      <p>Example: "HELLO" → "BD AE CB CB CD" (using ABCDE as coordinates)</p>
 
       <h3>Keyed Square</h3>
       <p>
-        To increase security, the grid can be filled starting with a secret keyword (removing
-        duplicate letters), followed by the remaining letters of the alphabet in order.
+        To increase security, the grid can be filled starting with a secret <strong>keyword</strong> (removing duplicate letters), followed by the remaining letters of the alphabet in order. This ensures that even if an attacker knows the coordinates, they cannot decode the message without the secret grid arrangement.
       </p>
 
       <p>Example with keyword "CYBERPUNK":</p>
@@ -58,12 +56,14 @@ const polybiusCipherKey = ref({
         <span class="header-char">E</span> T V W X Z
       </div>
 
-      <p>Note how duplicate letters are removed and "I/J" are treated as a single unit.</p>
-
-      <h3>Security</h3>
+      <h3>The Mathematics</h3>
       <p>
-        The Polybius square is primarily a fractionation method rather than a strong encryption by
-        itself. It is often used as a component in more complex ciphers like the ADFGVX cipher.
+        The Polybius Square is essentially a <strong>base-5</strong> numbering system for the alphabet. By converting a single character into two numerical components, it allows the data to be manipulated in ways that a single letter cannot. This process—breaking a character into parts—is the definition of fractionation.
+      </p>
+
+      <h3>Modern Perspective</h3>
+      <p>
+        The Polybius Square is rarely used alone for security, but it is a critical building block for more complex ciphers like the <strong>Playfair</strong>, the <strong>Nihilist</strong>, and the famous German <strong>ADFGVX</strong> cipher used in World War I. It teaches us how to transform data into different formats (like numbers) to prepare it for further encryption layers.
       </p>
     </template>
     <template v-slot:cipherKey>

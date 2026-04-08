@@ -18,47 +18,35 @@ const autokeyCipherKey = ref({
     :cipher-key="autokeyCipherKey"
   >
     <template v-slot:theory>
+      <h3>The Origin Story</h3>
       <p>
-        Developed by Giovan Battista Bellaso in 1564, the Autokey cipher improves on Vigenère by
-        using the plaintext itself as part of the key, making it harder to break with traditional
-        methods.
+        The Autokey cipher was designed to fix the greatest weakness of the Vigenère cipher: the repeating keyword. It was first described by Girolamo Cardano, but the definitive version used today was published by Giovan Battista Bellaso in 1564. By making the key as long as the message itself, Bellaso intended to eliminate the periodic patterns that allowed cryptanalysts to find the key length.
       </p>
 
-      <h3>How It Works</h3>
+      <h3>The Mechanics</h3>
       <p>
-        The key starts with a primer (the initial secret), then extends by appending the plaintext
-        message itself. This ensures the key never repeats. For example, with primer "K" and
-        plaintext "MEET AT MIDNIGHT":
+        The Autokey cipher starts with a short secret <strong>primer</strong>. Once the primer is exhausted, the cipher uses the <strong>plaintext itself</strong> as the remaining key. For example, if the primer is "K" and the message is "MEET", the full key becomes "KMEE". This ensures that the key is always unique and never repeats, significantly increasing the complexity of the ciphertext.
       </p>
-      <div class="cipher-example aligned">
-        <div class="example-row">
-          <span class="row-label">Plaintext:</span>
-          <span class="char-cell">M</span><span class="char-cell">E</span><span class="char-cell">E</span><span class="char-cell">T</span><span class="char-cell">A</span><span class="char-cell">T</span><span class="char-cell">M</span><span class="char-cell">I</span><span class="char-cell">D</span><span class="char-cell">N</span><span class="char-cell">I</span><span class="char-cell">G</span><span class="char-cell">H</span><span class="char-cell">T</span>
-        </div>
-        <div class="example-row">
-          <span class="row-label">Key:</span>
-          <span class="char-cell highlighted">K</span><span class="char-cell">M</span><span class="char-cell">E</span><span class="char-cell">E</span><span class="char-cell">T</span><span class="char-cell">A</span><span class="char-cell">T</span><span class="char-cell">M</span><span class="char-cell">I</span><span class="char-cell">D</span><span class="char-cell">N</span><span class="char-cell">I</span><span class="char-cell">G</span><span class="char-cell">H</span>
-        </div>
-        <div class="example-row">
-          <span class="row-label">Ciphertext:</span>
-          <span class="char-cell result">W</span><span class="char-cell result">Q</span><span class="char-cell result">I</span><span class="char-cell result">X</span><span class="char-cell result">T</span><span class="char-cell result">T</span><span class="char-cell result">F</span><span class="char-cell result">U</span><span class="char-cell result">L</span><span class="char-cell result">Q</span><span class="char-cell result">V</span><span class="char-cell result">O</span><span class="char-cell result">N</span><span class="char-cell result">A</span>
-        </div>
+
+      <h3>The Mathematics</h3>
+      <p>
+        The encryption process uses the same modular addition as the Vigenère, but with a dynamically generated key stream:
+      </p>
+      <div class="cipher-example">
+        <strong>E(p_i) = (p_i + k_i) mod 26</strong>
       </div>
-
-      <h3>Mathematical Formula</h3>
-      <p>Encryption: <strong>E(x_i) = (x_i + k_i) mod 26</strong></p>
       <p>
-        Where
-        <strong
-          >k_i = primer_i (for i ≤ primer length) or x_{i-primer length} (for i > primer
-          length)</strong
-        >
+        Where <strong>k_i</strong> is the <em>i</em>-th character of the primer for early positions, and <strong>p_{i-L}</strong> (the plaintext from <em>L</em> positions ago) for all subsequent positions, where <em>L</em> is the primer length.
       </p>
 
-      <h3>Security</h3>
+      <h3>The Breach</h3>
       <p>
-        More secure than Vigenère against Kasiski examination (no repeating key patterns), but
-        vulnerable to known-plaintext attacks.
+        While stronger than Vigenère, the Autokey cipher is still vulnerable to modern attacks. Because the key is composed of actual language (the plaintext), it still follows linguistic patterns. Cryptanalysts use <strong>"Hill Climbing"</strong> algorithms and automated dictionary attacks to guess the primer. Once the primer is guessed correctly, the rest of the key (and thus the plaintext) reveals itself through a chain reaction.
+      </p>
+
+      <h3>Modern Perspective</h3>
+      <p>
+        The Autokey cipher represents a brilliant attempt to solve the "repeating key" problem. It serves as a precursor to more advanced stream ciphers and highlights a core principle of cryptography: security is often improved by making the key as unpredictable and non-repeating as possible.
       </p>
     </template>
     <template v-slot:cipherKey>
