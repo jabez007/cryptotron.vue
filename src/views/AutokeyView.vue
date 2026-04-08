@@ -32,7 +32,7 @@ const autokeyCipherKey = ref({
       <div class="cipher-example aligned">
         <ExampleGrid label="Plaintext:" text="MEETATMIDNIGHT" />
         <ExampleGrid label="Key:" text="KMEETATMIDNIGH" type="highlighted" />
-        <ExampleGrid label="Ciphertext:" text="WQI XTTFULQ VON" type="result" />
+        <ExampleGrid label="Ciphertext:" text="WQIXTTFULQVONA" type="result" />
       </div>
 
       <p>
