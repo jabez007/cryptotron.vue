@@ -376,9 +376,8 @@ const crack = async () => {
         // Update decrypt output with the recovered plaintext
         decryptOutput.value = result.plaintext
       } else {
-        decryptOutput.value = '⚠️  no key found'
-      }
-    } catch (err) {
+        decryptError.value = 'no key found'
+      }    } catch (err) {
       console.error(err)
       decryptError.value = 'cracking failed'
     } finally {
