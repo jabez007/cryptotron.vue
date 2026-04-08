@@ -15,6 +15,7 @@ const props = defineProps<{
     | 'builder'
     | 'display'
     | 'display-off'
+    | 'error'
   size?: number | string
 }>()
 
@@ -116,6 +117,13 @@ const colors = {
       <rect x="3" y="4" width="18" height="12" :stroke="colors.secondary" stroke-width="1.5" opacity="0.6" />
       <path d="M7 20H17M12 16V20" :stroke="colors.secondary" stroke-width="1.5" opacity="0.6" />
       <path d="M3 3L21 21" :stroke="colors.magenta" stroke-width="1.5" />
+    </g>
+
+    <!-- Error / Warning -->
+    <g v-if="type === 'error'">
+      <path d="M12 2L2 22H22L12 2Z" :stroke="colors.magenta" stroke-width="1.5" />
+      <path d="M12 8V14" :stroke="colors.magenta" stroke-width="2" />
+      <circle cx="12" cy="18" r="1" :fill="colors.magenta" />
     </g>
 
     <!-- Load -->

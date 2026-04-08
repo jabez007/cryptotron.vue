@@ -52,6 +52,11 @@
               <button @click="clearEncrypt" class="cipher-button">Clear</button>
             </div>
 
+            <div v-if="encryptError" class="status-error">
+              <CyberIcon type="error" size="16" />
+              <span>{{ encryptError }}</span>
+            </div>
+
             <CipherOutput label="Output" :text="encryptOutput" />
           </div>
         </div>
@@ -87,6 +92,11 @@
                   Crack
                 </span>
               </button>
+            </div>
+
+            <div v-if="decryptError" class="status-error">
+              <CyberIcon type="error" size="16" />
+              <span>{{ decryptError }}</span>
             </div>
 
             <CipherOutput label="Output" :text="decryptOutput" />
@@ -241,36 +251,42 @@ onUnmounted(() => {
 
 const encryptInput = ref('')
 const encryptOutput = ref('')
+const encryptError = ref('')
 
 const encrypt = () => {
+  encryptError.value = ''
   try {
     encryptOutput.value = props.encryptAlgorithm(encryptInput.value)
   } catch (err) {
     console.error(err)
-    encryptOutput.value = '⚠️  encryption failed'
+    encryptError.value = 'encryption failed'
   }
 }
 
 const clearEncrypt = () => {
   encryptInput.value = ''
   encryptOutput.value = ''
+  encryptError.value = ''
 }
 
 const decryptInput = ref('')
 const decryptOutput = ref('')
+const decryptError = ref('')
 
 const decrypt = () => {
+  decryptError.value = ''
   try {
     decryptOutput.value = props.decryptAlgorithm(decryptInput.value)
   } catch (err) {
     console.error(err)
-    decryptOutput.value = '⚠️  decryption failed'
+    decryptError.value = 'decryption failed'
   }
 }
 
 const clearDecrypt = () => {
   decryptInput.value = ''
   decryptOutput.value = ''
+  decryptError.value = ''
 }
 
 const isCracking = ref(false)
@@ -280,6 +296,7 @@ const crack = async () => {
   if (!props.crackAlgorithm || !decryptInput.value || isCracking.value) return
 
   isCracking.value = true
+  decryptError.value = ''
   
   // Crack algorithms in the library are synchronous but might be heavy.
   // We yield to the event loop to allow the "Cracking..." UI to paint.
@@ -292,11 +309,11 @@ const crack = async () => {
         // Update decrypt output with the recovered plaintext
         decryptOutput.value = result.plaintext
       } else {
-        decryptOutput.value = '⚠️  no key found'
+        decryptError.value = 'no key found'
       }
     } catch (err) {
       console.error(err)
-      decryptOutput.value = '⚠️  cracking failed'
+      decryptError.value = 'cracking failed'
     } finally {
       isCracking.value = false
       crackTimer = null
@@ -379,6 +396,24 @@ const crack = async () => {
 .mode-hint {
   color: var(--text-secondary);
   opacity: 0.8;
+}
+
+.status-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  color: var(--neon-magenta);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: error-flicker 0.3s ease-in-out;
+}
+
+@keyframes error-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .cipher-container::before {
