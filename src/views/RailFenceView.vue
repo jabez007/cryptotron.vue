@@ -52,7 +52,7 @@ const railFenceCipherKey = ref({
 
       <h3>Modern Perspective</h3>
       <p>
-        Today, the Rail-Fence cipher is an introductory lesson in the world of transposition. It teaches the fundamental concept that data security isn't just about hiding what a character is, but also about where it is located. It is the simple ancestor to the complex <strong>Block Transpositions</strong> used in modern AES encryption.
+        Today, the Rail-Fence cipher is an introductory lesson in the world of transposition. It teaches the fundamental concept that data security isn't just about hiding what a character is, but also about where it is located. In modern cryptography, AES (Advanced Encryption Standard) uses a <strong>substitution-permutation network</strong>, where the <strong>ShiftRows</strong> step serves as a sophisticated modern parallel to the simple rail-fence transposition.
       </p>
     </template>
     <template v-slot:cipherKey>

@@ -39,7 +39,7 @@ const polybiusCipherKey = ref({
         <span class="header-char">E</span> V W X Y Z
       </div>
 
-      <p>Example: "HELLO" → "BD AE CB CB CD" (using ABCDE as coordinates)</p>
+      <p>Example: "HELLO" → "BC AE CA CA CD" (using ABCDE as coordinates)</p>
 
       <h3>Keyed Square</h3>
       <p>

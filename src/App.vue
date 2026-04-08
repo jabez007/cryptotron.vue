@@ -45,6 +45,7 @@
         <RouterLink 
           :to="{ name: item.name }" 
           :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }"
+          @click="menuOpen && closeMenu()"
         >
           <span v-if="menuOpen && menuSelectedIndex === index" class="menu-selection-indicator">&gt;</span>
           {{ item.label }}
@@ -131,7 +132,8 @@ watch(menuSelectedIndex, () => {
   if (menuOpen.value) {
     nextTick(() => {
       const activeLink = document.querySelector('nav.nav-overlay a.keyboard-selected')
-      activeLink?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+      activeLink?.scrollIntoView({ behavior, block: 'center' })
     })
   }
 })
