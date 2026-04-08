@@ -2,6 +2,7 @@
 import { vigenere } from '@jabez007/cryptotron.js'
 import CipherCard from '@/components/CipherCard.vue'
 import KeyVigenere from '@/components/keys/KeyVigenere.vue'
+import ExampleGrid from '@/components/ExampleGrid.vue'
 import { ref } from 'vue'
 
 const vigenereCipherKey = ref({
@@ -12,53 +13,50 @@ const vigenereCipherKey = ref({
 <template>
   <CipherCard
     title="Vigenère Cipher"
-    :encrypt-algorithm="vigenere.encrypt(vigenereCipherKey)"
-    :decrypt-algorithm="vigenere.decrypt(vigenereCipherKey)"
-    :cipher-key="vigenereCipherKey"
+    :encrypt-algorithm="() => vigenere.encrypt(vigenereCipherKey)"
+    :decrypt-algorithm="() => vigenere.decrypt(vigenereCipherKey)"
+    :crack-algorithm="vigenere.crack"
+    v-model:cipher-key="vigenereCipherKey"
   >
     <template v-slot:theory>
+      <h3>The Origin Story</h3>
       <p>
-        The Vigenère cipher is a more advanced encryption method that emerged in the 16th century,
-        often attributed to Blaise de Vigenère, though it was actually first described by Giovan
-        Battista Bellaso in 1553.
+        The Vigenère cipher is a method of encrypting alphabetic text by using a series of interwoven Caesar ciphers. Though named after Blaise de Vigenère, who published a description of it in 1586, the cipher was actually invented by Giovan Battista Bellaso in 1553. For over 300 years, it was famously known as <strong>"Le Chiffre Indéchiffrable"</strong> (The Unbreakable Cipher) because it resisted all standard methods of cryptanalysis until the mid-19th century.
       </p>
 
-      <h3>How It Works</h3>
+      <h3>The Mechanics</h3>
       <p>
-        The Vigenère cipher is a polyalphabetic substitution cipher that uses a keyword to shift
-        letters in the plaintext. Unlike the Caesar cipher which uses a single shift value, the
-        Vigenère cipher uses multiple shift values based on the letters of the keyword. For example,
-        with the keyword "KEY":
+        Unlike the Caesar cipher, which uses a single shift value for the whole message, the Vigenère cipher uses a <strong>keyword</strong>. Each letter of the keyword determines the shift for the corresponding letter in the plaintext. If the message is longer than the keyword, the keyword is repeated. For example, with the keyword "KEY":
       </p>
 
-      <div class="cipher-example">
-        Plaintext: A T T A C K A T D A W N<br />
-        Key: K E Y K E Y K E Y K E Y<br />
-        Ciphertext: K X R C E M K B D K B Y
+      <div class="cipher-example aligned">
+        <ExampleGrid label="Plaintext:" text="ATTACKATDAWN" />
+        <ExampleGrid label="Key:" text="KEYKEYKEYKEY" type="highlighted" />
+        <ExampleGrid label="Ciphertext:" text="KXRKGIKXBKAL" type="result" />
       </div>
 
-      <h3>Mathematical Formula</h3>
-      <p>For encryption: <strong>E(x_i) = (x_i + k_(i mod m)) mod 26</strong></p>
-      <p>For decryption: <strong>D(x_i) = (x_i - k_(i mod m)) mod 26</strong></p>
       <p>
-        Where x_i is the i-th letter position (A=0, B=1, ..., Z=25), k_j is the j-th letter of the
-        key, and m is the length of the key.
+        This makes it a <strong>polyalphabetic</strong> cipher—the same plaintext letter can be encrypted into different ciphertext letters depending on its position.
       </p>
 
-      <h3>Security</h3>
+      <h3>The Mathematics</h3>
       <p>
-        The Vigenère cipher was considered secure for centuries (the "unbreakable cipher") until
-        Charles Babbage and Friedrich Kasiski independently developed methods to break it in the
-        19th century. Its security depends on:
+        If we map letters to numbers (A=0, B=1, ..., Z=25), the encryption for a letter <em>p</em> with a key letter <em>k</em> is:
       </p>
-      <ul>
-        <li>Key length (longer keys are more secure)</li>
-        <li>Key randomness (avoiding predictable words)</li>
-        <li>Message length (shorter messages are harder to crack)</li>
-      </ul>
+      <div class="cipher-example">
+        Encryption: <strong>E(p_i) = (p_i + k_{i mod m}) mod 26</strong><br />
+        Decryption: <strong>D(c_i) = (c_i - k_{i mod m}) mod 26</strong>
+      </div>
+      <p>Where <em>m</em> is the length of the keyword.</p>
+
+      <h3>The Breach</h3>
       <p>
-        Modern attacks using frequency analysis and pattern recognition can break the cipher,
-        especially with short or repeated keys.
+        The "unbreakable" status of the Vigenère cipher ended in 1863 when Friedrich Kasiski published a method to find the key length by looking for repeated sequences in the ciphertext (the <strong>Kasiski examination</strong>). Once the key length is known, the ciphertext can be treated as a collection of several Caesar ciphers, each of which can be broken easily using frequency analysis. Even earlier, Charles Babbage had privately developed a similar method to break the cipher during the Crimean War.
+      </p>
+
+      <h3>Modern Perspective</h3>
+      <p>
+        The Vigenère cipher is a pivotal chapter in cryptography history. It marked the transition from simple substitution to complex, position-dependent encryption. It remains a fascinating study in pattern recognition and is the spiritual ancestor to the <strong>One-Time Pad</strong>, which remains mathematically unbreakable if used correctly.
       </p>
     </template>
     <template v-slot:cipherKey>
@@ -66,3 +64,7 @@ const vigenereCipherKey = ref({
     </template>
   </CipherCard>
 </template>
+
+<style scoped>
+@import '@/assets/example-grid.css';
+</style>

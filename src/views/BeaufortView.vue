@@ -2,44 +2,62 @@
 import { beaufort } from '@jabez007/cryptotron.js'
 import CipherCard from '@/components/CipherCard.vue'
 import KeyBeaufort from '@/components/keys/KeyBeaufort.vue'
+import ExampleGrid from '@/components/ExampleGrid.vue'
 import { ref } from 'vue'
 
 const beaufortCipherKey = ref({
-  keyword: 'lumberjack',
+  keyword: 'nightcity',
 })
 </script>
 
 <template>
   <CipherCard
     title="Beaufort Cipher"
-    :encrypt-algorithm="beaufort.encrypt(beaufortCipherKey)"
-    :decrypt-algorithm="beaufort.decrypt(beaufortCipherKey)"
-    :cipher-key="beaufortCipherKey"
+    :encrypt-algorithm="() => beaufort.encrypt(beaufortCipherKey)"
+    :decrypt-algorithm="() => beaufort.decrypt(beaufortCipherKey)"
+    :crack-algorithm="beaufort.crack"
+    v-model:cipher-key="beaufortCipherKey"
   >
     <template v-slot:theory>
+      <h3>The Origin Story</h3>
       <p>
-        Created by Sir Francis Beaufort in the 19th century, this cipher is similar to Vigenère but
-        uses a reversed encryption process. It was used in the Royal Navy for weather logs.
+        The Beaufort cipher is a variant of the Vigenère cipher, created by Sir Francis Beaufort (1774–1857), an officer in the British Royal Navy and the creator of the famous Beaufort scale for measuring wind speeds. This cipher was used by the Royal Navy for weather logs and was also a favorite of the Confederate States of America during the American Civil War due to its practical simplicity.
       </p>
 
-      <h3>How It Works</h3>
+      <h3>The Mechanics</h3>
       <p>
-        Encryption involves subtracting the plaintext from the key (mod 26). Example with key "KEY":
+        The Beaufort cipher is a polyalphabetic substitution cipher that uses a repeating keyword, just like the Vigenère. However, it uses a different mathematical operation. Instead of adding the key to the plaintext, it <strong>subtracts the plaintext from the key</strong>. For example, with key "FORTIFY":
       </p>
-      <div class="cipher-example">
-        Plaintext: A T T A C K<br />
-        Key: K E Y K E Y<br />
-        Ciphertext: K R J K E M (A→K: (10-0) mod 26 = 10 = K)
+
+      <div class="cipher-example aligned">
+        <ExampleGrid label="Plaintext:" text="DEFENDTHEEASTWALL" />
+        <ExampleGrid label="Key:" text="FORTIFYFORTIFYFOR" type="highlighted" />
+        <ExampleGrid label="Ciphertext:" text="CKMPVCFYKNTQMCFDG" type="result" />
       </div>
 
-      <h3>Mathematical Formula</h3>
-      <p>Encryption: <strong>E(x_i) = (k_i - x_i) mod 26</strong></p>
-      <p>Decryption: <strong>D(y_i) = (k_i - y_i) mod 26</strong></p>
-
-      <h3>Security</h3>
       <p>
-        Comparable to Vigenère, but its reciprocal property (encryption = decryption) can simplify
-        attacks in some cases.
+        This small change results in a unique property: the Beaufort cipher is <strong>reciprocal</strong>, meaning that encryption and decryption are the exact same process.
+      </p>
+
+      <h3>The Mathematics</h3>
+      <p>
+        Mapping letters to numbers (A=0, B=1, ..., Z=25), the Beaufort transformation is:
+      </p>
+      <div class="cipher-example">
+        Encryption/Decryption: <strong>E(x) = (k_i - p_i) mod 26</strong>
+      </div>
+      <p>
+        Because the operation is its own inverse, you don't need a separate decryption formula. If you "encrypt" the ciphertext using the same key, you get the plaintext back.
+      </p>
+
+      <h3>The Breach</h3>
+      <p>
+        Since it relies on a repeating keyword, the Beaufort cipher is vulnerable to the same cryptanalysis as the Vigenère. Friedrich Kasiski’s method of finding the keyword length through repeated ciphertext patterns (<strong>Kasiski examination</strong>) works perfectly here. Once the key length is identified, the cipher can be broken using standard frequency analysis on each individual shift set.
+      </p>
+
+      <h3>Modern Perspective</h3>
+      <p>
+        The Beaufort cipher is celebrated for its mathematical symmetry. It demonstrates how a simple change in algebra can simplify the operational logistics of a cipher (requiring only one set of instructions for both sending and receiving) without fundamentally altering its cryptographic strength.
       </p>
     </template>
     <template v-slot:cipherKey>
@@ -47,3 +65,7 @@ const beaufortCipherKey = ref({
     </template>
   </CipherCard>
 </template>
+
+<style scoped>
+@import '@/assets/example-grid.css';
+</style>

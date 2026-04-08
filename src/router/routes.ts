@@ -47,5 +47,15 @@ export default (parentRouteName?: string) => {
       path: `${rootPath}vigenere`,
       component: () => import('@/views/VigenereView.vue'),
     },
+    {
+      name: 'cryptotron-polybius',
+      path: `${rootPath}polybius`,
+      component: () => import('@/views/PolybiusView.vue'),
+    },
+    {
+      name: 'cryptotron-rail-fence',
+      path: `${rootPath}rail-fence`,
+      component: () => import('@/views/RailFenceView.vue'),
+    },
   ]
 }

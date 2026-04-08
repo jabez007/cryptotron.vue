@@ -1,40 +1,56 @@
 <template>
   <div class="cryptotron-app">
+    <div v-if="isCrtEnabled" class="crt-overlay"></div>
+    <div v-if="isCrtEnabled" class="scanlines"></div>
     <header>
       <div class="logo" @click="router.push({ name: 'cryptotron-home' })">
         <img alt="Vue logo" src="@/assets/logo.png" width="50" height="50" />
         CryptoTron
       </div>
 
-      <button
-        @click="toggleMenu"
-        :class="['hamburger-button', { active: menuOpen }]"
-        aria-label="Toggle navigation menu"
-        :aria-expanded="menuOpen"
-      >
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-      </button>
+      <div class="header-actions">
+        <button
+          class="crt-toggle-btn"
+          @click="toggleCrt"
+          :title="isCrtEnabled ? 'Disable CRT Effects (Clean Mode)' : 'Enable CRT Effects (Cyber Mode)'"
+          :aria-label="isCrtEnabled ? 'Disable CRT Effects' : 'Enable CRT Effects'"
+          :aria-pressed="isCrtEnabled"
+        >
+          <CyberIcon :type="isCrtEnabled ? 'display' : 'display-off'" size="24" />
+        </button>
+
+        <button
+          @click="toggleMenu"
+          :class="['hamburger-button', { active: menuOpen }]"
+          aria-label="Toggle navigation menu"
+          :aria-expanded="menuOpen"
+        >
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
     </header>
 
     <!-- Navigation Overlay -->
     <div :class="['nav-overlay-bg', { active: menuOpen }]" @click="closeMenu"></div>
     <nav :class="['nav-overlay', { active: menuOpen }]">
-      <RouterLink v-if="isSubApp" to="/">
-        <IconDocumentation />
-      </RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-home' }">Home</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-about' }">About</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-builder' }">BYOA</RouterLink>
-      <div class="nav-category">Substitution Ciphers</div>
-      <RouterLink :to="{ name: 'cryptotron-affine' }">Affine</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-caesar' }">Caesar</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-substitution' }">Simple</RouterLink>
-      <div class="nav-category">Polyalphabetic Ciphers</div>
-      <RouterLink :to="{ name: 'cryptotron-autokey' }">Autokey</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-beaufort' }">Beaufort</RouterLink>
-      <RouterLink :to="{ name: 'cryptotron-vigenere' }">Vigenère</RouterLink>
+      <template v-for="(item, index) in menuItems" :key="item.name">
+        <div 
+          v-if="item.category && (index === 0 || menuItems[index-1].category !== item.category)" 
+          class="nav-category"
+        >
+          {{ item.category }}
+        </div>
+        <RouterLink 
+          :to="{ name: item.name }" 
+          :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }"
+          @click="menuOpen && closeMenu()"
+        >
+          <span v-if="menuOpen && menuSelectedIndex === index" class="menu-selection-indicator">&gt;</span>
+          {{ item.label }}
+        </RouterLink>
+      </template>
     </nav>
 
     <div id="app-content">
@@ -61,24 +77,128 @@
 <script setup lang="ts">
 import IconBug from '@/components/icons/IconBug.vue'
 import IconDocumentation from '@/components/icons/IconDocumentation.vue'
+import CyberIcon from '@/components/icons/CyberIcon.vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
-import { onMounted, ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
 
-console.debug(`Current router is`, router)
-console.debug(`Current route is`, route)
+// CRT Persistence and Logic
+const isCrtEnabled = ref(localStorage.getItem('crt-enabled') !== 'false')
+
+const toggleCrt = () => {
+  isCrtEnabled.value = !isCrtEnabled.value
+  localStorage.setItem('crt-enabled', isCrtEnabled.value.toString())
+}
 
 /* nav menu */
 const menuOpen = ref(false)
+const menuSelectedIndex = ref(0)
+
+const menuItems = [
+  { name: 'cryptotron-home', label: 'Home' },
+  { name: 'cryptotron-about', label: 'About' },
+  { name: 'cryptotron-builder', label: 'BYOA' },
+  { name: 'cryptotron-affine', label: 'Affine', category: 'Substitution Ciphers' },
+  { name: 'cryptotron-caesar', label: 'Caesar', category: 'Substitution Ciphers' },
+  { name: 'cryptotron-substitution', label: 'Simple', category: 'Substitution Ciphers' },
+  { name: 'cryptotron-polybius', label: 'Polybius', category: 'Grid & Fractionation' },
+  { name: 'cryptotron-autokey', label: 'Autokey', category: 'Polyalphabetic Ciphers' },
+  { name: 'cryptotron-beaufort', label: 'Beaufort', category: 'Polyalphabetic Ciphers' },
+  { name: 'cryptotron-vigenere', label: 'Vigenère', category: 'Polyalphabetic Ciphers' },
+  { name: 'cryptotron-rail-fence', label: 'Rail-Fence', category: 'Transposition Ciphers' },
+]
+
+// ... (logic remains same until toggleMenu)
 
 const toggleMenu = () => {
   menuOpen.value = !menuOpen.value
+  if (menuOpen.value) {
+    // Find index of current route or default to 0
+    const currentIndex = menuItems.findIndex(item => item.name === route.name)
+    menuSelectedIndex.value = currentIndex !== -1 ? currentIndex : 0
+    
+    // Ensure selection is visible on open
+    nextTick(() => {
+      const activeLink = document.querySelector('nav.nav-overlay a.keyboard-selected')
+      activeLink?.scrollIntoView({ block: 'center' })
+    })
+  }
 }
+
+// Watch selection to handle scrolling
+watch(menuSelectedIndex, () => {
+  if (menuOpen.value) {
+    nextTick(() => {
+      const activeLink = document.querySelector('nav.nav-overlay a.keyboard-selected')
+      const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+      activeLink?.scrollIntoView({ behavior, block: 'center' })
+    })
+  }
+})
 
 const closeMenu = () => {
   menuOpen.value = false
+}
+
+const handleGlobalKeydown = (e: KeyboardEvent) => {
+  // Ignore if typing in an input
+  if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
+
+  const key = e.key.toLowerCase()
+
+  // Menu Navigation
+  if (menuOpen.value) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      menuSelectedIndex.value = (menuSelectedIndex.value + 1) % menuItems.length
+      return
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      menuSelectedIndex.value = (menuSelectedIndex.value - 1 + menuItems.length) % menuItems.length
+      return
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      e.stopImmediatePropagation()
+      const item = menuItems[menuSelectedIndex.value]
+      router.push({ name: item.name })
+      closeMenu()
+      return
+    }
+  }
+
+  // Terminal Shortcuts (Alt + Key)
+  if (e.altKey) {
+    switch (key) {
+      case 'h': e.preventDefault(); e.stopImmediatePropagation(); router.push({ name: 'cryptotron-home' }); break
+      case 'b': e.preventDefault(); e.stopImmediatePropagation(); router.push({ name: 'cryptotron-builder' }); break
+      case 'm': e.preventDefault(); e.stopImmediatePropagation(); toggleMenu(); break
+      case 't': e.preventDefault(); e.stopImmediatePropagation(); toggleCrt(); break
+    }
+  }
+
+  // Escape to Home
+  if (e.key === 'Escape') {
+    // Check if target is in a component handling its own Escape (like CipherCard in Vim mode)
+    const target = e.target as HTMLElement
+    const vimContainer = target.closest('[data-vim-mode]')
+    const vimMode = vimContainer?.getAttribute('data-vim-mode')
+    
+    if (vimMode === 'insert' || vimMode === 'key') {
+      // Let the component handle it
+      return
+    }
+
+    e.preventDefault()
+    e.stopImmediatePropagation()
+    if (menuOpen.value) closeMenu()
+    else router.push({ name: 'cryptotron-home' })
+  }
 }
 
 watch(
@@ -94,6 +214,13 @@ onMounted(() => {
   const root = router.resolve({ path: '/' })
   console.debug(`Root route resolved to ${root.name as string}`)
   isSubApp.value = root.name !== 'cryptotron-home'
+  
+  // Use capture: true so the global listener (menu shortcuts) runs BEFORE component listeners
+  window.addEventListener('keydown', handleGlobalKeydown, { capture: true })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleGlobalKeydown, { capture: true })
 })
 
 /* Bug report functionality */
@@ -106,10 +233,126 @@ const openIssues = () => {
 
 <style>
 @import '@/assets/base.css';
+
+/* Accessibility: Respect OS-level reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  /* CRT effects */
+  .crt-overlay,
+  .scanlines,
+  .crt-overlay::after {
+    display: none !important;
+  }
+
+  /* Glitch text */
+  .glitch-text::before,
+  .glitch-text::after {
+    display: none !important;
+  }
+
+  /* Global animations and transitions */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Specific theme elements */
+  .logo,
+  .nav-overlay,
+  .cipher-button::before,
+  .tab-panel.active {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Route transitions */
+  .cyber-glitch-enter-active,
+  .cyber-glitch-leave-active {
+    animation: none !important;
+    transition: none !important;
+  }
+}
 </style>
 
 <style scoped>
 @import '@/assets/main.css';
+
+/* CRT Screen Effects (Scoped) */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle, rgba(18, 16, 16, 0) 40%, rgba(0, 0, 0, 0.4) 100%),
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+  background-size:
+    100% 100%,
+    100% 4px,
+    3px 100%;
+  pointer-events: none;
+  z-index: 9999;
+  animation: crt-flicker 0.12s infinite;
+}
+
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.15) 50%
+  );
+  background-size: 100% 8px;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Subtle Vignette */
+.crt-overlay::after {
+  content: ' ';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(18, 16, 16, 0.1);
+  opacity: 0;
+  z-index: 10000;
+  pointer-events: none;
+  animation: crt-pulse 5s infinite;
+}
+
+@keyframes crt-flicker {
+  0% {
+    opacity: 0.97;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.98;
+  }
+}
+
+@keyframes crt-pulse {
+  0% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 0.1;
+  }
+}
 
 header {
   min-width: 100%;
@@ -126,6 +369,28 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.crt-toggle-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: all 0.3s ease;
+}
+
+.crt-toggle-btn:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 5px var(--neon-cyan));
 }
 
 .logo {
@@ -192,7 +457,7 @@ header {
   top: 50px;
   right: -100%;
   width: 350px;
-  height: 100vh;
+  height: calc(100vh - 50px);
   background: linear-gradient(135deg, var(--cryptotron-darker-bg) 0%, rgba(15, 15, 25, 0.98) 100%);
   backdrop-filter: blur(20px);
   border-left: 2px solid var(--neon-cyan);
@@ -200,7 +465,9 @@ header {
   transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1000;
   padding: 2rem;
+  padding-bottom: 5rem; /* Standard bottom padding */
   overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .nav-overlay.active {
@@ -249,11 +516,25 @@ nav a {
 }
 
 nav a:hover,
-nav a.router-link-exact-active {
+nav a.router-link-exact-active,
+nav a.keyboard-selected {
   border-color: var(--neon-cyan);
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   background: rgba(0, 255, 255, 0.1);
   transform: translateX(10px);
+}
+
+.menu-selection-indicator {
+  position: absolute;
+  left: 10px;
+  color: var(--neon-magenta);
+  font-weight: 900;
+  animation: menu-pulse 1s infinite alternate;
+}
+
+@keyframes menu-pulse {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
 }
 
 nav a::before {
@@ -316,8 +597,8 @@ nav a.router-link-exact-active:hover {
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   padding: 0.5rem 2rem;
   display: flex;
-  justify-content: start;
-  align-items: start;
+  justify-content: flex-start;
+  align-items: flex-start;
   backdrop-filter: blur(10px);
   position: sticky;
   bottom: 0;

@@ -94,6 +94,7 @@ const handleAddNode = (nodeData: { label: string; type: string }) => {
       type: nodeData.type,
       encryptAlgorithm: selectedCipher.encryptAlgorithm,
       decryptAlgorithm: selectedCipher.decryptAlgorithm,
+      crackAlgorithm: selectedCipher.crackAlgorithm,
       cipherKey: { ...selectedCipher.defaultKey },
       cipherKeyComponent: selectedCipher.cipherKeyComponent,
     },
@@ -342,6 +343,7 @@ const handleLoadGraph = (cipherFile: File) => {
             ...node.data,
             encryptAlgorithm: cipherData.encryptAlgorithm,
             decryptAlgorithm: cipherData.decryptAlgorithm,
+            crackAlgorithm: cipherData.crackAlgorithm,
             cipherKeyComponent: cipherData.cipherKeyComponent,
           },
         }

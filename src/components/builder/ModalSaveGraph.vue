@@ -4,7 +4,9 @@
       <div v-if="showModal" class="modal-content" @click.stop>
         <div class="modal-header">
           <h3>Save Cipher</h3>
-          <button class="modal-close" @click="closeModal">&times;</button>
+          <button class="modal-close" @click="closeModal">
+            <CyberIcon type="close" size="20" />
+          </button>
         </div>
 
         <div class="modal-body">
@@ -32,6 +34,7 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
+import CyberIcon from '../icons/CyberIcon.vue'
 
 interface Props {
   isOpen: boolean

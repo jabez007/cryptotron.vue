@@ -12,33 +12,44 @@ const caesarCipherKey = ref({
 <template>
   <CipherCard
     title="Caesar Cipher"
-    :encrypt-algorithm="caesar.encrypt(caesarCipherKey)"
-    :decrypt-algorithm="caesar.decrypt(caesarCipherKey)"
-    :cipher-key="caesarCipherKey"
+    :encrypt-algorithm="() => caesar.encrypt(caesarCipherKey)"
+    :decrypt-algorithm="() => caesar.decrypt(caesarCipherKey)"
+    :crack-algorithm="caesar.crack"
+    v-model:cipher-key="caesarCipherKey"
   >
     <template v-slot:theory>
+      <h3>The Origin Story</h3>
       <p>
-        The Caesar cipher is one of the earliest known encryption techniques, named after Julius
-        Caesar who reportedly used it to protect his military communications around 50 BCE.
+        The Caesar cipher is named after Julius Caesar (100 BC – 44 BC), who reportedly used it with a shift of three to protect military communications during the Gallic Wars. While Suetonius’s accounts provide the most famous evidence of its use, Caesar wasn't the first to use substitution—he simply popularized this specific variant. In an era where few could read, a simple shift was often enough to ensure total secrecy.
       </p>
 
-      <h3>How It Works</h3>
+      <h3>The Mechanics</h3>
       <p>
-        The Caesar cipher is a type of substitution cipher where each letter in the plaintext is
-        shifted a certain number of places down or up the alphabet. For example, with a shift of 3:
+        Each letter in your message is replaced by another letter found a fixed number of positions down the alphabet. For instance, with a shift of 3, 'A' becomes 'D', 'B' becomes 'E', and so on. When the end of the alphabet is reached, it wraps around back to the beginning. This is a <strong>monoalphabetic</strong> cipher, meaning the substitution remains constant for the entire message.
       </p>
 
-      <div class="cipher-example">A → D, B → E, C → F, ..., X → A, Y → B, Z → C</div>
-
-      <h3>Mathematical Formula</h3>
-      <p>For encryption: <strong>E(x) = (x + k) mod 26</strong></p>
-      <p>For decryption: <strong>D(x) = (x - k) mod 26</strong></p>
-      <p>Where x is the letter position (A=0, B=1, ..., Z=25) and k is the shift value.</p>
-
-      <h3>Security</h3>
+      <h3>The Mathematics</h3>
       <p>
-        The Caesar cipher is extremely vulnerable to frequency analysis and brute force attacks, as
-        there are only 25 possible keys to try.
+        We can express the Caesar cipher using modular arithmetic by assigning numbers to letters (A=0, B=1, ..., Z=25).
+      </p>
+      <div class="cipher-example">
+        Encryption: <strong>E(x) = (x + k) mod 26</strong><br />
+        Decryption: <strong>D(x) = (x - k) mod 26</strong>
+      </div>
+      <p>Where <em>x</em> is the letter numerical value and <em>k</em> is the shift (the key).</p>
+
+      <h3>The Breach</h3>
+      <p>
+        The Caesar cipher is trivial to break today for two main reasons:
+      </p>
+      <ul>
+        <li><strong>Brute Force:</strong> There are only 25 possible shifts (excluding zero). A computer can try every possibility in microseconds.</li>
+        <li><strong>Frequency Analysis:</strong> In any language, some letters appear more often than others. English 'E' is the most common. By analyzing which letters appear most frequently in the ciphertext, an attacker can quickly guess the shift.</li>
+      </ul>
+
+      <h3>Modern Perspective</h3>
+      <p>
+        While obsolete for security, the Caesar cipher remains a fundamental teaching tool. It is the basis for <strong>ROT13</strong>, a shift of 13 positions used today in digital forums to hide spoilers. It also serves as the building block for more complex polyalphabetic ciphers like the Vigenère.
       </p>
     </template>
     <template v-slot:cipherKey>

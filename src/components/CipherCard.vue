@@ -1,21 +1,34 @@
 <template>
-  <div class="cipher-content">
+  <div ref="root" class="cipher-content" tabindex="-1"
+    :data-vim-mode="isKeyMode ? 'key' : isInsertMode ? 'insert' : 'normal'">
     <h1 class="page-title">{{ title }}</h1>
     <div class="cipher-container">
+      <div class="vim-status-bar" :class="{ 'mode-insert': isInsertMode, 'mode-key': isKeyMode }">
+        <div class="status-left">
+          <span class="mode-tag">{{ isKeyMode ? '-- KEY --' : isInsertMode ? '-- INSERT --' : '-- NORMAL --' }}</span>
+          <span v-if="showYankedTooltip" class="yank-alert">SYSTEM: DATA YANKED</span>
+        </div>
+        <span class="mode-hint">
+          {{ isInsertMode ? 'Press ESC to exit' : 'i: text | k: key | 1-3: tabs | e: enc | d: dec | c: crack | x: clr | y: yank' }}
+        </span>
+      </div>
       <div class="tab-navigation">
         <button @click="switchTab('theory')" :class="['tab-button', { active: cipherActiveTab === 'theory' }]">
-          📚 Theory
+          <CyberIcon type="theory" size="16" class="tab-icon" />
+          <span class="tab-label">Theory</span>
         </button>
         <button @click="switchTab('encrypt')" :class="['tab-button', { active: cipherActiveTab === 'encrypt' }]">
-          🔒 Encrypt
+          <CyberIcon type="encrypt" size="16" class="tab-icon" />
+          <span class="tab-label">Encrypt</span>
         </button>
         <button @click="switchTab('decrypt')" :class="['tab-button', { active: cipherActiveTab === 'decrypt' }]">
-          🔓 Decrypt
+          <CyberIcon type="decrypt" size="16" class="tab-icon" />
+          <span class="tab-label">Decrypt</span>
         </button>
       </div>
 
       <div class="tab-content">
-        <div id="theory" :class="['tab-panel']">
+        <div ref="theoryPanel" class="tab-panel">
           <ScanLine />
           <div class="cipher-theory">
             <h2 class="section-title">Theory & History</h2>
@@ -25,7 +38,7 @@
           </div>
         </div>
 
-        <div id="encrypt" :class="['tab-panel']">
+        <div ref="encryptPanel" class="tab-panel">
           <div class="cipher-practice">
             <h2 class="section-title">Encrypt Messages</h2>
             <div class="control-group">
@@ -43,11 +56,16 @@
               <button @click="clearEncrypt" class="cipher-button">Clear</button>
             </div>
 
+            <div v-if="encryptError" class="status-error">
+              <CyberIcon type="error" size="16" />
+              <span>{{ encryptError }}</span>
+            </div>
+
             <CipherOutput label="Output" :text="encryptOutput" />
           </div>
         </div>
 
-        <div id="decrypt" :class="['tab-panel']">
+        <div ref="decryptPanel" class="tab-panel">
           <div class="cipher-practice">
             <h2 class="section-title">Decrypt Messages</h2>
             <div class="control-group">
@@ -63,7 +81,22 @@
             <div class="button-group">
               <button @click="decrypt" class="cipher-button">Decrypt</button>
               <button @click="clearDecrypt" class="cipher-button">Clear</button>
-              <button v-if="keysGenerator" class="cipher-button">Crack</button>
+              <button v-if="crackAlgorithm" @click="crack" class="cipher-button crack"
+                :disabled="isCracking || !decryptInput">
+                <span v-if="isCracking" class="glitch-text" data-text="Cracking...">
+                  <CyberIcon type="crack" size="18" class="button-icon pulse" />
+                  Cracking...
+                </span>
+                <span v-else class="button-content">
+                  <CyberIcon type="crack" size="18" class="button-icon" />
+                  Crack
+                </span>
+              </button>
+            </div>
+
+            <div v-if="decryptError" class="status-error">
+              <CyberIcon type="error" size="16" />
+              <span>{{ decryptError }}</span>
             </div>
 
             <CipherOutput label="Output" :text="decryptOutput" />
@@ -75,9 +108,10 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import CipherOutput from './CipherOutput.vue'
 import ScanLine from './ScanLine.vue'
+import CyberIcon from './icons/CyberIcon.vue'
 
 const props = defineProps({
   title: {
@@ -96,66 +130,280 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  keysGenerator: {
+  crackAlgorithm: {
     type: Function,
     required: false,
   },
 })
 
+const emit = defineEmits<{
+  'update:cipherKey': [key: any]
+}>()
+
 const cipherActiveTab = ref('theory')
+const root = ref<HTMLElement | null>(null)
+const theoryPanel = ref<HTMLElement | null>(null)
+const encryptPanel = ref<HTMLElement | null>(null)
+const decryptPanel = ref<HTMLElement | null>(null)
+
+const getPanel = (tabId: string) => {
+  if (tabId === 'theory') return theoryPanel.value
+  if (tabId === 'encrypt') return encryptPanel.value
+  if (tabId === 'decrypt') return decryptPanel.value
+  return null
+}
+
+let switchTabTimer: ReturnType<typeof setTimeout> | null = null
 
 const switchTab = (newTabId: string) => {
+  if (cipherActiveTab.value === newTabId) return
+
+  const oldTabId = cipherActiveTab.value
+  const oldPanel = getPanel(oldTabId)
+  const newPanel = getPanel(newTabId)
+
   cipherActiveTab.value = newTabId
 
+  // Clear any existing timer
+  if (switchTabTimer) clearTimeout(switchTabTimer)
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  if (prefersReducedMotion) {
+    const panels = [theoryPanel.value, encryptPanel.value, decryptPanel.value]
+    panels.forEach(p => p?.classList.remove('active', 'leaving'))
+    newPanel?.classList.add('active')
+    return
+  }
+
   // Add leaving class to current tab
-  document.querySelector('.tab-panel.active')?.classList.add('leaving')
+  oldPanel?.classList.add('leaving')
 
   // After exit animation, switch to new tab
-  setTimeout(async () => {
+  switchTabTimer = setTimeout(async () => {
     await nextTick()
-    document.querySelectorAll('.tab-panel').forEach((panel) => {
-      panel.classList.remove('active', 'leaving')
+    const panels = [theoryPanel.value, encryptPanel.value, decryptPanel.value]
+    panels.forEach((panel) => {
+      panel?.classList.remove('active', 'leaving')
     })
-    document.getElementById(newTabId)?.classList.add('active')
+    newPanel?.classList.add('active')
+    switchTabTimer = null
   }, 600) // Match exit animation duration
 }
 
+const isInsertMode = ref(false)
+const isKeyMode = ref(false)
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.defaultPrevented) return
+
+  // Ignore shortcuts if Ctrl, Meta (Cmd), or Alt are pressed
+  if (e.ctrlKey || e.metaKey || e.altKey) return
+
+  const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)
+  const isKeyInput = (e.target as HTMLElement).classList.contains('cipher-input')
+
+  // Prevent collision with global navigation menu
+  const isMenuOpen = document.querySelector('.nav-overlay.active') !== null
+  if (isMenuOpen) return
+
+  // Handle Escape to leave insert mode
+  if (e.key === 'Escape') {
+    if (isInput) {
+      ; (e.target as HTMLElement).blur()
+      // Return focus to the root so shortcuts continue to work
+      nextTick(() => {
+        root.value?.focus()
+      })
+    }
+    isInsertMode.value = false
+    isKeyMode.value = false
+    return
+  }
+
+  // If typing in an input, update modes
+  if (isInput) {
+    isInsertMode.value = true
+    isKeyMode.value = isKeyInput
+    return
+  }
+
+  const key = e.key.toLowerCase()
+
+  // Normal Mode Shortcuts
+  if (!isInsertMode.value) {
+    switch (key) {
+      case 'i': {
+        const panel = getPanel(cipherActiveTab.value)
+        const textarea = panel?.querySelector('textarea') as HTMLTextAreaElement
+        if (textarea) {
+          e.preventDefault()
+          isInsertMode.value = true
+          isKeyMode.value = false
+          setTimeout(() => textarea.focus(), 0)
+        }
+        break
+      }
+      case 'k': {
+        const panel = getPanel(cipherActiveTab.value)
+        const keyInput = panel?.querySelector('.cipher-input') as HTMLInputElement
+        if (keyInput) {
+          e.preventDefault()
+          isInsertMode.value = true
+          isKeyMode.value = true
+          setTimeout(() => keyInput.focus(), 0)
+        }
+        break
+      }
+      case '1': switchTab('theory'); break
+      case '2': switchTab('encrypt'); break
+      case '3': switchTab('decrypt'); break
+      case 'e':
+        if (cipherActiveTab.value === 'encrypt') encrypt();
+        break
+      case 'd':
+        if (cipherActiveTab.value === 'decrypt') decrypt();
+        break
+      case 'c':
+        if (cipherActiveTab.value === 'decrypt' && props.crackAlgorithm && !isCracking.value) crack();
+        break
+      case 'x':
+        if (cipherActiveTab.value === 'encrypt') clearEncrypt();
+        else if (cipherActiveTab.value === 'decrypt') clearDecrypt();
+        break
+      case 'y':
+        yankOutput()
+        break
+    }
+  }
+}
+
 onMounted(() => {
-  document.getElementById(cipherActiveTab.value)?.classList.add('active')
+  getPanel(cipherActiveTab.value)?.classList.add('active')
+  root.value?.addEventListener('keydown', handleKeydown)
+
+  // Focus the card automatically so keyboard shortcuts work immediately
+  nextTick(() => {
+    root.value?.focus()
+  })
+})
+
+onUnmounted(() => {
+  root.value?.removeEventListener('keydown', handleKeydown)
+  if (switchTabTimer) clearTimeout(switchTabTimer)
+  if (crackTimer) clearTimeout(crackTimer)
 })
 
 const encryptInput = ref('')
 const encryptOutput = ref('')
+const encryptError = ref('')
 
 const encrypt = () => {
+  if (!encryptInput.value) return
+  encryptError.value = ''
   try {
-    encryptOutput.value = props.encryptAlgorithm(encryptInput.value)
+    const transformer = props.encryptAlgorithm()
+    encryptOutput.value = transformer(encryptInput.value)
   } catch (err) {
     console.error(err)
-    encryptOutput.value = '⚠️  encryption failed'
+    encryptError.value = 'encryption failed'
+    encryptOutput.value = ''
   }
 }
 
 const clearEncrypt = () => {
   encryptInput.value = ''
   encryptOutput.value = ''
+  encryptError.value = ''
 }
 
 const decryptInput = ref('')
 const decryptOutput = ref('')
+const decryptError = ref('')
 
 const decrypt = () => {
+  if (!decryptInput.value) return
+  decryptError.value = ''
   try {
-    decryptOutput.value = props.decryptAlgorithm(decryptInput.value)
+    const transformer = props.decryptAlgorithm()
+    decryptOutput.value = transformer(decryptInput.value)
   } catch (err) {
     console.error(err)
-    decryptOutput.value = '⚠️  decryption failed'
+    decryptError.value = 'decryption failed'
+    decryptOutput.value = ''
   }
 }
 
 const clearDecrypt = () => {
   decryptInput.value = ''
   decryptOutput.value = ''
+  decryptError.value = ''
+}
+
+const isCracking = ref(false)
+const showYankedTooltip = ref(false)
+let crackTimer: ReturnType<typeof setTimeout> | null = null
+
+const yankOutput = () => {
+  const output = cipherActiveTab.value === 'encrypt' ? encryptOutput.value : decryptOutput.value
+  if (!output) return
+
+  navigator.clipboard.writeText(output)
+    .then(() => {
+      showYankedTooltip.value = true
+      setTimeout(() => {
+        showYankedTooltip.value = false
+      }, 2000)
+    })
+    .catch((err) => {
+      console.error('Failed to copy text: ', err)
+      // Display error state temporarily
+      const originalError = cipherActiveTab.value === 'encrypt' ? encryptError.value : decryptError.value
+      if (cipherActiveTab.value === 'encrypt') encryptError.value = 'copy failed'
+      else decryptError.value = 'copy failed'
+      
+      setTimeout(() => {
+        if (cipherActiveTab.value === 'encrypt') encryptError.value = originalError
+        else decryptError.value = originalError
+      }, 2000)
+    })
+}
+
+const crack = async () => {
+  if (!props.crackAlgorithm || !decryptInput.value || isCracking.value) return
+
+  const ciphertext = decryptInput.value
+  isCracking.value = true
+  decryptError.value = ''
+
+  // Crack algorithms in the library are synchronous but might be heavy.
+  // We yield to the event loop to allow the "Cracking..." UI to paint.
+  crackTimer = setTimeout(() => {
+    try {
+      const result = props.crackAlgorithm!(ciphertext)
+      if (result && result.key) {
+        // Validate that the key has at least one property (is an object)
+        const isValidKey = typeof result.key === 'object' && Object.keys(result.key).length > 0
+
+        if (isValidKey) {
+          // Emit updated key instead of mutating prop
+          emit('update:cipherKey', result.key)
+          // Update decrypt output with the recovered plaintext
+          decryptOutput.value = result.plaintext
+        } else {
+          decryptError.value = 'invalid key recovered'
+        }
+      } else {
+        decryptError.value = 'no key found'
+      }
+    } catch (err) {
+      console.error(err)
+      decryptError.value = 'cracking failed'
+    } finally {
+      isCracking.value = false
+      crackTimer = null
+    }
+  }, 0)
 }
 </script>
 
@@ -165,6 +413,8 @@ const clearDecrypt = () => {
 .cipher-content {
   min-width: 100%;
   max-width: calc(100vw - 5rem);
+  outline: none;
+  /* Remove focus outline */
 }
 
 .page-title {
@@ -190,6 +440,99 @@ const clearDecrypt = () => {
   position: relative;
   overflow: hidden;
   /* margin-bottom: 2rem; */
+}
+
+.vim-status-bar {
+  background: rgba(0, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-glow);
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.status-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.yank-alert {
+  color: var(--neon-green);
+  font-weight: 700;
+  text-shadow: 0 0 5px var(--neon-green);
+  animation: yank-flicker 0.2s infinite;
+}
+
+@keyframes yank-flicker {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.vim-status-bar.mode-insert {
+  background: rgba(255, 0, 255, 0.15);
+  border-bottom-color: var(--neon-magenta);
+}
+
+.vim-status-bar.mode-key {
+  background: rgba(0, 255, 65, 0.15);
+  border-bottom-color: var(--neon-green);
+}
+
+.mode-tag {
+  color: var(--neon-cyan);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.mode-insert .mode-tag {
+  color: var(--neon-magenta);
+  text-shadow: 0 0 5px var(--neon-magenta);
+}
+
+.mode-key .mode-tag {
+  color: var(--neon-green);
+  text-shadow: 0 0 5px var(--neon-green);
+}
+
+.mode-hint {
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.status-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  color: var(--neon-magenta);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: error-flicker 0.3s ease-in-out;
+}
+
+@keyframes error-flicker {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .cipher-container::before {
@@ -226,7 +569,7 @@ const clearDecrypt = () => {
   border: none;
   color: var(--text-secondary);
   font-family: 'Orbitron', monospace;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -234,6 +577,92 @@ const clearDecrypt = () => {
   transition: all 0.3s ease;
   position: relative;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.tab-label::before {
+  content: '[';
+  margin-right: 4px;
+  opacity: 0.5;
+}
+
+.tab-label::after {
+  content: ']';
+  margin-left: 4px;
+  opacity: 0.5;
+}
+
+.tab-button.active .tab-label {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.tab-button.active .tab-label::before {
+  content: '> [';
+  opacity: 1;
+  color: var(--neon-magenta);
+}
+
+.tab-button.active .tab-label::after {
+  content: '] <';
+  opacity: 1;
+  color: var(--neon-magenta);
+}
+
+.tab-icon {
+  filter: drop-shadow(0 0 2px rgba(0, 255, 255, 0.3));
+}
+
+.tab-button.active .tab-icon {
+  filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.8));
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button-icon {
+  vertical-align: middle;
+}
+
+.pulse {
+  animation: icon-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes icon-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+/* Accessibility: Respect OS-level reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+
+  .tab-button.active::after,
+  .tab-panel.active,
+  .pulse,
+  .cipher-button::before {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .tab-panel.active {
+    transform: none !important;
+    opacity: 1 !important;
+  }
 }
 
 .tab-button:hover {

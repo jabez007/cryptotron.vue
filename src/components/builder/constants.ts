@@ -1,5 +1,14 @@
 import { MarkerType } from '@vue-flow/core'
-import { affine, autokey, beaufort, caesar, substitution, vigenere } from '@jabez007/cryptotron.js'
+import {
+  affine,
+  autokey,
+  beaufort,
+  caesar,
+  polybius,
+  railFence,
+  substitution,
+  vigenere,
+} from '@jabez007/cryptotron.js'
 
 export const availableCiphers = [
   {
@@ -8,6 +17,7 @@ export const availableCiphers = [
     defaultKey: { alpha: 3, beta: 1 },
     encryptAlgorithm: affine.encrypt,
     decryptAlgorithm: affine.decrypt,
+    crackAlgorithm: affine.crack,
     cipherKeyComponent: () => import('@/components/keys/KeyAffine.vue'),
   },
   {
@@ -16,14 +26,16 @@ export const availableCiphers = [
     defaultKey: { primer: 'bytewalker' },
     encryptAlgorithm: autokey.encrypt,
     decryptAlgorithm: autokey.decrypt,
+    crackAlgorithm: autokey.crack,
     cipherKeyComponent: () => import('@/components/keys/KeyAutokey.vue'),
   },
   {
     type: 'beaufort',
     label: 'Beaufort Cipher',
-    defaultKey: { keyword: 'lumberjack' },
+    defaultKey: { keyword: 'nightcity' },
     encryptAlgorithm: beaufort.encrypt,
     decryptAlgorithm: beaufort.decrypt,
+    crackAlgorithm: beaufort.crack,
     cipherKeyComponent: () => import('@/components/keys/KeyBeaufort.vue'),
   },
   {
@@ -32,7 +44,26 @@ export const availableCiphers = [
     defaultKey: { shift: 13 },
     encryptAlgorithm: caesar.encrypt,
     decryptAlgorithm: caesar.decrypt,
+    crackAlgorithm: caesar.crack,
     cipherKeyComponent: () => import('@/components/keys/KeyCaesar.vue'),
+  },
+  {
+    type: 'polybius',
+    label: 'Polybius Square',
+    defaultKey: { keyword: '', cipherChars: 'ABCDE' },
+    encryptAlgorithm: polybius.encrypt,
+    decryptAlgorithm: polybius.decrypt,
+    crackAlgorithm: polybius.crack,
+    cipherKeyComponent: () => import('@/components/keys/KeyPolybius.vue'),
+  },
+  {
+    type: 'rail-fence',
+    label: 'Rail-Fence Cipher',
+    defaultKey: { rails: 3 },
+    encryptAlgorithm: railFence.encrypt,
+    decryptAlgorithm: railFence.decrypt,
+    crackAlgorithm: railFence.crack,
+    cipherKeyComponent: () => import('@/components/keys/KeyRailFence.vue'),
   },
   {
     type: 'substitution',
@@ -40,6 +71,7 @@ export const availableCiphers = [
     defaultKey: { cipherAlphabet: 'qwertyuiopasdfghjklzxcvbnm' },
     encryptAlgorithm: substitution.encrypt,
     decryptAlgorithm: substitution.decrypt,
+    crackAlgorithm: substitution.crack,
     cipherKeyComponent: () => import('@/components/keys/KeySubstitution.vue'),
   },
   {
@@ -48,6 +80,7 @@ export const availableCiphers = [
     defaultKey: { keyword: 'mockraven' },
     encryptAlgorithm: vigenere.encrypt,
     decryptAlgorithm: vigenere.decrypt,
+    crackAlgorithm: vigenere.crack,
     cipherKeyComponent: () => import('@/components/keys/KeyVigenere.vue'),
   },
   // Add more cipher types as needed
@@ -59,6 +92,7 @@ export const cipherLookup = new Map(
     {
       encryptAlgorithm: cipher.encryptAlgorithm,
       decryptAlgorithm: cipher.decryptAlgorithm,
+      crackAlgorithm: cipher.crackAlgorithm,
       cipherKeyComponent: cipher.cipherKeyComponent,
     },
   ]),
@@ -73,6 +107,7 @@ export const defaultNodes = [
       type: 'caesar',
       encryptAlgorithm: caesar.encrypt,
       decryptAlgorithm: caesar.decrypt,
+      crackAlgorithm: caesar.crack,
       cipherKey: { shift: 13 },
       cipherKeyComponent: () => import('@/components/keys/KeyCaesar.vue'),
     },
@@ -86,6 +121,7 @@ export const defaultNodes = [
       type: 'vigenere',
       encryptAlgorithm: vigenere.encrypt,
       decryptAlgorithm: vigenere.decrypt,
+      crackAlgorithm: vigenere.crack,
       cipherKey: { keyword: 'mockraven' },
       cipherKeyComponent: () => import('@/components/keys/KeyVigenere.vue'),
     },
