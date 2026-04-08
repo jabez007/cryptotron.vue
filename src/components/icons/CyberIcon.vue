@@ -69,12 +69,14 @@ const colors = {
       <path d="M12 11H16" :stroke="colors.cyan" stroke-width="1" />
     </g>
 
-    <!-- Crack / Glitch / Attack -->
+    <!-- Crack / Scanner / Targeting -->
     <g v-if="type === 'crack'">
-      <path d="M12 3L4 19H20L12 3Z" :stroke="colors.magenta" stroke-width="1.5" />
-      <path d="M12 8V13" :stroke="colors.magenta" stroke-width="1.5" />
-      <circle cx="12" cy="16" r="1" :fill="colors.magenta" />
-      <path d="M2 12H5M19 12H22M12 2V5M12 19V22" :stroke="colors.cyan" stroke-width="1" opacity="0.5" />
+      <!-- Outer Scope -->
+      <circle cx="12" cy="12" r="9" :stroke="colors.cyan" stroke-width="1.5" opacity="0.5" />
+      <path d="M12 2V5M12 19V22M2 12H5M19 12H22" :stroke="colors.cyan" stroke-width="1.5" />
+      <!-- Inner Diamond Probe -->
+      <path d="M12 7L17 12L12 17L7 12L12 7Z" :fill="colors.magenta" />
+      <circle cx="12" cy="12" r="1" fill="white" />
     </g>
 
     <!-- Home -->
@@ -119,11 +121,12 @@ const colors = {
       <path d="M3 3L21 21" :stroke="colors.magenta" stroke-width="1.5" />
     </g>
 
-    <!-- Error / Warning -->
+    <!-- Error / High-Voltage / Warning -->
     <g v-if="type === 'error'">
-      <path d="M12 2L2 22H22L12 2Z" :stroke="colors.magenta" stroke-width="1.5" />
-      <path d="M12 8V14" :stroke="colors.magenta" stroke-width="2" />
-      <circle cx="12" cy="18" r="1" :fill="colors.magenta" />
+      <!-- High Voltage Bolt -->
+      <path d="M12 2L4 15H10L8 22L16 9H10L12 2Z" :fill="colors.magenta" :stroke="colors.magenta" stroke-width="1" />
+      <!-- Outer Border Fragments -->
+      <path d="M3 21L2 21L2 20M21 21L22 21L22 20M2 4L2 3L3 3M22 4L22 3L21 3" :stroke="colors.magenta" stroke-width="1.5" />
     </g>
 
     <!-- Load -->
