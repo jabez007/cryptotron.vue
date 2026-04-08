@@ -25,7 +25,26 @@ const beaufortCipherKey = ref({
 
       <h3>The Mechanics</h3>
       <p>
-        The Beaufort cipher is a polyalphabetic substitution cipher that uses a repeating keyword, just like the Vigenère. However, it uses a different mathematical operation. Instead of adding the key to the plaintext, it <strong>subtracts the plaintext from the key</strong>. This small change results in a unique property: the Beaufort cipher is <strong>reciprocal</strong>, meaning that encryption and decryption are the exact same process.
+        The Beaufort cipher is a polyalphabetic substitution cipher that uses a repeating keyword, just like the Vigenère. However, it uses a different mathematical operation. Instead of adding the key to the plaintext, it <strong>subtracts the plaintext from the key</strong>. For example, with key "FORTIFY":
+      </p>
+
+      <div class="cipher-example aligned">
+        <div class="example-row">
+          <span class="row-label">Plaintext:</span>
+          <span class="char-cell">D</span><span class="char-cell">E</span><span class="char-cell">F</span><span class="char-cell">E</span><span class="char-cell">N</span><span class="char-cell">D</span><span class="char-cell">T</span><span class="char-cell">H</span><span class="char-cell">E</span><span class="char-cell">E</span><span class="char-cell">A</span><span class="char-cell">S</span><span class="char-cell">T</span>
+        </div>
+        <div class="example-row">
+          <span class="row-label">Key:</span>
+          <span class="char-cell highlighted">F</span><span class="char-cell highlighted">O</span><span class="char-cell highlighted">R</span><span class="char-cell highlighted">T</span><span class="char-cell highlighted">I</span><span class="char-cell highlighted">F</span><span class="char-cell highlighted">Y</span><span class="char-cell highlighted">F</span><span class="char-cell highlighted">O</span><span class="char-cell highlighted">R</span><span class="char-cell highlighted">T</span><span class="char-cell highlighted">I</span><span class="char-cell highlighted">F</span>
+        </div>
+        <div class="example-row">
+          <span class="row-label">Ciphertext:</span>
+          <span class="char-cell result">C</span><span class="char-cell result">K</span><span class="char-cell result">M</span><span class="char-cell result">P</span><span class="char-cell result">V</span><span class="char-cell result">C</span><span class="char-cell result">F</span><span class="char-cell result">Y</span><span class="char-cell result">K</span><span class="char-cell result">N</span><span class="char-cell result">T</span><span class="char-cell result">Q</span><span class="char-cell result">M</span>
+        </div>
+      </div>
+
+      <p>
+        This small change results in a unique property: the Beaufort cipher is <strong>reciprocal</strong>, meaning that encryption and decryption are the exact same process.
       </p>
 
       <h3>The Mathematics</h3>

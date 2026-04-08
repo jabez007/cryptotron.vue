@@ -25,7 +25,26 @@ const autokeyCipherKey = ref({
 
       <h3>The Mechanics</h3>
       <p>
-        The Autokey cipher starts with a short secret <strong>primer</strong>. Once the primer is exhausted, the cipher uses the <strong>plaintext itself</strong> as the remaining key. For example, if the primer is "K" and the message is "MEET", the full key becomes "KMEE". This ensures that the key is always unique and never repeats, significantly increasing the complexity of the ciphertext.
+        The Autokey cipher starts with a short secret <strong>primer</strong>. Once the primer is exhausted, the cipher uses the <strong>plaintext itself</strong> as the remaining key. For example, with primer "K" and plaintext "MEET AT MIDNIGHT":
+      </p>
+
+      <div class="cipher-example aligned">
+        <div class="example-row">
+          <span class="row-label">Plaintext:</span>
+          <span class="char-cell">M</span><span class="char-cell">E</span><span class="char-cell">E</span><span class="char-cell">T</span><span class="char-cell">A</span><span class="char-cell">T</span><span class="char-cell">M</span><span class="char-cell">I</span><span class="char-cell">D</span><span class="char-cell">N</span><span class="char-cell">I</span><span class="char-cell">G</span><span class="char-cell">H</span><span class="char-cell">T</span>
+        </div>
+        <div class="example-row">
+          <span class="row-label">Key:</span>
+          <span class="char-cell highlighted">K</span><span class="char-cell">M</span><span class="char-cell">E</span><span class="char-cell">E</span><span class="char-cell">T</span><span class="char-cell">A</span><span class="char-cell">T</span><span class="char-cell">M</span><span class="char-cell">I</span><span class="char-cell">D</span><span class="char-cell">N</span><span class="char-cell">I</span><span class="char-cell">G</span><span class="char-cell">H</span>
+        </div>
+        <div class="example-row">
+          <span class="row-label">Ciphertext:</span>
+          <span class="char-cell result">W</span><span class="char-cell result">Q</span><span class="char-cell result">I</span><span class="char-cell result">X</span><span class="char-cell result">T</span><span class="char-cell result">T</span><span class="char-cell result">F</span><span class="char-cell result">U</span><span class="char-cell result">L</span><span class="char-cell result">Q</span><span class="char-cell result">V</span><span class="char-cell result">O</span><span class="char-cell result">N</span><span class="char-cell result">A</span>
+        </div>
+      </div>
+
+      <p>
+        This ensures that the key is always unique and never repeats, significantly increasing the complexity of the ciphertext.
       </p>
 
       <h3>The Mathematics</h3>

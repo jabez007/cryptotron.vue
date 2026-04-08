@@ -25,7 +25,26 @@ const vigenereCipherKey = ref({
 
       <h3>The Mechanics</h3>
       <p>
-        Unlike the Caesar cipher, which uses a single shift value for the whole message, the Vigenère cipher uses a <strong>keyword</strong>. Each letter of the keyword determines the shift for the corresponding letter in the plaintext. If the message is longer than the keyword, the keyword is repeated. This makes it a <strong>polyalphabetic</strong> cipher—the same plaintext letter can be encrypted into different ciphertext letters depending on its position.
+        Unlike the Caesar cipher, which uses a single shift value for the whole message, the Vigenère cipher uses a <strong>keyword</strong>. Each letter of the keyword determines the shift for the corresponding letter in the plaintext. If the message is longer than the keyword, the keyword is repeated. For example, with the keyword "KEY":
+      </p>
+
+      <div class="cipher-example aligned">
+        <div class="example-row">
+          <span class="row-label">Plaintext:</span>
+          <span class="char-cell">A</span><span class="char-cell">T</span><span class="char-cell">T</span><span class="char-cell">A</span><span class="char-cell">C</span><span class="char-cell">K</span><span class="char-cell">A</span><span class="char-cell">T</span><span class="char-cell">D</span><span class="char-cell">A</span><span class="char-cell">W</span><span class="char-cell">N</span>
+        </div>
+        <div class="example-row">
+          <span class="row-label">Key:</span>
+          <span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span><span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span><span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span><span class="char-cell highlighted">K</span><span class="char-cell highlighted">E</span><span class="char-cell highlighted">Y</span>
+        </div>
+        <div class="example-row">
+          <span class="row-label">Ciphertext:</span>
+          <span class="char-cell result">K</span><span class="char-cell result">X</span><span class="char-cell result">R</span><span class="char-cell result">C</span><span class="char-cell result">E</span><span class="char-cell result">M</span><span class="char-cell result">K</span><span class="char-cell result">B</span><span class="char-cell result">D</span><span class="char-cell result">K</span><span class="char-cell result">B</span><span class="char-cell result">Y</span>
+        </div>
+      </div>
+
+      <p>
+        This makes it a <strong>polyalphabetic</strong> cipher—the same plaintext letter can be encrypted into different ciphertext letters depending on its position.
       </p>
 
       <h3>The Mathematics</h3>
