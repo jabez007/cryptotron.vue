@@ -15,7 +15,7 @@ const substitutionCipherKey = ref({
     :encrypt-algorithm="substitution.encrypt(substitutionCipherKey)"
     :decrypt-algorithm="substitution.decrypt(substitutionCipherKey)"
     :crack-algorithm="substitution.crack"
-    :cipher-key="substitutionCipherKey"
+    v-model:cipher-key="substitutionCipherKey"
   >
     <template v-slot:theory>
       <h3>The Origin Story</h3>

@@ -15,7 +15,7 @@ const railFenceCipherKey = ref({
     :encrypt-algorithm="railFence.encrypt(railFenceCipherKey)"
     :decrypt-algorithm="railFence.decrypt(railFenceCipherKey)"
     :crack-algorithm="railFence.crack"
-    :cipher-key="railFenceCipherKey"
+    v-model:cipher-key="railFenceCipherKey"
   >
     <template v-slot:theory>
       <h3>The Origin Story</h3>

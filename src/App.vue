@@ -182,6 +182,16 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
 
   // Escape to Home
   if (e.key === 'Escape') {
+    // Check if target is in a component handling its own Escape (like CipherCard in Vim mode)
+    const target = e.target as HTMLElement
+    const vimContainer = target.closest('[data-vim-mode]')
+    const vimMode = vimContainer?.getAttribute('data-vim-mode')
+    
+    if (vimMode === 'insert' || vimMode === 'key') {
+      // Let the component handle it
+      return
+    }
+
     e.preventDefault()
     e.stopImmediatePropagation()
     if (menuOpen.value) closeMenu()

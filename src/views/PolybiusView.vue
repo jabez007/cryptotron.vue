@@ -16,7 +16,7 @@ const polybiusCipherKey = ref({
     :encrypt-algorithm="polybius.encrypt(polybiusCipherKey)"
     :decrypt-algorithm="polybius.decrypt(polybiusCipherKey)"
     :crack-algorithm="polybius.crack"
-    :cipher-key="polybiusCipherKey"
+    v-model:cipher-key="polybiusCipherKey"
   >
     <template v-slot:theory>
       <h3>The Origin Story</h3>
@@ -67,7 +67,7 @@ const polybiusCipherKey = ref({
       </p>
     </template>
     <template v-slot:cipherKey>
-      <KeyPolybius v-model:cipherKey="polybiusCipherKey" />
+      <KeyPolybius v-model:cipher-key="polybiusCipherKey" />
     </template>
   </CipherCard>
 </template>

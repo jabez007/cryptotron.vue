@@ -1,5 +1,8 @@
 <template>
-  <div class="cipher-content">
+  <div 
+    class="cipher-content" 
+    :data-vim-mode="isKeyMode ? 'key' : isInsertMode ? 'insert' : 'normal'"
+  >
     <h1 class="page-title">{{ title }}</h1>
     <div class="cipher-container">
       <div class="vim-status-bar" :class="{ 'mode-insert': isInsertMode, 'mode-key': isKeyMode }">
@@ -135,6 +138,10 @@ const props = defineProps({
     required: false,
   },
 })
+
+const emit = defineEmits<{
+  'update:cipherKey': [key: any]
+}>()
 
 const cipherActiveTab = ref('theory')
 let switchTabTimer: ReturnType<typeof setTimeout> | null = null
@@ -304,12 +311,12 @@ const crack = async () => {
     try {
       const result = props.crackAlgorithm!(decryptInput.value)
       if (result && result.key) {
-        // Update the cipher key object properties
-        Object.assign(props.cipherKey, result.key)
+        // Emit updated key instead of mutating prop
+        emit('update:cipherKey', result.key)
         // Update decrypt output with the recovered plaintext
         decryptOutput.value = result.plaintext
       } else {
-        decryptError.value = 'no key found'
+        decryptOutput.value = '⚠️  no key found'
       }
     } catch (err) {
       console.error(err)

@@ -15,7 +15,7 @@ const vigenereCipherKey = ref({
     :encrypt-algorithm="vigenere.encrypt(vigenereCipherKey)"
     :decrypt-algorithm="vigenere.decrypt(vigenereCipherKey)"
     :crack-algorithm="vigenere.crack"
-    :cipher-key="vigenereCipherKey"
+    v-model:cipher-key="vigenereCipherKey"
   >
     <template v-slot:theory>
       <h3>The Origin Story</h3>
@@ -74,58 +74,5 @@ const vigenereCipherKey = ref({
 </template>
 
 <style scoped>
-.cipher-example.aligned {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid var(--cryptotron-grid-color);
-  margin: 1.5rem 0;
-  font-family: 'Space Mono', monospace;
-  overflow-x: auto;
-}
-
-.example-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  white-space: nowrap;
-}
-
-.example-row:last-child {
-  margin-bottom: 0;
-}
-
-.row-label {
-  display: inline-block;
-  width: 120px;
-  color: var(--cryptotron-text-secondary);
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.char-cell {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  width: 24px;
-  height: 30px;
-  border: 1px solid rgba(0, 255, 255, 0.1);
-  margin-right: 2px;
-  color: var(--cryptotron-text-primary);
-  font-weight: 700;
-}
-
-.char-cell.highlighted {
-  color: var(--neon-magenta);
-  border-color: rgba(255, 0, 255, 0.2);
-  background: rgba(255, 0, 255, 0.05);
-}
-
-.char-cell.result {
-  color: var(--neon-green);
-  border-color: rgba(0, 255, 65, 0.2);
-  background: rgba(0, 255, 65, 0.05);
-  text-shadow: 0 0 5px var(--neon-green);
-}
+@import '@/assets/example-grid.css';
 </style>
