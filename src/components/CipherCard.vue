@@ -6,9 +6,12 @@
     <h1 class="page-title">{{ title }}</h1>
     <div class="cipher-container">
       <div class="vim-status-bar" :class="{ 'mode-insert': isInsertMode, 'mode-key': isKeyMode }">
-        <span class="mode-tag">{{ isKeyMode ? '-- KEY --' : isInsertMode ? '-- INSERT --' : '-- NORMAL --' }}</span>
+        <div class="status-left">
+          <span class="mode-tag">{{ isKeyMode ? '-- KEY --' : isInsertMode ? '-- INSERT --' : '-- NORMAL --' }}</span>
+          <span v-if="showYankedTooltip" class="yank-alert">SYSTEM: DATA YANKED</span>
+        </div>
         <span class="mode-hint">
-          {{ isInsertMode ? 'Press ESC to exit' : 'i: text | k: key | 1-3: tabs | e: encrypt | d: decrypt | c: crack | x: clear' }}
+          {{ isInsertMode ? 'Press ESC to exit' : 'i: text | k: key | 1-3: tabs | e: enc | d: dec | c: crack | x: clr | y: yank' }}
         </span>
       </div>
       <div class="tab-navigation">
@@ -241,6 +244,9 @@ const handleKeydown = (e: KeyboardEvent) => {
         if (cipherActiveTab.value === 'encrypt') clearEncrypt();
         else if (cipherActiveTab.value === 'decrypt') clearDecrypt();
         break
+      case 'y':
+        yankOutput()
+        break
     }
   }
 }
@@ -297,7 +303,20 @@ const clearDecrypt = () => {
 }
 
 const isCracking = ref(false)
+const showYankedTooltip = ref(false)
 let crackTimer: ReturnType<typeof setTimeout> | null = null
+
+const yankOutput = () => {
+  const output = cipherActiveTab.value === 'encrypt' ? encryptOutput.value : decryptOutput.value
+  if (!output) return
+
+  navigator.clipboard.writeText(output).then(() => {
+    showYankedTooltip.value = true
+    setTimeout(() => {
+      showYankedTooltip.value = false
+    }, 2000)
+  })
+}
 
 const crack = async () => {
   if (!props.crackAlgorithm || !decryptInput.value || isCracking.value) return
@@ -372,6 +391,24 @@ const crack = async () => {
   font-family: 'Space Mono', monospace;
   font-size: 0.75rem;
   transition: all 0.3s ease;
+}
+
+.status-left {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.yank-alert {
+  color: var(--neon-green);
+  font-weight: 700;
+  text-shadow: 0 0 5px var(--neon-green);
+  animation: yank-flicker 0.2s infinite;
+}
+
+@keyframes yank-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
 }
 
 .vim-status-bar.mode-insert {
