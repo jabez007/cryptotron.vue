@@ -32,7 +32,7 @@ export const availableCiphers = [
   {
     type: 'beaufort',
     label: 'Beaufort Cipher',
-    defaultKey: { keyword: 'lumberjack' },
+    defaultKey: { keyword: 'nightcity' },
     encryptAlgorithm: beaufort.encrypt,
     decryptAlgorithm: beaufort.decrypt,
     crackAlgorithm: beaufort.crack,

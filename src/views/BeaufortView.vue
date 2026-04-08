@@ -5,7 +5,7 @@ import KeyBeaufort from '@/components/keys/KeyBeaufort.vue'
 import { ref } from 'vue'
 
 const beaufortCipherKey = ref({
-  keyword: 'lumberjack',
+  keyword: 'nightcity',
 })
 </script>
 
