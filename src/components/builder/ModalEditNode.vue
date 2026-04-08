@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue'
 import type { Node } from '@vue-flow/core'
+import CyberIcon from '../icons/CyberIcon.vue'
 
 const props = defineProps<{
   isOpen: boolean
@@ -64,7 +65,9 @@ const handleClose = () => {
       <div v-if="showModal" class="modal-content" @click.stop>
         <div class="modal-header">
           <h3>Edit {{ localNode.label }} Key</h3>
-          <button class="modal-close" @click="handleClose">&times;</button>
+          <button class="modal-close" @click="handleClose">
+            <CyberIcon type="close" size="20" />
+          </button>
         </div>
 
         <div class="modal-body">

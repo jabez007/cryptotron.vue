@@ -16,6 +16,7 @@ const props = defineProps<{
     | 'display'
     | 'display-off'
     | 'error'
+    | 'close'
   size?: number | string
 }>()
 
@@ -127,6 +128,11 @@ const colors = {
       <path d="M12 2L4 15H10L8 22L16 9H10L12 2Z" :fill="colors.magenta" :stroke="colors.magenta" stroke-width="1" />
       <!-- Outer Border Fragments -->
       <path d="M3 21L2 21L2 20M21 21L22 21L22 20M2 4L2 3L3 3M22 4L22 3L21 3" :stroke="colors.magenta" stroke-width="1.5" />
+    </g>
+
+    <!-- Close / X -->
+    <g v-if="type === 'close'">
+      <path d="M18 6L6 18M6 6L18 18" :stroke="colors.magenta" stroke-width="2" />
     </g>
 
     <!-- Load -->

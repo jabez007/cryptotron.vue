@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
 import { availableCiphers } from './constants'
+import CyberIcon from '../icons/CyberIcon.vue'
 
 const props = defineProps<{
   isOpen: boolean
@@ -54,7 +55,9 @@ const closeModal = () => {
       <div v-if="showModal" class="modal-content" @click.stop>
         <div class="modal-header">
           <h3>Add New Cipher Node</h3>
-          <button class="modal-close" @click="closeModal">&times;</button>
+          <button class="modal-close" @click="closeModal">
+            <CyberIcon type="close" size="20" />
+          </button>
         </div>
 
         <div class="modal-body">
