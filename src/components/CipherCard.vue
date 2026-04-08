@@ -219,6 +219,10 @@ const handleKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Escape') {
     if (isInput) {
       ;(e.target as HTMLElement).blur()
+      // Return focus to the root so shortcuts continue to work
+      nextTick(() => {
+        root.value?.focus()
+      })
     }
     isInsertMode.value = false
     isKeyMode.value = false
