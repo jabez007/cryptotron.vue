@@ -55,7 +55,7 @@ const closeModal = () => {
       <div v-if="showModal" class="modal-content" @click.stop>
         <div class="modal-header">
           <h3>Add New Cipher Node</h3>
-          <button class="modal-close" @click="closeModal">
+          <button class="modal-close" @click="closeModal" aria-label="Close">
             <CyberIcon type="close" size="20" />
           </button>
         </div>

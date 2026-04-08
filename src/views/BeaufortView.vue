@@ -32,7 +32,7 @@ const beaufortCipherKey = ref({
       <div class="cipher-example aligned">
         <ExampleGrid label="Plaintext:" text="DEFENDTHEEASTWALL" />
         <ExampleGrid label="Key:" text="FORTIFYFORTIFYFOR" type="highlighted" />
-        <ExampleGrid label="Ciphertext:" text="CKMPVCFYKN TQM" type="result" />
+        <ExampleGrid label="Ciphertext:" text="CKMPVCFYKNQMCFDG" type="result" />
       </div>
 
       <p>

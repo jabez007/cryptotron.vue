@@ -25,9 +25,4 @@ const characters = computed(() => props.text.split(''))
 
 <style scoped>
 @import '@/assets/example-grid.css';
-
-/* Override some styles if needed for the component context */
-.example-row {
-  margin-bottom: 0.5rem;
-}
 </style>

@@ -65,7 +65,7 @@ const handleClose = () => {
       <div v-if="showModal" class="modal-content" @click.stop>
         <div class="modal-header">
           <h3>Edit {{ localNode.label }} Key</h3>
-          <button class="modal-close" @click="handleClose">
+          <button class="modal-close" @click="handleClose" aria-label="Close dialog">
             <CyberIcon type="close" size="20" />
           </button>
         </div>

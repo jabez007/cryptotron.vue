@@ -348,12 +348,25 @@ const yankOutput = () => {
   const output = cipherActiveTab.value === 'encrypt' ? encryptOutput.value : decryptOutput.value
   if (!output) return
 
-  navigator.clipboard.writeText(output).then(() => {
-    showYankedTooltip.value = true
-    setTimeout(() => {
-      showYankedTooltip.value = false
-    }, 2000)
-  })
+  navigator.clipboard.writeText(output)
+    .then(() => {
+      showYankedTooltip.value = true
+      setTimeout(() => {
+        showYankedTooltip.value = false
+      }, 2000)
+    })
+    .catch((err) => {
+      console.error('Failed to copy text: ', err)
+      // Display error state temporarily
+      const originalError = cipherActiveTab.value === 'encrypt' ? encryptError.value : decryptError.value
+      if (cipherActiveTab.value === 'encrypt') encryptError.value = 'copy failed'
+      else decryptError.value = 'copy failed'
+      
+      setTimeout(() => {
+        if (cipherActiveTab.value === 'encrypt') encryptError.value = originalError
+        else decryptError.value = originalError
+      }, 2000)
+    })
 }
 
 const crack = async () => {
