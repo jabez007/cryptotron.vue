@@ -25,16 +25,16 @@ const railFenceCipherKey = ref({
 
       <h3>The Mechanics</h3>
       <p>
-        To encrypt a message, you write the plaintext in a diagonal, zigzag pattern across a set number of "rails" (the key). Once the pattern is complete, you read the characters off row by row. For example, with 3 rails and the message "WE ARE DISCOVERED":
+        To encrypt a message, you write the plaintext in a diagonal, zigzag pattern across a set number of "rails" (the key). Once the pattern is complete, you read the characters off row by row. For example, with 3 rails and the message "WEAREDISCOVERED":
       </p>
 
       <div class="cipher-example">
-        W . . . E . . . I . . . V . . . E<br />
-        . E . R . D . S . O . E . E . D .<br />
-        . . A . . . C . . . R . . . R . .
+        W . . . E . . . C . . . R<br />
+        . E . R . D . S . O . E . E<br />
+        . . A . . . I . . . V . . . D
       </div>
 
-      <p>By reading the rows left-to-right, the ciphertext becomes: "WEIVE ERDSOEED ACRR"</p>
+      <p>By reading the rows left-to-right, the ciphertext becomes: "WECR ERDSOEE AIVD"</p>
 
       <h3>The Mathematics</h3>
       <p>
