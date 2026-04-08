@@ -280,31 +280,28 @@ const crack = async () => {
   if (!props.crackAlgorithm || !decryptInput.value || isCracking.value) return
 
   isCracking.value = true
-  try {
-    // Crack algorithms in the library are synchronous but might be heavy.
-    // We yield to the event loop to allow the "Cracking..." UI to paint.
-    crackTimer = setTimeout(() => {
-      try {
-        const result = props.crackAlgorithm!(decryptInput.value)
-        if (result && result.key) {
-          // Update the cipher key object properties
-          Object.assign(props.cipherKey, result.key)
-          // Update decrypt output with the recovered plaintext
-          decryptOutput.value = result.plaintext
-        }
-      } catch (err) {
-        console.error(err)
-        decryptOutput.value = '⚠️  cracking failed'
-      } finally {
-        isCracking.value = false
-        crackTimer = null
+  
+  // Crack algorithms in the library are synchronous but might be heavy.
+  // We yield to the event loop to allow the "Cracking..." UI to paint.
+  crackTimer = setTimeout(() => {
+    try {
+      const result = props.crackAlgorithm!(decryptInput.value)
+      if (result && result.key) {
+        // Update the cipher key object properties
+        Object.assign(props.cipherKey, result.key)
+        // Update decrypt output with the recovered plaintext
+        decryptOutput.value = result.plaintext
+      } else {
+        decryptOutput.value = '⚠️  no key found'
       }
-    }, 0)
-  } catch (err) {
-    console.error(err)
-    decryptOutput.value = '⚠️  cracking failed'
-    isCracking.value = false
-  }
+    } catch (err) {
+      console.error(err)
+      decryptOutput.value = '⚠️  cracking failed'
+    } finally {
+      isCracking.value = false
+      crackTimer = null
+    }
+  }, 0)
 }
 </script>
 

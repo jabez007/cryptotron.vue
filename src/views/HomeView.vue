@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import ScanLine from '@/components/ScanLine.vue'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 
 const router = useRouter()
 
@@ -39,56 +39,68 @@ const navigateToCipher = (name: string) => {
 
 const handleKeyDown = (e: KeyboardEvent) => {
   if (e.defaultPrevented) return
-  if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
-
-  // Prevent collision with global navigation menu
-  const isMenuOpen = document.querySelector('.nav-overlay.active') !== null
-  if (isMenuOpen) return
-
+  
+  // No need to check for INPUT/TEXTAREA if listener is on gridElement
+  // but keeping a check for safety if needed
+  
   const cols = getColumns()
+  let newIndex = selectedIndex.value
 
   switch (e.key) {
     case 'ArrowRight':
       e.preventDefault()
-      selectedIndex.value = (selectedIndex.value + 1) % ciphers.length
+      newIndex = (selectedIndex.value + 1) % ciphers.length
       break
     case 'ArrowLeft':
       e.preventDefault()
-      selectedIndex.value = (selectedIndex.value - 1 + ciphers.length) % ciphers.length
+      newIndex = (selectedIndex.value - 1 + ciphers.length) % ciphers.length
       break
     case 'ArrowDown':
       e.preventDefault()
       if (selectedIndex.value + cols < ciphers.length) {
-        selectedIndex.value += cols
+        newIndex = selectedIndex.value + cols
       } else {
-        selectedIndex.value = (selectedIndex.value + 1) % ciphers.length
+        newIndex = (selectedIndex.value + 1) % ciphers.length
       }
       break
     case 'ArrowUp':
       e.preventDefault()
       if (selectedIndex.value - cols >= 0) {
-        selectedIndex.value -= cols
+        newIndex = selectedIndex.value - cols
       } else {
-        selectedIndex.value = (selectedIndex.value - 1 + ciphers.length) % ciphers.length
+        newIndex = (selectedIndex.value - 1 + ciphers.length) % ciphers.length
       }
       break
     case 'Enter':
-      e.preventDefault()
-      navigateToCipher(ciphers[selectedIndex.value].name)
-      break
     case ' ':
       e.preventDefault()
       navigateToCipher(ciphers[selectedIndex.value].name)
-      break
+      return
+  }
+
+  if (newIndex !== selectedIndex.value) {
+    selectedIndex.value = newIndex
+    // Move DOM focus to the newly selected card
+    nextTick(() => {
+      const cards = gridElement.value?.querySelectorAll('.cipher-card')
+      if (cards && cards[newIndex]) {
+        ;(cards[newIndex] as HTMLElement).focus()
+      }
+    })
   }
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeyDown)
+  // Attach to grid element for better scoping
+  gridElement.value?.addEventListener('keydown', handleKeyDown)
+  
+  // Focus the first card on mount to enable arrow navigation immediately
+  const firstCard = gridElement.value?.querySelector('.cipher-card') as HTMLElement
+  firstCard?.focus()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeyDown)
+  gridElement.value?.removeEventListener('keydown', handleKeyDown)
 })
 </script>
 
