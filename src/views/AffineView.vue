@@ -13,8 +13,8 @@ const affineCipherKey = ref({
 <template>
   <CipherCard
     title="Affine Cipher"
-    :encrypt-algorithm="affine.encrypt(affineCipherKey)"
-    :decrypt-algorithm="affine.decrypt(affineCipherKey)"
+    :encrypt-algorithm="() => affine.encrypt(affineCipherKey)"
+    :decrypt-algorithm="() => affine.decrypt(affineCipherKey)"
     :crack-algorithm="affine.crack"
     v-model:cipher-key="affineCipherKey"
   >

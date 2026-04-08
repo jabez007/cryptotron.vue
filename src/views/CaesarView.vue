@@ -12,8 +12,8 @@ const caesarCipherKey = ref({
 <template>
   <CipherCard
     title="Caesar Cipher"
-    :encrypt-algorithm="caesar.encrypt(caesarCipherKey)"
-    :decrypt-algorithm="caesar.decrypt(caesarCipherKey)"
+    :encrypt-algorithm="() => caesar.encrypt(caesarCipherKey)"
+    :decrypt-algorithm="() => caesar.decrypt(caesarCipherKey)"
     :crack-algorithm="caesar.crack"
     v-model:cipher-key="caesarCipherKey"
   >

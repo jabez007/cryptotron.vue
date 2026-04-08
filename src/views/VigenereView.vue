@@ -13,8 +13,8 @@ const vigenereCipherKey = ref({
 <template>
   <CipherCard
     title="Vigenère Cipher"
-    :encrypt-algorithm="vigenere.encrypt(vigenereCipherKey)"
-    :decrypt-algorithm="vigenere.decrypt(vigenereCipherKey)"
+    :encrypt-algorithm="() => vigenere.encrypt(vigenereCipherKey)"
+    :decrypt-algorithm="() => vigenere.decrypt(vigenereCipherKey)"
     :crack-algorithm="vigenere.crack"
     v-model:cipher-key="vigenereCipherKey"
   >

@@ -13,8 +13,8 @@ const beaufortCipherKey = ref({
 <template>
   <CipherCard
     title="Beaufort Cipher"
-    :encrypt-algorithm="beaufort.encrypt(beaufortCipherKey)"
-    :decrypt-algorithm="beaufort.decrypt(beaufortCipherKey)"
+    :encrypt-algorithm="() => beaufort.encrypt(beaufortCipherKey)"
+    :decrypt-algorithm="() => beaufort.decrypt(beaufortCipherKey)"
     :crack-algorithm="beaufort.crack"
     v-model:cipher-key="beaufortCipherKey"
   >

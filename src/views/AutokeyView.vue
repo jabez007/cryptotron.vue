@@ -13,8 +13,8 @@ const autokeyCipherKey = ref({
 <template>
   <CipherCard
     title="Autokey Cipher"
-    :encrypt-algorithm="autokey.encrypt(autokeyCipherKey)"
-    :decrypt-algorithm="autokey.decrypt(autokeyCipherKey)"
+    :encrypt-algorithm="() => autokey.encrypt(autokeyCipherKey)"
+    :decrypt-algorithm="() => autokey.decrypt(autokeyCipherKey)"
     :crack-algorithm="autokey.crack"
     v-model:cipher-key="autokeyCipherKey"
   >

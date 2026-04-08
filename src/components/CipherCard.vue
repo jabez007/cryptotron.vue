@@ -302,7 +302,8 @@ const encrypt = () => {
   if (!encryptInput.value) return
   encryptError.value = ''
   try {
-    encryptOutput.value = props.encryptAlgorithm(encryptInput.value)
+    const transformer = props.encryptAlgorithm()
+    encryptOutput.value = transformer(encryptInput.value)
   } catch (err) {
     console.error(err)
     encryptError.value = 'encryption failed'
@@ -324,7 +325,8 @@ const decrypt = () => {
   if (!decryptInput.value) return
   decryptError.value = ''
   try {
-    decryptOutput.value = props.decryptAlgorithm(decryptInput.value)
+    const transformer = props.decryptAlgorithm()
+    decryptOutput.value = transformer(decryptInput.value)
   } catch (err) {
     console.error(err)
     decryptError.value = 'decryption failed'

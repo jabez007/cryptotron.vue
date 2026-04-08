@@ -13,8 +13,8 @@ const polybiusCipherKey = ref({
 <template>
   <CipherCard
     title="Polybius Square"
-    :encrypt-algorithm="polybius.encrypt(polybiusCipherKey)"
-    :decrypt-algorithm="polybius.decrypt(polybiusCipherKey)"
+    :encrypt-algorithm="() => polybius.encrypt(polybiusCipherKey)"
+    :decrypt-algorithm="() => polybius.decrypt(polybiusCipherKey)"
     :crack-algorithm="polybius.crack"
     v-model:cipher-key="polybiusCipherKey"
   >

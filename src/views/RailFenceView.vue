@@ -12,8 +12,8 @@ const railFenceCipherKey = ref({
 <template>
   <CipherCard
     title="Rail-Fence Cipher"
-    :encrypt-algorithm="railFence.encrypt(railFenceCipherKey)"
-    :decrypt-algorithm="railFence.decrypt(railFenceCipherKey)"
+    :encrypt-algorithm="() => railFence.encrypt(railFenceCipherKey)"
+    :decrypt-algorithm="() => railFence.decrypt(railFenceCipherKey)"
     :crack-algorithm="railFence.crack"
     v-model:cipher-key="railFenceCipherKey"
   >

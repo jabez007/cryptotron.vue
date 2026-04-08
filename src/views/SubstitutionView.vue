@@ -12,8 +12,8 @@ const substitutionCipherKey = ref({
 <template>
   <CipherCard
     title="Simple Substitution Cipher"
-    :encrypt-algorithm="substitution.encrypt(substitutionCipherKey)"
-    :decrypt-algorithm="substitution.decrypt(substitutionCipherKey)"
+    :encrypt-algorithm="() => substitution.encrypt(substitutionCipherKey)"
+    :decrypt-algorithm="() => substitution.decrypt(substitutionCipherKey)"
     :crack-algorithm="substitution.crack"
     v-model:cipher-key="substitutionCipherKey"
   >
