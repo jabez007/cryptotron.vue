@@ -1,0 +1,1 @@
+import{d as o,a5 as c,o as n,c as t}from"./index-TjFRJAR-.js";import{_ as r}from"./_plugin-vue_export-helper-DlAUqK2U.js";const _={class:"scan-line"},p=o({__name:"ScanLine",props:{delay:{default:"0s"}},setup(e){c(a=>({"311d94a4":s.delay}));const s=e;return(a,d)=>(n(),t("div",_))}}),m=r(p,[["__scopeId","data-v-e84be065"]]);export{m as S};
