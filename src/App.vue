@@ -9,22 +9,14 @@
       </div>
 
       <div class="header-actions">
-        <button
-          class="crt-toggle-btn"
-          @click="toggleCrt"
+        <button class="crt-toggle-btn" @click="toggleCrt"
           :title="isCrtEnabled ? 'Disable CRT Effects (Clean Mode)' : 'Enable CRT Effects (Cyber Mode)'"
-          :aria-label="isCrtEnabled ? 'Disable CRT Effects' : 'Enable CRT Effects'"
-          :aria-pressed="isCrtEnabled"
-        >
+          :aria-label="isCrtEnabled ? 'Disable CRT Effects' : 'Enable CRT Effects'" :aria-pressed="isCrtEnabled">
           <CyberIcon :type="isCrtEnabled ? 'display' : 'display-off'" size="24" />
         </button>
 
-        <button
-          @click="toggleMenu"
-          :class="['hamburger-button', { active: menuOpen }]"
-          aria-label="Toggle navigation menu"
-          :aria-expanded="menuOpen"
-        >
+        <button @click="toggleMenu" :class="['hamburger-button', { active: menuOpen }]"
+          aria-label="Toggle navigation menu" :aria-expanded="menuOpen">
           <span class="hamburger-line"></span>
           <span class="hamburger-line"></span>
           <span class="hamburger-line"></span>
@@ -36,17 +28,12 @@
     <div :class="['nav-overlay-bg', { active: menuOpen }]" @click="closeMenu"></div>
     <nav :class="['nav-overlay', { active: menuOpen }]">
       <template v-for="(item, index) in menuItems" :key="item.name">
-        <div 
-          v-if="item.category && (index === 0 || menuItems[index-1].category !== item.category)" 
-          class="nav-category"
-        >
+        <div v-if="item.category && (index === 0 || menuItems[index - 1].category !== item.category)"
+          class="nav-category">
           {{ item.category }}
         </div>
-        <RouterLink 
-          :to="{ name: item.name }" 
-          :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }"
-          @click="menuOpen && closeMenu()"
-        >
+        <RouterLink :to="{ name: item.name }" :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }"
+          @click="menuOpen && closeMenu()">
           <span v-if="menuOpen && menuSelectedIndex === index" class="menu-selection-indicator">&gt;</span>
           {{ item.label }}
         </RouterLink>
@@ -62,12 +49,8 @@
     </div>
 
     <footer class="app-footer">
-      <button
-        class="bug-report-btn"
-        aria-label="Report a bug or issue"
-        title="Report a bug or issue"
-        @click="openIssues"
-      >
+      <button class="bug-report-btn" aria-label="Report a bug or issue" title="Report a bug or issue"
+        @click="openIssues">
         <IconBug />
       </button>
     </footer>
@@ -118,7 +101,7 @@ const toggleMenu = () => {
     // Find index of current route or default to 0
     const currentIndex = menuItems.findIndex(item => item.name === route.name)
     menuSelectedIndex.value = currentIndex !== -1 ? currentIndex : 0
-    
+
     // Ensure selection is visible on open
     nextTick(() => {
       const activeLink = document.querySelector('nav.nav-overlay a.keyboard-selected')
@@ -188,7 +171,7 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement
     const vimContainer = target.closest('[data-vim-mode]')
     const vimMode = vimContainer?.getAttribute('data-vim-mode')
-    
+
     if (vimMode === 'insert' || vimMode === 'key') {
       // Let the component handle it
       return
@@ -214,7 +197,7 @@ onMounted(() => {
   const root = router.resolve({ path: '/' })
   console.debug(`Root route resolved to ${root.name as string}`)
   isSubApp.value = root.name !== 'cryptotron-home'
-  
+
   // Use capture: true so the global listener (menu shortcuts) runs BEFORE component listeners
   window.addEventListener('keydown', handleGlobalKeydown, { capture: true })
 })
@@ -236,6 +219,7 @@ const openIssues = () => {
 
 /* Accessibility: Respect OS-level reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
+
   /* CRT effects */
   .crt-overlay,
   .scanlines,
@@ -305,10 +289,8 @@ const openIssues = () => {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.15) 50%
-  );
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.15) 50%);
   background-size: 100% 8px;
   pointer-events: none;
   z-index: 9998;
@@ -334,9 +316,11 @@ const openIssues = () => {
   0% {
     opacity: 0.97;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0.98;
   }
@@ -346,9 +330,11 @@ const openIssues = () => {
   0% {
     opacity: 0.1;
   }
+
   50% {
     opacity: 0.15;
   }
+
   100% {
     opacity: 0.1;
   }
@@ -465,20 +451,21 @@ header {
   transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1000;
   padding: 2rem;
-  padding-bottom: 5rem; /* Standard bottom padding */
+  padding-bottom: 5rem;
+  /* Standard bottom padding */
   overflow-y: auto;
   scroll-behavior: smooth;
 }
 
 .nav-overlay.active {
-  right: 0;
+  right: 0.5rem;
 }
 
 .nav-overlay-bg {
   position: fixed;
   top: calc(50px + 2rem + 2px);
-  left: 0;
-  width: 100%;
+  left: 0.5rem;
+  width: calc(100% - 1rem);
   height: 100%;
   background: rgba(0, 0, 0, 0.7);
   opacity: 0;
@@ -533,8 +520,13 @@ nav a.keyboard-selected {
 }
 
 @keyframes menu-pulse {
-  from { opacity: 0.5; }
-  to { opacity: 1; }
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 nav a::before {
@@ -647,6 +639,7 @@ nav a.router-link-exact-active:hover {
 }
 
 @keyframes bug-wiggle {
+
   0%,
   100% {
     transform: rotate(0deg);
@@ -674,6 +667,7 @@ nav a.router-link-exact-active:hover {
 
 /* Keyframe Animations */
 @keyframes glitch-effect {
+
   0%,
   100% {
     transform: translateX(0);
