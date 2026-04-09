@@ -440,10 +440,10 @@ header {
 
 .nav-overlay {
   position: fixed;
-  top: 50px;
+  top: calc(50px + 0.5rem);
   right: -100%;
   width: 350px;
-  height: calc(100vh - 50px);
+  height: calc(100vh - 50px - 3rem);
   background: linear-gradient(135deg, var(--cryptotron-darker-bg) 0%, rgba(15, 15, 25, 0.98) 100%);
   backdrop-filter: blur(20px);
   border-left: 2px solid var(--neon-cyan);
@@ -463,10 +463,10 @@ header {
 
 .nav-overlay-bg {
   position: fixed;
-  top: calc(50px + 2rem + 2px);
+  top: calc(50px + 2.5rem + 2px);
   left: 0.5rem;
   width: calc(100% - 1rem);
-  height: 100%;
+  height: calc(100vh - 50px - 6rem);
   background: rgba(0, 0, 0, 0.7);
   opacity: 0;
   visibility: hidden;
@@ -574,7 +574,7 @@ nav a.router-link-exact-active:hover {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  padding-bottom: 3rem;
+  padding-bottom: 5rem;
   overflow: auto;
   display: flex;
   flex-direction: column;
