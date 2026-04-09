@@ -37,14 +37,31 @@
     <!-- Navigation Overlay -->
     <div :class="['nav-overlay-bg', { active: menuOpen }]" @click="closeMenu"></div>
     <nav :class="['nav-overlay', { active: menuOpen }]">
-      <template v-for="(item, index) in menuItems" :key="item.name">
+      <template v-for="(item, index) in menuItems" :key="'name' in item ? item.name : item.path">
         <div
-          v-if="item.category && (index === 0 || menuItems[index - 1].category !== item.category)"
+          v-if="
+            'category' in item &&
+            item.category &&
+            (index === 0 || (menuItems[index - 1] as any).category !== item.category)
+          "
           class="nav-category"
         >
           {{ item.category }}
         </div>
         <RouterLink
+          v-if="'isRoot' in item"
+          :to="item.path"
+          class="nav-root-link"
+          :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }"
+          @click="menuOpen && closeMenu()"
+        >
+          <span v-if="menuOpen && menuSelectedIndex === index" class="menu-selection-indicator"
+            >&gt;</span
+          >
+          <IconDocumentation />
+        </RouterLink>
+        <RouterLink
+          v-else
           :to="{ name: item.name }"
           :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }"
           @click="menuOpen && closeMenu()"
@@ -80,9 +97,10 @@
 
 <script setup lang="ts">
 import IconBug from '@/components/icons/IconBug.vue'
+import IconDocumentation from '@/components/icons/IconDocumentation.vue'
 import CyberIcon from '@/components/icons/CyberIcon.vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch, computed } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -99,7 +117,10 @@ const toggleCrt = () => {
 const menuOpen = ref(false)
 const menuSelectedIndex = ref(0)
 
-const menuItems = [
+/* Check if runing as sub-app to avoid displaying duplicate home links */
+const isSubApp = ref(false)
+
+const baseMenuItems = [
   { name: 'cryptotron-home', label: 'Home' },
   { name: 'cryptotron-about', label: 'About' },
   { name: 'cryptotron-builder', label: 'BYOA' },
@@ -113,13 +134,21 @@ const menuItems = [
   { name: 'cryptotron-rail-fence', label: 'Rail-Fence', category: 'Transposition Ciphers' },
 ]
 
-// ... (logic remains same until toggleMenu)
+const menuItems = computed(() => {
+  if (isSubApp.value) {
+    return [{ path: '/', label: 'Back to Parent', isRoot: true }, ...baseMenuItems]
+  }
+  return baseMenuItems
+})
 
 const toggleMenu = () => {
   menuOpen.value = !menuOpen.value
   if (menuOpen.value) {
     // Find index of current route or default to 0
-    const currentIndex = menuItems.findIndex((item) => item.name === route.name)
+    const currentIndex = menuItems.value.findIndex((item) => {
+      if ('name' in item) return item.name === route.name
+      return false
+    })
     menuSelectedIndex.value = currentIndex !== -1 ? currentIndex : 0
 
     // Ensure selection is visible on open
@@ -158,20 +187,25 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
       e.stopImmediatePropagation()
-      menuSelectedIndex.value = (menuSelectedIndex.value + 1) % menuItems.length
+      menuSelectedIndex.value = (menuSelectedIndex.value + 1) % menuItems.value.length
       return
     }
     if (e.key === 'ArrowUp') {
       e.preventDefault()
       e.stopImmediatePropagation()
-      menuSelectedIndex.value = (menuSelectedIndex.value - 1 + menuItems.length) % menuItems.length
+      menuSelectedIndex.value =
+        (menuSelectedIndex.value - 1 + menuItems.value.length) % menuItems.value.length
       return
     }
     if (e.key === 'Enter') {
       e.preventDefault()
       e.stopImmediatePropagation()
-      const item = menuItems[menuSelectedIndex.value]
-      router.push({ name: item.name })
+      const item = menuItems.value[menuSelectedIndex.value]
+      if ('path' in item) {
+        window.location.href = item.path
+      } else {
+        router.push({ name: item.name })
+      }
       closeMenu()
       return
     }
@@ -229,8 +263,6 @@ watch(
   },
 )
 
-/* Check if runing as sub-app to avoid displaying duplicate home links */
-const isSubApp = ref(false)
 onMounted(() => {
   const root = router.resolve({ path: '/' })
   console.debug(`Root route resolved to ${root.name as string}`)
@@ -588,6 +620,23 @@ nav a.router-link-exact-active {
 
 nav a.router-link-exact-active:hover {
   background-color: transparent;
+}
+
+.nav-root-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  color: var(--neon-cyan);
+}
+
+.nav-root-link:hover {
+  background: rgba(0, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+  border-bottom-color: var(--neon-cyan);
 }
 
 .nav-category {
