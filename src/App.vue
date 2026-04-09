@@ -37,6 +37,9 @@
     <!-- Navigation Overlay -->
     <div :class="['nav-overlay-bg', { active: menuOpen }]" @click="closeMenu"></div>
     <nav :class="['nav-overlay', { active: menuOpen }]">
+      <RouterLink v-if="isSubApp" to="/" class="nav-root-link" @click="menuOpen && closeMenu()">
+        <IconDocumentation />
+      </RouterLink>
       <template v-for="(item, index) in menuItems" :key="item.name">
         <div
           v-if="item.category && (index === 0 || menuItems[index - 1].category !== item.category)"
@@ -80,6 +83,7 @@
 
 <script setup lang="ts">
 import IconBug from '@/components/icons/IconBug.vue'
+import IconDocumentation from '@/components/icons/IconDocumentation.vue'
 import CyberIcon from '@/components/icons/CyberIcon.vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -588,6 +592,23 @@ nav a.router-link-exact-active {
 
 nav a.router-link-exact-active:hover {
   background-color: transparent;
+}
+
+.nav-root-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  color: var(--neon-cyan);
+}
+
+.nav-root-link:hover {
+  background: rgba(0, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+  border-bottom-color: var(--neon-cyan);
 }
 
 .nav-category {
