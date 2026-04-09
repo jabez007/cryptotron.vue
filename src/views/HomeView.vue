@@ -6,11 +6,36 @@ import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 const router = useRouter()
 
 const ciphers = [
-  { name: 'cryptotron-caesar', label: 'Caesar Cipher', delay: '-1s', text: 'One of the oldest known ciphers and simplest substitution cipher, used by Julius Caesar himself! Shift each letter by a fixed number of positions in the alphabet (e.g., ROT13).' },
-  { name: 'cryptotron-rail-fence', label: 'Rail-Fence Cipher', delay: '-2s', text: 'A transposition cipher from the 19th-century that writes the message in a zigzag pattern across multiple "rails", then reads off the ciphertext row by row. Simple yet effective!' },
-  { name: 'cryptotron-vigenere', label: 'Vigenère Cipher', delay: '-3s', text: 'A 16th-century polyalphabetic substitution cipher that resisted cracking for centuries! Uses a keyword to create multiple shifting alphabets, making it much harder to crack.' },
-  { name: 'cryptotron-polybius', label: 'Polybius Square', delay: '-4s', text: 'Invented by the ancient Greeks! A digraph substitution cipher that turn letters into coordinates using a 5×5 grid of letters (I and J share a cell) based on a keyword.' },
-  { name: 'cryptotron-builder', label: 'Interactive Cipher Chain Builder', delay: '-5s', text: 'Create visual encryption pipelines by connecting cipher blocks. Build complex multi-step sequences with Caesar, Vigenère, and other classical ciphers. Discover how combining different encryption methods strengthens security through hands-on experimentation.' },
+  {
+    name: 'cryptotron-caesar',
+    label: 'Caesar Cipher',
+    delay: '-1s',
+    text: 'One of the oldest known ciphers and simplest substitution cipher, used by Julius Caesar himself! Shift each letter by a fixed number of positions in the alphabet (e.g., ROT13).',
+  },
+  {
+    name: 'cryptotron-rail-fence',
+    label: 'Rail-Fence Cipher',
+    delay: '-2s',
+    text: 'A transposition cipher from the 19th-century that writes the message in a zigzag pattern across multiple "rails", then reads off the ciphertext row by row. Simple yet effective!',
+  },
+  {
+    name: 'cryptotron-vigenere',
+    label: 'Vigenère Cipher',
+    delay: '-3s',
+    text: 'A 16th-century polyalphabetic substitution cipher that resisted cracking for centuries! Uses a keyword to create multiple shifting alphabets, making it much harder to crack.',
+  },
+  {
+    name: 'cryptotron-polybius',
+    label: 'Polybius Square',
+    delay: '-4s',
+    text: 'Invented by the ancient Greeks! A digraph substitution cipher that turn letters into coordinates using a 5×5 grid of letters (I and J share a cell) based on a keyword.',
+  },
+  {
+    name: 'cryptotron-builder',
+    label: 'Interactive Cipher Chain Builder',
+    delay: '-5s',
+    text: 'Create visual encryption pipelines by connecting cipher blocks. Build complex multi-step sequences with Caesar, Vigenère, and other classical ciphers. Discover how combining different encryption methods strengthens security through hands-on experimentation.',
+  },
 ]
 
 const selectedIndex = ref(0)
@@ -18,11 +43,11 @@ const gridElement = ref<HTMLElement | null>(null)
 
 const getColumns = () => {
   if (!gridElement.value || gridElement.value.children.length === 0) return 1
-  
+
   const cards = Array.from(gridElement.value.children) as HTMLElement[]
   const firstTop = cards[0].offsetTop
   let cols = 0
-  
+
   for (const card of cards) {
     if (card.offsetTop === firstTop) {
       cols++
@@ -39,10 +64,10 @@ const navigateToCipher = (name: string) => {
 
 const handleKeyDown = (e: KeyboardEvent) => {
   if (e.defaultPrevented) return
-  
+
   // No need to check for INPUT/TEXTAREA if listener is on gridElement
   // but keeping a check for safety if needed
-  
+
   const cols = getColumns()
   let newIndex = selectedIndex.value
 
@@ -93,7 +118,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
 onMounted(() => {
   // Attach to grid element for better scoping
   gridElement.value?.addEventListener('keydown', handleKeyDown)
-  
+
   // Focus the first card on mount to enable arrow navigation immediately
   const firstCard = gridElement.value?.querySelector('.cipher-card') as HTMLElement
   firstCard?.focus()
@@ -173,8 +198,14 @@ onUnmounted(() => {
 }
 
 @keyframes pulse {
-  from { opacity: 0.5; transform: translateX(0); }
-  to { opacity: 1; transform: translateX(5px); }
+  from {
+    opacity: 0.5;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(5px);
+  }
 }
 
 .cipher-card h3 {

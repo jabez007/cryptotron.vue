@@ -79,8 +79,11 @@ const handleClose = () => {
           <!-- Fallback for nodes without key components -->
           <div v-else>
             <label class="modal-label">Cipher Key:</label>
-            <textarea v-model="localNode.data.cipherKey" class="modal-textarea"
-              placeholder="Enter cipher key configuration"></textarea>
+            <textarea
+              v-model="localNode.data.cipherKey"
+              class="modal-textarea"
+              placeholder="Enter cipher key configuration"
+            ></textarea>
             <small class="modal-help">This cipher doesn't have a dedicated key editor</small>
           </div>
         </div>

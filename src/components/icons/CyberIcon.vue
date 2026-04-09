@@ -51,14 +51,22 @@ const colors = {
     <!-- Encrypt / Lock -->
     <g v-if="type === 'encrypt'">
       <rect x="5" y="10" width="14" height="10" :stroke="colors.cyan" stroke-width="1.5" />
-      <path d="M8 10V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V10" :stroke="colors.cyan" stroke-width="1.5" />
+      <path
+        d="M8 10V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V10"
+        :stroke="colors.cyan"
+        stroke-width="1.5"
+      />
       <circle cx="12" cy="15" r="1.5" :fill="colors.magenta" />
     </g>
 
     <!-- Decrypt / Unlock -->
     <g v-if="type === 'decrypt'">
       <rect x="5" y="10" width="14" height="10" :stroke="colors.cyan" stroke-width="1.5" />
-      <path d="M8 10V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7" :stroke="colors.cyan" stroke-width="1.5" />
+      <path
+        d="M8 10V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7"
+        :stroke="colors.cyan"
+        stroke-width="1.5"
+      />
       <circle cx="12" cy="15" r="1.5" :fill="colors.green" />
     </g>
 
@@ -117,7 +125,15 @@ const colors = {
 
     <!-- Display Off / Clean Mode -->
     <g v-if="type === 'display-off'">
-      <rect x="3" y="4" width="18" height="12" :stroke="colors.secondary" stroke-width="1.5" opacity="0.6" />
+      <rect
+        x="3"
+        y="4"
+        width="18"
+        height="12"
+        :stroke="colors.secondary"
+        stroke-width="1.5"
+        opacity="0.6"
+      />
       <path d="M7 20H17M12 16V20" :stroke="colors.secondary" stroke-width="1.5" opacity="0.6" />
       <path d="M3 3L21 21" :stroke="colors.magenta" stroke-width="1.5" />
     </g>
@@ -125,9 +141,18 @@ const colors = {
     <!-- Error / High-Voltage / Warning -->
     <g v-if="type === 'error'">
       <!-- High Voltage Bolt -->
-      <path d="M12 2L4 15H10L8 22L16 9H10L12 2Z" :fill="colors.magenta" :stroke="colors.magenta" stroke-width="1" />
+      <path
+        d="M12 2L4 15H10L8 22L16 9H10L12 2Z"
+        :fill="colors.magenta"
+        :stroke="colors.magenta"
+        stroke-width="1"
+      />
       <!-- Outer Border Fragments -->
-      <path d="M3 21L2 21L2 20M21 21L22 21L22 20M2 4L2 3L3 3M22 4L22 3L21 3" :stroke="colors.magenta" stroke-width="1.5" />
+      <path
+        d="M3 21L2 21L2 20M21 21L22 21L22 20M2 4L2 3L3 3M22 4L22 3L21 3"
+        :stroke="colors.magenta"
+        stroke-width="1.5"
+      />
     </g>
 
     <!-- Close / X -->

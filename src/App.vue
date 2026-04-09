@@ -12,7 +12,9 @@
         <button
           class="crt-toggle-btn"
           @click="toggleCrt"
-          :title="isCrtEnabled ? 'Disable CRT Effects (Clean Mode)' : 'Enable CRT Effects (Cyber Mode)'"
+          :title="
+            isCrtEnabled ? 'Disable CRT Effects (Clean Mode)' : 'Enable CRT Effects (Cyber Mode)'
+          "
           :aria-label="isCrtEnabled ? 'Disable CRT Effects' : 'Enable CRT Effects'"
           :aria-pressed="isCrtEnabled"
         >
@@ -36,18 +38,20 @@
     <div :class="['nav-overlay-bg', { active: menuOpen }]" @click="closeMenu"></div>
     <nav :class="['nav-overlay', { active: menuOpen }]">
       <template v-for="(item, index) in menuItems" :key="item.name">
-        <div 
-          v-if="item.category && (index === 0 || menuItems[index-1].category !== item.category)" 
+        <div
+          v-if="item.category && (index === 0 || menuItems[index - 1].category !== item.category)"
           class="nav-category"
         >
           {{ item.category }}
         </div>
-        <RouterLink 
-          :to="{ name: item.name }" 
+        <RouterLink
+          :to="{ name: item.name }"
           :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }"
           @click="menuOpen && closeMenu()"
         >
-          <span v-if="menuOpen && menuSelectedIndex === index" class="menu-selection-indicator">&gt;</span>
+          <span v-if="menuOpen && menuSelectedIndex === index" class="menu-selection-indicator"
+            >&gt;</span
+          >
           {{ item.label }}
         </RouterLink>
       </template>
@@ -76,7 +80,6 @@
 
 <script setup lang="ts">
 import IconBug from '@/components/icons/IconBug.vue'
-import IconDocumentation from '@/components/icons/IconDocumentation.vue'
 import CyberIcon from '@/components/icons/CyberIcon.vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -116,9 +119,9 @@ const toggleMenu = () => {
   menuOpen.value = !menuOpen.value
   if (menuOpen.value) {
     // Find index of current route or default to 0
-    const currentIndex = menuItems.findIndex(item => item.name === route.name)
+    const currentIndex = menuItems.findIndex((item) => item.name === route.name)
     menuSelectedIndex.value = currentIndex !== -1 ? currentIndex : 0
-    
+
     // Ensure selection is visible on open
     nextTick(() => {
       const activeLink = document.querySelector('nav.nav-overlay a.keyboard-selected')
@@ -132,7 +135,9 @@ watch(menuSelectedIndex, () => {
   if (menuOpen.value) {
     nextTick(() => {
       const activeLink = document.querySelector('nav.nav-overlay a.keyboard-selected')
-      const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+      const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth'
       activeLink?.scrollIntoView({ behavior, block: 'center' })
     })
   }
@@ -175,10 +180,26 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
   // Terminal Shortcuts (Alt + Key)
   if (e.altKey) {
     switch (key) {
-      case 'h': e.preventDefault(); e.stopImmediatePropagation(); router.push({ name: 'cryptotron-home' }); break
-      case 'b': e.preventDefault(); e.stopImmediatePropagation(); router.push({ name: 'cryptotron-builder' }); break
-      case 'm': e.preventDefault(); e.stopImmediatePropagation(); toggleMenu(); break
-      case 't': e.preventDefault(); e.stopImmediatePropagation(); toggleCrt(); break
+      case 'h':
+        e.preventDefault()
+        e.stopImmediatePropagation()
+        router.push({ name: 'cryptotron-home' })
+        break
+      case 'b':
+        e.preventDefault()
+        e.stopImmediatePropagation()
+        router.push({ name: 'cryptotron-builder' })
+        break
+      case 'm':
+        e.preventDefault()
+        e.stopImmediatePropagation()
+        toggleMenu()
+        break
+      case 't':
+        e.preventDefault()
+        e.stopImmediatePropagation()
+        toggleCrt()
+        break
     }
   }
 
@@ -188,7 +209,7 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement
     const vimContainer = target.closest('[data-vim-mode]')
     const vimMode = vimContainer?.getAttribute('data-vim-mode')
-    
+
     if (vimMode === 'insert' || vimMode === 'key') {
       // Let the component handle it
       return
@@ -214,7 +235,7 @@ onMounted(() => {
   const root = router.resolve({ path: '/' })
   console.debug(`Root route resolved to ${root.name as string}`)
   isSubApp.value = root.name !== 'cryptotron-home'
-  
+
   // Use capture: true so the global listener (menu shortcuts) runs BEFORE component listeners
   window.addEventListener('keydown', handleGlobalKeydown, { capture: true })
 })
@@ -287,7 +308,8 @@ const openIssues = () => {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(circle, rgba(18, 16, 16, 0) 40%, rgba(0, 0, 0, 0.4) 100%),
+  background:
+    radial-gradient(circle, rgba(18, 16, 16, 0) 40%, rgba(0, 0, 0, 0.4) 100%),
     linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
     linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
   background-size:
@@ -305,10 +327,7 @@ const openIssues = () => {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%,
-    rgba(0, 0, 0, 0.15) 50%
-  );
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
   background-size: 100% 8px;
   pointer-events: none;
   z-index: 9998;
@@ -334,9 +353,11 @@ const openIssues = () => {
   0% {
     opacity: 0.97;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0.98;
   }
@@ -346,9 +367,11 @@ const openIssues = () => {
   0% {
     opacity: 0.1;
   }
+
   50% {
     opacity: 0.15;
   }
+
   100% {
     opacity: 0.1;
   }
@@ -465,7 +488,8 @@ header {
   transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1000;
   padding: 2rem;
-  padding-bottom: 5rem; /* Standard bottom padding */
+  padding-bottom: 5rem;
+  /* Standard bottom padding */
   overflow-y: auto;
   scroll-behavior: smooth;
 }
@@ -479,7 +503,7 @@ header {
   top: calc(50px + 2rem + 2px);
   left: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 50px - 5rem);
   background: rgba(0, 0, 0, 0.7);
   opacity: 0;
   visibility: hidden;
@@ -533,8 +557,13 @@ nav a.keyboard-selected {
 }
 
 @keyframes menu-pulse {
-  from { opacity: 0.5; }
-  to { opacity: 1; }
+  from {
+    opacity: 0.5;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 nav a::before {
@@ -582,7 +611,7 @@ nav a.router-link-exact-active:hover {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  padding-bottom: 3rem;
+  padding-bottom: 5rem;
   overflow: auto;
   display: flex;
   flex-direction: column;

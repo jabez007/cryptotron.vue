@@ -1,27 +1,46 @@
 <template>
-  <div ref="root" class="cipher-content" tabindex="-1"
-    :data-vim-mode="isKeyMode ? 'key' : isInsertMode ? 'insert' : 'normal'">
+  <div
+    ref="root"
+    class="cipher-content"
+    tabindex="-1"
+    :data-vim-mode="isKeyMode ? 'key' : isInsertMode ? 'insert' : 'normal'"
+  >
     <h1 class="page-title">{{ title }}</h1>
     <div class="cipher-container">
       <div class="vim-status-bar" :class="{ 'mode-insert': isInsertMode, 'mode-key': isKeyMode }">
         <div class="status-left">
-          <span class="mode-tag">{{ isKeyMode ? '-- KEY --' : isInsertMode ? '-- INSERT --' : '-- NORMAL --' }}</span>
+          <span class="mode-tag">{{
+            isKeyMode ? '-- KEY --' : isInsertMode ? '-- INSERT --' : '-- NORMAL --'
+          }}</span>
           <span v-if="showYankedTooltip" class="yank-alert">SYSTEM: DATA YANKED</span>
         </div>
         <span class="mode-hint">
-          {{ isInsertMode ? 'Press ESC to exit' : 'i: text | k: key | 1-3: tabs | e: enc | d: dec | c: crack | x: clr | y: yank' }}
+          {{
+            isInsertMode
+              ? 'Press ESC to exit'
+              : 'i: text | k: key | 1-3: tabs | e: enc | d: dec | c: crack | x: clr | y: yank'
+          }}
         </span>
       </div>
       <div class="tab-navigation">
-        <button @click="switchTab('theory')" :class="['tab-button', { active: cipherActiveTab === 'theory' }]">
+        <button
+          @click="switchTab('theory')"
+          :class="['tab-button', { active: cipherActiveTab === 'theory' }]"
+        >
           <CyberIcon type="theory" size="16" class="tab-icon" />
           <span class="tab-label">Theory</span>
         </button>
-        <button @click="switchTab('encrypt')" :class="['tab-button', { active: cipherActiveTab === 'encrypt' }]">
+        <button
+          @click="switchTab('encrypt')"
+          :class="['tab-button', { active: cipherActiveTab === 'encrypt' }]"
+        >
           <CyberIcon type="encrypt" size="16" class="tab-icon" />
           <span class="tab-label">Encrypt</span>
         </button>
-        <button @click="switchTab('decrypt')" :class="['tab-button', { active: cipherActiveTab === 'decrypt' }]">
+        <button
+          @click="switchTab('decrypt')"
+          :class="['tab-button', { active: cipherActiveTab === 'decrypt' }]"
+        >
           <CyberIcon type="decrypt" size="16" class="tab-icon" />
           <span class="tab-label">Decrypt</span>
         </button>
@@ -47,8 +66,11 @@
 
             <div class="control-group">
               <label class="control-label">Input Text:</label>
-              <textarea v-model="encryptInput" placeholder="Enter text to encrypt..."
-                class="cipher-textarea"></textarea>
+              <textarea
+                v-model="encryptInput"
+                placeholder="Enter text to encrypt..."
+                class="cipher-textarea"
+              ></textarea>
             </div>
 
             <div class="button-group">
@@ -74,15 +96,22 @@
 
             <div class="control-group">
               <label class="control-label">Input Text:</label>
-              <textarea v-model="decryptInput" placeholder="Enter text to decrypt..."
-                class="cipher-textarea"></textarea>
+              <textarea
+                v-model="decryptInput"
+                placeholder="Enter text to decrypt..."
+                class="cipher-textarea"
+              ></textarea>
             </div>
 
             <div class="button-group">
               <button @click="decrypt" class="cipher-button">Decrypt</button>
               <button @click="clearDecrypt" class="cipher-button">Clear</button>
-              <button v-if="crackAlgorithm" @click="crack" class="cipher-button crack"
-                :disabled="isCracking || !decryptInput">
+              <button
+                v-if="crackAlgorithm"
+                @click="crack"
+                class="cipher-button crack"
+                :disabled="isCracking || !decryptInput"
+              >
                 <span v-if="isCracking" class="glitch-text" data-text="Cracking...">
                   <CyberIcon type="crack" size="18" class="button-icon pulse" />
                   Cracking...
@@ -137,7 +166,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits<{
-  'update:cipherKey': [key: any]
+  'update:cipherKey': [key: object]
 }>()
 
 const cipherActiveTab = ref('theory')
@@ -171,7 +200,7 @@ const switchTab = (newTabId: string) => {
 
   if (prefersReducedMotion) {
     const panels = [theoryPanel.value, encryptPanel.value, decryptPanel.value]
-    panels.forEach(p => p?.classList.remove('active', 'leaving'))
+    panels.forEach((p) => p?.classList.remove('active', 'leaving'))
     newPanel?.classList.add('active')
     return
   }
@@ -210,7 +239,7 @@ const handleKeydown = (e: KeyboardEvent) => {
   // Handle Escape to leave insert mode
   if (e.key === 'Escape') {
     if (isInput) {
-      ; (e.target as HTMLElement).blur()
+      ;(e.target as HTMLElement).blur()
       // Return focus to the root so shortcuts continue to work
       nextTick(() => {
         root.value?.focus()
@@ -255,21 +284,28 @@ const handleKeydown = (e: KeyboardEvent) => {
         }
         break
       }
-      case '1': switchTab('theory'); break
-      case '2': switchTab('encrypt'); break
-      case '3': switchTab('decrypt'); break
+      case '1':
+        switchTab('theory')
+        break
+      case '2':
+        switchTab('encrypt')
+        break
+      case '3':
+        switchTab('decrypt')
+        break
       case 'e':
-        if (cipherActiveTab.value === 'encrypt') encrypt();
+        if (cipherActiveTab.value === 'encrypt') encrypt()
         break
       case 'd':
-        if (cipherActiveTab.value === 'decrypt') decrypt();
+        if (cipherActiveTab.value === 'decrypt') decrypt()
         break
       case 'c':
-        if (cipherActiveTab.value === 'decrypt' && props.crackAlgorithm && !isCracking.value) crack();
+        if (cipherActiveTab.value === 'decrypt' && props.crackAlgorithm && !isCracking.value)
+          crack()
         break
       case 'x':
-        if (cipherActiveTab.value === 'encrypt') clearEncrypt();
-        else if (cipherActiveTab.value === 'decrypt') clearDecrypt();
+        if (cipherActiveTab.value === 'encrypt') clearEncrypt()
+        else if (cipherActiveTab.value === 'decrypt') clearDecrypt()
         break
       case 'y':
         yankOutput()
@@ -348,7 +384,8 @@ const yankOutput = () => {
   const output = cipherActiveTab.value === 'encrypt' ? encryptOutput.value : decryptOutput.value
   if (!output) return
 
-  navigator.clipboard.writeText(output)
+  navigator.clipboard
+    .writeText(output)
     .then(() => {
       showYankedTooltip.value = true
       setTimeout(() => {
@@ -358,10 +395,11 @@ const yankOutput = () => {
     .catch((err) => {
       console.error('Failed to copy text: ', err)
       // Display error state temporarily
-      const originalError = cipherActiveTab.value === 'encrypt' ? encryptError.value : decryptError.value
+      const originalError =
+        cipherActiveTab.value === 'encrypt' ? encryptError.value : decryptError.value
       if (cipherActiveTab.value === 'encrypt') encryptError.value = 'copy failed'
       else decryptError.value = 'copy failed'
-      
+
       setTimeout(() => {
         if (cipherActiveTab.value === 'encrypt') encryptError.value = originalError
         else decryptError.value = originalError
@@ -468,7 +506,6 @@ const crack = async () => {
 }
 
 @keyframes yank-flicker {
-
   0%,
   100% {
     opacity: 1;
@@ -524,7 +561,6 @@ const crack = async () => {
 }
 
 @keyframes error-flicker {
-
   0%,
   100% {
     opacity: 1;
@@ -635,7 +671,6 @@ const crack = async () => {
 }
 
 @keyframes icon-pulse {
-
   0%,
   100% {
     transform: scale(1);
@@ -650,7 +685,6 @@ const crack = async () => {
 
 /* Accessibility: Respect OS-level reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
-
   .tab-button.active::after,
   .tab-panel.active,
   .pulse,

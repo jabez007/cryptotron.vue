@@ -204,20 +204,42 @@
 }
 
 @keyframes glitch-anim-1 {
-  0% { clip-path: inset(20% 0 30% 0); }
-  20% { clip-path: inset(60% 0 10% 0); }
-  40% { clip-path: inset(40% 0 50% 0); }
-  60% { clip-path: inset(80% 0 5% 0); }
-  80% { clip-path: inset(10% 0 70% 0); }
-  100% { clip-path: inset(30% 0 20% 0); }
+  0% {
+    clip-path: inset(20% 0 30% 0);
+  }
+  20% {
+    clip-path: inset(60% 0 10% 0);
+  }
+  40% {
+    clip-path: inset(40% 0 50% 0);
+  }
+  60% {
+    clip-path: inset(80% 0 5% 0);
+  }
+  80% {
+    clip-path: inset(10% 0 70% 0);
+  }
+  100% {
+    clip-path: inset(30% 0 20% 0);
+  }
 }
 
 @keyframes glitch-anim-2 {
-  0% { clip-path: inset(15% 0 35% 0); }
-  25% { clip-path: inset(55% 0 15% 0); }
-  50% { clip-path: inset(35% 0 45% 0); }
-  75% { clip-path: inset(75% 0 10% 0); }
-  100% { clip-path: inset(25% 0 25% 0); }
+  0% {
+    clip-path: inset(15% 0 35% 0);
+  }
+  25% {
+    clip-path: inset(55% 0 15% 0);
+  }
+  50% {
+    clip-path: inset(35% 0 45% 0);
+  }
+  75% {
+    clip-path: inset(75% 0 10% 0);
+  }
+  100% {
+    clip-path: inset(25% 0 25% 0);
+  }
 }
 
 /* Accessibility: Respect OS-level reduced motion preference */
