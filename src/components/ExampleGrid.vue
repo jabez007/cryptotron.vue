@@ -13,11 +13,7 @@ const characters = computed(() => props.text.split(''))
 <template>
   <div class="example-row">
     <span class="row-label">{{ label }}</span>
-    <span
-      v-for="(char, index) in characters"
-      :key="index"
-      :class="['char-cell', type]"
-    >
+    <span v-for="(char, index) in characters" :key="index" :class="['char-cell', type]">
       {{ char }}
     </span>
   </div>

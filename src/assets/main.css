@@ -1,4 +1,4 @@
-@import "./scrollbar.css";
+@import './scrollbar.css';
 
 :deep(*),
 :deep(*)::before,
@@ -10,7 +10,6 @@
 
 .cryptotron-app {
   min-height: 100%;
-  max-height: calc(100vh - 1rem);
   min-width: 100%;
   color: var(--cryptotron-text-primary);
   background: var(--cryptotron-dark-bg);
@@ -22,13 +21,12 @@
     color 0.5s,
     background-color 0.5s;
   line-height: 1.6;
-  font-family: "Space Mono", monospace;
+  font-family: 'Space Mono', monospace;
   font-size: 15px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
-  overflow: hidden;
 }
 
 :deep(a),

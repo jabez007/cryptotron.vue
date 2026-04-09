@@ -34,9 +34,8 @@ interface PropertyValidation<T> {
 export function useCipherKey<T extends Record<string, any>>( // eslint-disable-line @typescript-eslint/no-explicit-any
   props: { cipherKey: T },
   emit: (event: 'update:cipherKey', value: T) => void,
-  validationRules: ValidationRules<T> = {}
+  validationRules: ValidationRules<T> = {},
 ) {
-
   // Store validation errors for each property - initialize as reactive object
   const validationErrors = ref<Partial<Record<keyof T, string[]>>>({})
 
@@ -83,9 +82,7 @@ export function useCipherKey<T extends Record<string, any>>( // eslint-disable-l
    * @param property - The key of the property to create a computed for.
    * @returns A `PropertyValidation` object, which is a writable computed ref with added validation state.
    */
-  const createPropertyComputed = <K extends keyof T>(
-    property: K
-  ): PropertyValidation<T[K]> => {
+  const createPropertyComputed = <K extends keyof T>(property: K): PropertyValidation<T[K]> => {
     const baseComputed = computed({
       get: () => props.cipherKey[property],
       set: (newValue: T[K]) => {
@@ -98,10 +95,10 @@ export function useCipherKey<T extends Record<string, any>>( // eslint-disable-l
         if (errors.length === 0) {
           emit('update:cipherKey', {
             ...props.cipherKey,
-            [property]: newValue
+            [property]: newValue,
           })
         }
-      }
+      },
     })
 
     const errors = computed(() => validationErrors.value[property] || [])
@@ -129,7 +126,7 @@ export function useCipherKey<T extends Record<string, any>>( // eslint-disable-l
       errors,
       isValid,
       hasError,
-    });
+    })
   }
 
   // --- Overall State ---
@@ -141,7 +138,7 @@ export function useCipherKey<T extends Record<string, any>>( // eslint-disable-l
     const allErrors = Object.values(validationErrors.value).flat()
     return {
       isValid: allErrors.length === 0,
-      errors: allErrors as string[]
+      errors: allErrors as string[],
     }
   })
 
@@ -160,45 +157,53 @@ export const validationRules = {
     return null
   },
 
-  numberRange: (min: number, max: number) => (value: number): string | null => {
-    if (typeof value !== 'number' || isNaN(value)) {
-      return 'Must be a valid number'
-    }
-    if (value < min || value > max) {
-      return `Must be between ${min} and ${max}`
-    }
-    return null
-  },
+  numberRange:
+    (min: number, max: number) =>
+    (value: number): string | null => {
+      if (typeof value !== 'number' || isNaN(value)) {
+        return 'Must be a valid number'
+      }
+      if (value < min || value > max) {
+        return `Must be between ${min} and ${max}`
+      }
+      return null
+    },
 
-  minLength: (min: number) => (value: string): string | null => {
-    if (typeof value !== 'string') {
-      return 'Must be a string'
-    }
-    if (value.length < min) {
-      return `Must be at least ${min} characters long`
-    }
-    return null
-  },
+  minLength:
+    (min: number) =>
+    (value: string): string | null => {
+      if (typeof value !== 'string') {
+        return 'Must be a string'
+      }
+      if (value.length < min) {
+        return `Must be at least ${min} characters long`
+      }
+      return null
+    },
 
-  maxLength: (max: number) => (value: string): string | null => {
-    if (typeof value !== 'string') {
-      return 'Must be a string'
-    }
-    if (value.length > max) {
-      return `Must be no more than ${max} characters long`
-    }
-    return null
-  },
+  maxLength:
+    (max: number) =>
+    (value: string): string | null => {
+      if (typeof value !== 'string') {
+        return 'Must be a string'
+      }
+      if (value.length > max) {
+        return `Must be no more than ${max} characters long`
+      }
+      return null
+    },
 
-  pattern: (regex: RegExp, message: string) => (value: string): string | null => {
-    if (typeof value !== 'string') {
-      return 'Must be a string'
-    }
-    if (!regex.test(value)) {
-      return message
-    }
-    return null
-  }
+  pattern:
+    (regex: RegExp, message: string) =>
+    (value: string): string | null => {
+      if (typeof value !== 'string') {
+        return 'Must be a string'
+      }
+      if (!regex.test(value)) {
+        return message
+      }
+      return null
+    },
 }
 
 // Example usage with validation:
@@ -267,4 +272,3 @@ input.error {
 }
 </style>
 */
-
