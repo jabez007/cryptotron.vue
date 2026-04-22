@@ -4,6 +4,7 @@ import {
   autokey,
   beaufort,
   caesar,
+  columnar,
   polybius,
   railFence,
   substitution,
@@ -46,6 +47,15 @@ export const availableCiphers = [
     decryptAlgorithm: caesar.decrypt,
     crackAlgorithm: caesar.crack,
     cipherKeyComponent: () => import('@/components/keys/KeyCaesar.vue'),
+  },
+  {
+    type: 'columnar',
+    label: 'Columnar Cipher',
+    defaultKey: { keyword: 'NIGHTCITY' },
+    encryptAlgorithm: columnar.encrypt,
+    decryptAlgorithm: columnar.decrypt,
+    crackAlgorithm: columnar.crack,
+    cipherKeyComponent: () => import('@/components/keys/KeyColumnar.vue'),
   },
   {
     type: 'polybius',

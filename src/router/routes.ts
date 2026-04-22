@@ -57,5 +57,10 @@ export default (parentRouteName?: string) => {
       path: `${rootPath}rail-fence`,
       component: () => import('@/views/RailFenceView.vue'),
     },
+    {
+      name: 'cryptotron-columnar',
+      path: `${rootPath}columnar`,
+      component: () => import('@/views/ColumnarView.vue'),
+    },
   ]
 }
