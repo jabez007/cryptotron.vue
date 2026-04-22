@@ -128,6 +128,7 @@ const baseMenuItems = [
   { name: 'cryptotron-caesar', label: 'Caesar', category: 'Substitution Ciphers' },
   { name: 'cryptotron-substitution', label: 'Simple', category: 'Substitution Ciphers' },
   { name: 'cryptotron-polybius', label: 'Polybius', category: 'Grid & Fractionation' },
+  { name: 'cryptotron-playfair', label: 'Playfair', category: 'Grid & Fractionation' },
   { name: 'cryptotron-autokey', label: 'Autokey', category: 'Polyalphabetic Ciphers' },
   { name: 'cryptotron-beaufort', label: 'Beaufort', category: 'Polyalphabetic Ciphers' },
   { name: 'cryptotron-vigenere', label: 'Vigenère', category: 'Polyalphabetic Ciphers' },

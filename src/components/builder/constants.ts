@@ -6,6 +6,7 @@ import {
   caesar,
   columnar,
   polybius,
+  playfair,
   railFence,
   substitution,
   vigenere,
@@ -56,6 +57,15 @@ export const availableCiphers = [
     decryptAlgorithm: columnar.decrypt,
     crackAlgorithm: columnar.crack,
     cipherKeyComponent: () => import('@/components/keys/KeyColumnar.vue'),
+  },
+  {
+    type: 'playfair',
+    label: 'Playfair Cipher',
+    defaultKey: { keyword: 'MONARCHY' },
+    encryptAlgorithm: playfair.encrypt,
+    decryptAlgorithm: playfair.decrypt,
+    crackAlgorithm: playfair.crack,
+    cipherKeyComponent: () => import('@/components/keys/KeyPlayfair.vue'),
   },
   {
     type: 'polybius',
