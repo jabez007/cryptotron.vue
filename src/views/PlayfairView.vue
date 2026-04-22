@@ -47,23 +47,19 @@ const playfairCipherKey = ref({
         U V W X Z<br />
         </code><br />
         <strong>2. Prepare the Message:</strong> "INSTRUMENTS"<br />
-        Split into digraphs: IN ST RU ME NT S<br />
-        (Add padding 'X' for the lone 'S'): <strong>IN ST RU ME NT SX</strong><br />
+        Split into digraphs: <strong>IN ST RU ME NT SX</strong> (padded with X)<br />
         <br />
         <strong>3. Encrypt Digraphs:</strong><br />
-        IN → <strong>GA</strong> (Rectangle: I at row 3, col 4; N at row 1, col 3)<br />
-        ST → <strong>TL</strong> (Same column: S at row 4, col 4; T at row 4, col 5 → Wrap to L at row 4, col 1)<br />
-        RU → <strong>MZ</strong> (Rectangle: R at row 1, col 5; U at row 5, col 1)<br />
-        ME → <strong>CL</strong> (Rectangle: M at row 1, col 1; E at row 3, col 1)<br />
-        NT → <strong>RQ</strong> (Rectangle: N at row 1, col 3; T at row 4, col 5)<br />
-        SX → <strong>AX</strong> (Same row: S at row 4, col 4; X at row 5, col 4 → Wait, same row rule is row-wise. S is (4,4), X is (5,4). That is same column!)<br />
-        SX → <strong>XQ</strong> (Wait, let's re-verify with the grid above)<br />
-        S is (4,4), X is (5,4) → Same Column → Replace with letter below.<br />
-        S → X (below S)<br />
-        X → B (Wait, grid above has B at (2,4). Column 4 is A, B, I, S, X. So X → A)<br />
-        SX → <strong>XA</strong><br />
+        <ul>
+          <li><strong>IN → GA:</strong> Rectangle (I at 3,4; N at 1,3). Swap columns.</li>
+          <li><strong>ST → TL:</strong> Same Row (S at 4,4; T at 4,5). Shift right (T, wrap to L).</li>
+          <li><strong>RU → MZ:</strong> Rectangle (R at 1,5; U at 5,1). Swap columns.</li>
+          <li><strong>ME → CL:</strong> Same Column (M at 1,1; E at 3,1). Shift down.</li>
+          <li><strong>NT → RQ:</strong> Rectangle (N at 1,3; T at 4,5). Swap columns.</li>
+          <li><strong>SX → XA:</strong> Same Column (S at 4,4; X at 5,4). Shift down (X, wrap to A).</li>
+        </ul>
         <br />
-        <strong>Result:</strong> <code>GATLMZCLRQAX</code>
+        <strong>Result:</strong> <code>GATLMZCLRQXA</code>
       </div>
 
       <h3>Security</h3>
