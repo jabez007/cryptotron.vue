@@ -67,5 +67,10 @@ export default (parentRouteName?: string) => {
       path: `${rootPath}playfair`,
       component: () => import('@/views/PlayfairView.vue'),
     },
+    {
+      name: 'cryptotron-bacon',
+      path: `${rootPath}bacon`,
+      component: () => import('@/views/BaconView.vue'),
+    },
   ]
 }
