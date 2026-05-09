@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { baconDecoder, baconEncoder, toHtmlSnippet, toMarkdown, type StyledChar } from '@/utils/steganography'
 
 const activeTab = ref<'theory' | 'hide' | 'extract'>('theory')
@@ -12,7 +12,12 @@ const encodedInput = ref('')
 const preview = computed<StyledChar[]>(() => {
   try {
     return baconEncoder(secretMessage.value, coverText.value)
-  } catch {
+  } catch (error) {
+    console.error("Bacon encoder preview failed", {
+      error,
+      secretMessage: secretMessage.value,
+      coverText: coverText.value,
+    })
     return [...coverText.value].map((char) => ({ char, type: 'a' as const }))
   }
 })
@@ -25,22 +30,41 @@ const lengthError = computed(() =>
     : '',
 )
 
-const extracted = computed(() => baconDecoder(encodedInput.value))
+const extracted = computed(() => {
+  try {
+    return baconDecoder(encodedInput.value)
+  } catch (error) {
+    console.error('Bacon decoder extraction failed', {
+      error,
+      encodedInput: encodedInput.value,
+    })
+    return ''
+  }
+})
 
 const htmlExport = computed(() => toHtmlSnippet(preview.value))
 const markdownExport = computed(() => toMarkdown(preview.value))
 
 const handleHotkey = (event: KeyboardEvent) => {
   if (event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLInputElement) return
+  if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return
 
   if (event.key === 'r') revealMode.value = !revealMode.value
   if (event.key === 'e') activeTab.value = 'hide'
   if (event.key === 'd') activeTab.value = 'extract'
 }
 
-if (typeof window !== 'undefined') {
-  window.addEventListener('keydown', handleHotkey)
-}
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    window.addEventListener('keydown', handleHotkey)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('keydown', handleHotkey)
+  }
+})
 </script>
 
 <template>

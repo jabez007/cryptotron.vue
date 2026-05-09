@@ -44,7 +44,7 @@ export const toHtmlSnippet = (styled: StyledChar[]): string => {
     .map(({ char, type }) => `<span class="b-${type}">${escapeHtml(char)}</span>`)
     .join('')
 
-  return `<style>\n.b-a{font-weight:400;color:var(--text-primary);}\n.b-b{font-weight:700;color:var(--neon-green);text-shadow:0 0 5px var(--neon-green);}\n</style>\n<p>${spans}</p>`
+  return `<style>\n.b-a{font-weight:400;color:#e5e7eb;}\n.b-b{font-weight:700;color:#00ff41;text-shadow:0 0 5px #00ff41;}\n</style>\n<p>${spans}</p>`
 }
 
 export const toMarkdown = (styled: StyledChar[]): string =>
