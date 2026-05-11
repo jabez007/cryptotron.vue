@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import CipherCard from '@/components/CipherCard.vue'
+import { computed, ref } from 'vue'
 import { baconDecoder, baconEncoder, toHtmlSnippet, toMarkdown, type StyledChar } from '@/utils/steganography'
 
-const activeTab = ref<'theory' | 'hide' | 'extract'>('theory')
-const revealMode = ref(false)
-
+const baconCipherKey = ref({})
 const secretMessage = ref('')
 const coverText = ref('')
 const encodedInput = ref('')
+const revealMode = ref(false)
+const exportMode = ref<'html' | 'markdown'>('html')
+const copiedNotice = ref('')
 
 const preview = computed<StyledChar[]>(() => {
   try {
     return baconEncoder(secretMessage.value, coverText.value)
   } catch (error) {
-    console.error("Bacon encoder preview failed", {
+    console.error('Bacon encoder preview failed', {
       error,
       secretMessage: secretMessage.value,
       coverText: coverText.value,
@@ -44,129 +46,263 @@ const extracted = computed(() => {
 
 const htmlExport = computed(() => toHtmlSnippet(preview.value))
 const markdownExport = computed(() => toMarkdown(preview.value))
+const activeExport = computed(() => (exportMode.value === 'html' ? htmlExport.value : markdownExport.value))
 
-const handleHotkey = (event: KeyboardEvent) => {
-  if (event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLInputElement) return
-  if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return
+const copyActiveExport = async () => {
+  if (!activeExport.value) return
 
-  if (event.key === 'r') revealMode.value = !revealMode.value
-  if (event.key === 'e') activeTab.value = 'hide'
-  if (event.key === 'd') activeTab.value = 'extract'
+  try {
+    await navigator.clipboard.writeText(activeExport.value)
+    copiedNotice.value = `${exportMode.value.toUpperCase()} copied`
+    setTimeout(() => {
+      copiedNotice.value = ''
+    }, 2000)
+  } catch (error) {
+    console.error('Failed to copy Bacon export', { error, exportMode: exportMode.value })
+    copiedNotice.value = 'Copy failed'
+    setTimeout(() => {
+      copiedNotice.value = ''
+    }, 2000)
+  }
 }
 
-onMounted(() => {
-  if (typeof window !== 'undefined') {
-    window.addEventListener('keydown', handleHotkey)
-  }
-})
-
-onBeforeUnmount(() => {
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('keydown', handleHotkey)
-  }
-})
+const baconEncrypt = () => activeExport.value
+const baconDecrypt = () => extracted.value
 </script>
 
 <template>
-  <section class="bacon-view">
-    <h1>Bacon's Cipher</h1>
-
-    <div class="tabs">
-      <button :class="{ active: activeTab === 'theory' }" @click="activeTab = 'theory'">Theory</button>
-      <button :class="{ active: activeTab === 'hide' }" @click="activeTab = 'hide'">Hide</button>
-      <button :class="{ active: activeTab === 'extract' }" @click="activeTab = 'extract'">Extract</button>
-    </div>
-
-    <div v-if="activeTab === 'theory'" class="panel theory-content">
+  <CipherCard
+    title="Bacon's Cipher"
+    :encrypt-algorithm="() => baconEncrypt"
+    :decrypt-algorithm="() => baconDecrypt"
+    v-model:cipher-key="baconCipherKey"
+  >
+    <template #theory>
+      <h3>The Origin Story</h3>
       <p>
-        <strong>Bacon's Cipher</strong> is a steganographic technique from the early 1600s, credited to Francis Bacon.
-        Instead of scrambling letters like Caesar or Vigenère, it hides a message in plain sight by changing style.
+        <strong>Bacon's Cipher</strong> is a steganographic system attributed to Francis Bacon in the
+        early 1600s. Instead of disguising a message by shifting or scrambling letters, it hides the
+        payload inside an innocent-looking cover text by giving letters one of two visual styles.
       </p>
       <p>
-        The modern variant used here maps each secret letter A-Z to a five-character pattern made of <code>a</code> and
-        <code>b</code>. You can think of <code>a</code> as binary 0 and <code>b</code> as binary 1. Since five bits can represent
-        32 values, we have enough room to encode all 26 letters.
+        That distinction matters: this is less about secret math and more about covert signaling.
+        To a casual reader the text still looks readable, but to someone who knows the pattern, the
+        typography itself becomes the channel.
+      </p>
+
+      <h3>The Mechanics</h3>
+      <p>
+        The modern version used here maps each plaintext letter A-Z to a five-symbol pattern of
+        <code>a</code> and <code>b</code>. Think of <code>a</code> as binary <code>0</code> and
+        <code>b</code> as binary <code>1</code>. Because five bits can represent 32 values, that is
+        enough room to cover the 26-letter alphabet.
       </p>
       <p>
-        In Cryptotron, each alphabetic character in the cover text carries one bit:
+        Cryptotron applies those bits to the <em>alphabetic</em> characters in the cover text from
+        left to right:
       </p>
       <ul>
-        <li><strong>Type A</strong> (normal weight) = <code>a</code> = 0</li>
-        <li><strong>Type B</strong> (bright emphasized text) = <code>b</code> = 1</li>
+        <li><strong>Type A</strong> = normal weight = <code>a</code> = 0</li>
+        <li><strong>Type B</strong> = emphasized neon weight = <code>b</code> = 1</li>
       </ul>
       <p>
-        After five styled letters, the decoder reads one hidden character. Spaces and punctuation are preserved in the
-        cover text but do not consume bits.
+        Spaces, punctuation, and other non-letter characters stay visible in the cover text, but
+        they do not consume bits. That means only letters count toward the available hiding
+        capacity.
       </p>
+
+      <h3>The Binary Mapping</h3>
       <p>
-        <strong>Example:</strong> The letter <code>H</code> is index 7 in A=0 indexing, binary <code>00111</code>, which becomes
-        <code>aabbb</code>. If your cover starts with "There...", the first five alphabetic letters would be styled as:
-        normal, normal, bold, bold, bold.
+        Internally, the encoder converts each secret letter to its alphabet index using A=0,
+        B=1, ..., Z=25. That number is then written as a five-bit binary value and translated into
+        <code>a</code>/<code>b</code> symbols.
       </p>
-      <p>
-        To hide a full message, the app concatenates these five-bit groups and applies them left-to-right over the
-        cover text. To extract, it reads styling back into bits, chunks them by five, and maps each chunk to a letter.
-      </p>
-      <p>
-        Use this when you want subtle message hiding rather than cryptographic strength. Anyone who notices the
-        style pattern can decode it, so the real security comes from plausible cover text and not drawing attention to
-        the Type A/Type B distinction.
-      </p>
-    </div>
-
-    <div v-if="activeTab === 'hide'" class="panel">
-      <label>Secret Message</label>
-      <textarea v-model="secretMessage" rows="4" />
-
-      <label>Cover Text</label>
-      <textarea v-model="coverText" rows="6" />
-
-      <p v-if="lengthError" class="error">{{ lengthError }}</p>
-
-      <div class="preview" :class="{ reveal: revealMode }">
-        <span v-for="(item, idx) in preview" :key="idx" :class="`b-${item.type}`">{{ item.char }}</span>
+      <div class="cipher-example">
+        <strong>Worked example:</strong><br />
+        H = 7<br />
+        7 in binary = <code>00111</code><br />
+        <code>00111</code> becomes <code>aabbb</code><br />
+        So the next five alphabetic letters in the cover text are styled as:
+        normal, normal, emphasized, emphasized, emphasized.
       </div>
+      <p>
+        If your secret message is <code>HELLO</code>, the encoder creates 25 total bits, so you need
+        at least 25 alphabetic characters in the cover text. That acceptance rule is enforced here
+        to prevent partial or ambiguous output.
+      </p>
 
-      <label>HTML Export</label>
-      <textarea :value="htmlExport" rows="6" readonly />
+      <h3>Encoding and Extraction</h3>
+      <p>
+        In the <strong>Hide</strong> workflow, the app cleans the secret message down to A-Z,
+        converts every letter into five Bacon bits, then overlays those bits onto the cover text.
+        The live preview shows what the styled carrier text will look like.
+      </p>
+      <p>
+        In the <strong>Extract</strong> workflow, the decoder reads the style markers back in. Bold
+        or <code>b-b</code> spans are treated as binary 1, unstyled or Type A letters become binary
+        0, and the stream is then chunked into five-bit groups to recover the hidden message.
+      </p>
+      <p>
+        The HTML export preserves explicit <code>span</code> classes for reliable recovery, while the
+        Markdown export uses bold formatting as a lightweight fallback.
+      </p>
 
-      <label>Markdown Export</label>
-      <textarea :value="markdownExport" rows="4" readonly />
-    </div>
+      <h3>Modern Perspective</h3>
+      <p>
+        Bacon's Cipher is a good lesson in the difference between <strong>encryption</strong> and
+        <strong>steganography</strong>. The message is not mathematically protected against a curious
+        observer who notices the pattern; instead, the goal is to avoid attracting attention in the
+        first place.
+      </p>
+      <p>
+        So the real risk is not brute force. It is detection. If the styling contrast is too loud,
+        the carrier text looks suspicious. If the cover text is too short or unnatural, the pattern
+        becomes easier to spot. What matters is not just whether the encoding works, but whether the
+        hiding still looks plausible.
+      </p>
+    </template>
 
-    <div v-if="activeTab === 'extract'" class="panel">
-      <label>Encoded Text (HTML/Markdown)</label>
-      <textarea v-model="encodedInput" rows="8" />
+    <template #cipherKey>
+      <div class="bacon-practice-stack">
+        <div class="control-group">
+          <label class="control-label">Secret Message</label>
+          <textarea
+            v-model="secretMessage"
+            rows="4"
+            class="cipher-textarea"
+            placeholder="Enter the hidden message..."
+          />
+        </div>
 
-      <label>Extracted Secret</label>
-      <textarea :value="extracted" rows="3" readonly />
-    </div>
-  </section>
+        <div class="control-group">
+          <label class="control-label">Cover Text</label>
+          <textarea
+            v-model="coverText"
+            rows="6"
+            class="cipher-textarea"
+            placeholder="Enter the visible carrier text..."
+          />
+        </div>
+
+        <p v-if="lengthError" class="status-error bacon-inline-error">
+          <span>{{ lengthError }}</span>
+        </p>
+
+        <div class="control-group">
+          <div class="bacon-preview-header">
+            <label class="control-label">Live Preview</label>
+            <button class="cipher-button bacon-secondary-button" type="button" @click="revealMode = !revealMode">
+              {{ revealMode ? 'Hide Reveal' : 'Reveal Bits' }}
+            </button>
+          </div>
+          <div class="bacon-preview" :class="{ reveal: revealMode }">
+            <span v-for="(item, idx) in preview" :key="idx" :class="`b-${item.type}`">{{ item.char }}</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="bacon-preview-header">
+            <label class="control-label">Export Output</label>
+            <div class="bacon-export-actions">
+              <button
+                class="cipher-button bacon-secondary-button"
+                type="button"
+                @click="exportMode = exportMode === 'html' ? 'markdown' : 'html'"
+              >
+                {{ exportMode === 'html' ? 'Switch to Markdown' : 'Switch to HTML' }}
+              </button>
+              <button class="cipher-button bacon-secondary-button" type="button" @click="copyActiveExport">
+                Copy {{ exportMode.toUpperCase() }}
+              </button>
+            </div>
+          </div>
+          <p v-if="copiedNotice" class="bacon-copy-notice">{{ copiedNotice }}</p>
+          <textarea :value="activeExport" rows="8" class="cipher-textarea" readonly />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Encoded Text (HTML/Markdown)</label>
+          <textarea
+            v-model="encodedInput"
+            rows="8"
+            class="cipher-textarea"
+            placeholder="Paste exported Bacon text here to decode..."
+          />
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Extracted Secret</label>
+          <textarea :value="extracted" rows="3" class="cipher-textarea" readonly />
+        </div>
+      </div>
+    </template>
+  </CipherCard>
 </template>
 
 <style scoped>
-.bacon-view { display: grid; gap: 1rem; }
-.tabs { display: flex; gap: 0.5rem; }
-button.active { border-color: var(--neon-green); color: var(--neon-green); }
-.panel {
+.bacon-practice-stack {
   display: grid;
+  gap: 1.25rem;
+}
+
+.bacon-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.bacon-export-actions {
+  display: flex;
   gap: 0.75rem;
-  border: 1px solid var(--cryptotron-grid-color);
-  border-radius: 10px;
-  background: var(--panel-bg);
+  flex-wrap: wrap;
+}
+
+.bacon-secondary-button {
+  padding: 0.6rem 1rem;
+}
+
+.bacon-preview {
+  border: 1px solid var(--cryptotron-border-glow);
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
   padding: 1rem;
+  min-height: 5rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--cryptotron-text-primary);
+  font-family: 'Space Mono', monospace;
 }
 
-.panel label {
-  font-weight: 600;
-  color: var(--text-secondary);
+.b-a {
+  font-weight: 400;
+  color: var(--cryptotron-text-primary);
 }
 
-.theory-content ul {
-  margin: 0;
-  padding-left: 1.25rem;
-  display: grid;
-  gap: 0.35rem;
+.b-b {
+  font-weight: 700;
+  color: var(--neon-green);
+  text-shadow: 0 0 5px var(--neon-green);
+}
+
+.bacon-preview.reveal .b-b {
+  color: var(--neon-magenta);
+  text-shadow: 0 0 8px var(--neon-magenta);
+}
+
+.bacon-inline-error {
+  margin-top: -0.25rem;
+}
+
+.bacon-copy-notice {
+  margin: 0 0 0.5rem;
+  color: var(--neon-green);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .theory-content code {
@@ -174,30 +310,10 @@ button.active { border-color: var(--neon-green); color: var(--neon-green); }
   color: var(--neon-green);
 }
 
-.preview {
-  border: 1px solid var(--cryptotron-grid-color);
-  background: color-mix(in srgb, var(--panel-bg) 85%, black 15%);
-  padding: 1rem;
-  border-radius: 8px;
-  min-height: 5rem;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.b-a { font-weight: 400; color: var(--text-primary); }
-.b-b { font-weight: 700; color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
-.preview.reveal .b-b { color: var(--neon-magenta); text-shadow: 0 0 8px var(--neon-magenta); }
-.error { color: #ff6b6b; }
-textarea {
-  width: 100%;
-  border: 1px solid var(--cryptotron-grid-color);
-  border-radius: 8px;
-  background: var(--panel-bg);
-  color: var(--text-primary);
-  padding: 0.75rem;
-  resize: vertical;
-}
-
-textarea[readonly] {
-  opacity: 0.95;
+.theory-content ul {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.35rem;
 }
 </style>
