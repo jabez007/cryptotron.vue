@@ -4,12 +4,22 @@ import { computed, ref } from 'vue'
 import { baconDecoder, baconEncoder, toHtmlSnippet, toMarkdown, type StyledChar } from '@/utils/steganography'
 
 const baconCipherKey = ref({})
+const baconCoverKey = ref({ coverText: '' })
 const secretMessage = ref('')
-const coverText = ref('')
 const encodedInput = ref('')
 const revealMode = ref(false)
 const exportMode = ref<'html' | 'markdown'>('html')
 const copiedNotice = ref('')
+
+const coverText = computed({
+  get: () => baconCoverKey.value.coverText ?? '',
+  set: (value: string) => {
+    baconCoverKey.value = {
+      ...baconCoverKey.value,
+      coverText: value,
+    }
+  },
+})
 
 const preview = computed<StyledChar[]>(() => {
   try {
@@ -66,8 +76,15 @@ const copyActiveExport = async () => {
   }
 }
 
-const baconEncrypt = () => activeExport.value
-const baconDecrypt = () => extracted.value
+const baconEncrypt = (input: string) => {
+  secretMessage.value = input
+  return activeExport.value
+}
+
+const baconDecrypt = (input: string) => {
+  encodedInput.value = input
+  return extracted.value
+}
 </script>
 
 <template>
@@ -75,7 +92,7 @@ const baconDecrypt = () => extracted.value
     title="Bacon's Cipher"
     :encrypt-algorithm="() => baconEncrypt"
     :decrypt-algorithm="() => baconDecrypt"
-    v-model:cipher-key="baconCipherKey"
+    v-model:cipher-key="baconCoverKey"
   >
     <template #theory>
       <h3>The Origin Story</h3>
@@ -163,27 +180,19 @@ const baconDecrypt = () => extracted.value
     </template>
 
     <template #cipherKey>
+      <div class="control-group">
+        <label class="control-label">Cover Text</label>
+        <textarea
+          v-model="coverText"
+          rows="6"
+          class="cipher-textarea"
+          placeholder="Enter the visible carrier text..."
+        />
+      </div>
+    </template>
+
+    <template #encryptOutput>
       <div class="bacon-practice-stack">
-        <div class="control-group">
-          <label class="control-label">Secret Message</label>
-          <textarea
-            v-model="secretMessage"
-            rows="4"
-            class="cipher-textarea"
-            placeholder="Enter the hidden message..."
-          />
-        </div>
-
-        <div class="control-group">
-          <label class="control-label">Cover Text</label>
-          <textarea
-            v-model="coverText"
-            rows="6"
-            class="cipher-textarea"
-            placeholder="Enter the visible carrier text..."
-          />
-        </div>
-
         <p v-if="lengthError" class="status-error bacon-inline-error">
           <span>{{ lengthError }}</span>
         </p>
@@ -221,19 +230,16 @@ const baconDecrypt = () => extracted.value
         </div>
 
         <div class="control-group">
-          <label class="control-label">Encoded Text (HTML/Markdown)</label>
-          <textarea
-            v-model="encodedInput"
-            rows="8"
-            class="cipher-textarea"
-            placeholder="Paste exported Bacon text here to decode..."
-          />
-        </div>
-
-        <div class="control-group">
-          <label class="control-label">Extracted Secret</label>
+          <label class="control-label">Decoded Secret Preview</label>
           <textarea :value="extracted" rows="3" class="cipher-textarea" readonly />
         </div>
+      </div>
+    </template>
+
+    <template #decryptOutput>
+      <div class="control-group">
+        <label class="control-label">Decoded Secret Preview</label>
+        <textarea :value="extracted" rows="3" class="cipher-textarea" readonly />
       </div>
     </template>
   </CipherCard>
