@@ -77,14 +77,40 @@ onBeforeUnmount(() => {
       <button :class="{ active: activeTab === 'extract' }" @click="activeTab = 'extract'">Extract</button>
     </div>
 
-    <div v-if="activeTab === 'theory'" class="panel">
+    <div v-if="activeTab === 'theory'" class="panel theory-content">
       <p>
-        Bacon's Cipher maps each plaintext letter (A-Z) into a 5-symbol sequence of a/b, then hides those
-        symbols in visible typography changes across a cover text.
+        <strong>Bacon's Cipher</strong> is a steganographic technique from the early 1600s, credited to Francis Bacon.
+        Instead of scrambling letters like Caesar or Vigenère, it hides a message in plain sight by changing style.
       </p>
       <p>
-        In this implementation, normal letters are Type A and emphasized letters are Type B. Five styled letters
-        decode to one secret character.
+        The modern variant used here maps each secret letter A-Z to a five-character pattern made of <code>a</code> and
+        <code>b</code>. You can think of <code>a</code> as binary 0 and <code>b</code> as binary 1. Since five bits can represent
+        32 values, we have enough room to encode all 26 letters.
+      </p>
+      <p>
+        In Cryptotron, each alphabetic character in the cover text carries one bit:
+      </p>
+      <ul>
+        <li><strong>Type A</strong> (normal weight) = <code>a</code> = 0</li>
+        <li><strong>Type B</strong> (bright emphasized text) = <code>b</code> = 1</li>
+      </ul>
+      <p>
+        After five styled letters, the decoder reads one hidden character. Spaces and punctuation are preserved in the
+        cover text but do not consume bits.
+      </p>
+      <p>
+        <strong>Example:</strong> The letter <code>H</code> is index 7 in A=0 indexing, binary <code>00111</code>, which becomes
+        <code>aabbb</code>. If your cover starts with "There...", the first five alphabetic letters would be styled as:
+        normal, normal, bold, bold, bold.
+      </p>
+      <p>
+        To hide a full message, the app concatenates these five-bit groups and applies them left-to-right over the
+        cover text. To extract, it reads styling back into bits, chunks them by five, and maps each chunk to a letter.
+      </p>
+      <p>
+        Use this when you want subtle message hiding rather than cryptographic strength. Anyone who notices the
+        style pattern can decode it, so the real security comes from plausible cover text and not drawing attention to
+        the Type A/Type B distinction.
       </p>
     </div>
 
@@ -122,9 +148,35 @@ onBeforeUnmount(() => {
 .bacon-view { display: grid; gap: 1rem; }
 .tabs { display: flex; gap: 0.5rem; }
 button.active { border-color: var(--neon-green); color: var(--neon-green); }
-.panel { display: grid; gap: 0.6rem; }
+.panel {
+  display: grid;
+  gap: 0.75rem;
+  border: 1px solid var(--cryptotron-grid-color);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  padding: 1rem;
+}
+
+.panel label {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.theory-content ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.theory-content code {
+  font-family: var(--font-mono);
+  color: var(--neon-green);
+}
+
 .preview {
   border: 1px solid var(--cryptotron-grid-color);
+  background: color-mix(in srgb, var(--panel-bg) 85%, black 15%);
   padding: 1rem;
   border-radius: 8px;
   min-height: 5rem;
@@ -135,5 +187,17 @@ button.active { border-color: var(--neon-green); color: var(--neon-green); }
 .b-b { font-weight: 700; color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
 .preview.reveal .b-b { color: var(--neon-magenta); text-shadow: 0 0 8px var(--neon-magenta); }
 .error { color: #ff6b6b; }
-textarea { width: 100%; }
+textarea {
+  width: 100%;
+  border: 1px solid var(--cryptotron-grid-color);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  color: var(--text-primary);
+  padding: 0.75rem;
+  resize: vertical;
+}
+
+textarea[readonly] {
+  opacity: 0.95;
+}
 </style>
