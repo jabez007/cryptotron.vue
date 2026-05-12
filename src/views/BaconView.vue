@@ -7,7 +7,6 @@ const baconCipherKey = ref({})
 const baconCoverKey = ref({ coverText: '' })
 const secretMessage = ref('')
 const encodedInput = ref('')
-const highlightHiddenBits = ref(false)
 const exportMode = ref<'html' | 'markdown'>('html')
 const copiedNotice = ref('')
 
@@ -200,11 +199,8 @@ const baconDecrypt = (input: string) => {
         <div class="control-group">
           <div class="bacon-preview-header">
             <label class="control-label">Live Preview</label>
-            <button class="cipher-button" type="button" @click="highlightHiddenBits = !highlightHiddenBits">
-              {{ highlightHiddenBits ? 'Normal Preview' : 'Highlight Hidden Bits' }}
-            </button>
           </div>
-          <div class="bacon-preview" :class="{ reveal: highlightHiddenBits }">
+          <div class="bacon-preview">
             <span v-for="(item, idx) in preview" :key="idx" :class="`b-${item.type}`">{{ item.char }}</span>
           </div>
         </div>
@@ -283,11 +279,6 @@ const baconDecrypt = (input: string) => {
   font-weight: 700;
   color: var(--neon-green);
   text-shadow: 0 0 5px var(--neon-green);
-}
-
-.bacon-preview.reveal .b-b {
-  color: var(--neon-magenta);
-  text-shadow: 0 0 8px var(--neon-magenta);
 }
 
 .bacon-inline-error {
