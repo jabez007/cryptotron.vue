@@ -238,6 +238,8 @@ const baconDecrypt = (input: string) => {
 </template>
 
 <style scoped>
+@import '@/assets/cipher-card.css';
+
 .bacon-practice-stack {
   display: grid;
   gap: 1.25rem;
@@ -258,33 +260,6 @@ const baconDecrypt = (input: string) => {
   flex-wrap: wrap;
 }
 
-.bacon-export-actions .cipher-button {
-  background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
-  border: 1px solid var(--neon-cyan);
-  border-radius: 6px;
-  padding: 0.75rem 1.5rem;
-  color: var(--cryptotron-text-primary);
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.bacon-export-actions .cipher-button:hover {
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-  transform: translateY(-2px);
-}
-
-.bacon-export-actions .cipher-button:active {
-  transform: translateY(0);
-}
-
-.bacon-export-actions .cipher-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 
 .bacon-preview {
   border: 1px solid var(--cryptotron-border-glow);
