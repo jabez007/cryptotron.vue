@@ -179,6 +179,10 @@ const props = defineProps({
     type: Function,
     required: false,
   },
+  normalModeKeyHandler: {
+    type: Function,
+    required: false,
+  },
 })
 
 const emit = defineEmits<{
@@ -325,6 +329,12 @@ const handleKeydown = (e: KeyboardEvent) => {
         break
       case 'y':
         yankOutput()
+        break
+      default:
+        if (props.normalModeKeyHandler) {
+          const handled = props.normalModeKeyHandler(key, cipherActiveTab.value)
+          if (handled) e.preventDefault()
+        }
         break
     }
   }

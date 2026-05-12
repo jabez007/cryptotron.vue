@@ -75,6 +75,14 @@ const copyActiveExport = async () => {
   }
 }
 
+const handleBaconNormalModeKey = (key: string, activeTab: string) => {
+  if (activeTab !== 'encrypt') return false
+  if (key !== 'm') return false
+
+  exportMode.value = exportMode.value === 'html' ? 'markdown' : 'html'
+  return true
+}
+
 const baconEncrypt = (input: string) => {
   secretMessage.value = input
   return activeExport.value
@@ -92,6 +100,7 @@ const baconDecrypt = (input: string) => {
     :encrypt-algorithm="() => baconEncrypt"
     :decrypt-algorithm="() => baconDecrypt"
     :encrypt-output-override="() => activeExport"
+    :normal-mode-key-handler="handleBaconNormalModeKey"
     v-model:cipher-key="baconCoverKey"
   >
     <template #theory>
@@ -215,7 +224,7 @@ const baconDecrypt = (input: string) => {
                 type="button"
                 @click="exportMode = exportMode === 'html' ? 'markdown' : 'html'"
               >
-                {{ exportMode === 'html' ? 'Switch to Markdown' : 'Switch to HTML' }}
+                {{ exportMode === 'html' ? 'Switch to Markdown (m)' : 'Switch to HTML (m)' }}
               </button>
               <button class="cipher-button bacon-secondary-button" type="button" @click="copyActiveExport">
                 Copy {{ exportMode.toUpperCase() }}
