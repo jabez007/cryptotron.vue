@@ -67,6 +67,7 @@
             <div class="control-group">
               <label class="control-label">Input Text:</label>
               <textarea
+                ref="encryptInputField"
                 v-model="encryptInput"
                 placeholder="Enter text to encrypt..."
                 class="cipher-textarea"
@@ -103,6 +104,7 @@
             <div class="control-group">
               <label class="control-label">Input Text:</label>
               <textarea
+                ref="decryptInputField"
                 v-model="decryptInput"
                 placeholder="Enter text to decrypt..."
                 class="cipher-textarea"
@@ -194,6 +196,8 @@ const root = ref<HTMLElement | null>(null)
 const theoryPanel = ref<HTMLElement | null>(null)
 const encryptPanel = ref<HTMLElement | null>(null)
 const decryptPanel = ref<HTMLElement | null>(null)
+const encryptInputField = ref<HTMLTextAreaElement | null>(null)
+const decryptInputField = ref<HTMLTextAreaElement | null>(null)
 
 const getPanel = (tabId: string) => {
   if (tabId === 'theory') return theoryPanel.value
@@ -283,13 +287,13 @@ const handleKeydown = (e: KeyboardEvent) => {
   if (!isInsertMode.value) {
     switch (key) {
       case 'i': {
-        const panel = getPanel(cipherActiveTab.value)
-        const textarea = panel?.querySelector('textarea') as HTMLTextAreaElement
-        if (textarea) {
+        const target =
+          cipherActiveTab.value === 'encrypt' ? encryptInputField.value : decryptInputField.value
+        if (target) {
           e.preventDefault()
           isInsertMode.value = true
           isKeyMode.value = false
-          setTimeout(() => textarea.focus(), 0)
+          setTimeout(() => target.focus(), 0)
         }
         break
       }

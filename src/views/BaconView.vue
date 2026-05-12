@@ -194,7 +194,7 @@ const baconDecrypt = (input: string) => {
         <textarea
           v-model="coverText"
           rows="6"
-          class="cipher-textarea"
+          class="cipher-textarea cipher-input"
           placeholder="Enter the visible carrier text..."
         />
       </div>
