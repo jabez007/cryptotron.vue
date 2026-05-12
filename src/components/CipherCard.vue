@@ -175,6 +175,10 @@ const props = defineProps({
     type: Function,
     required: false,
   },
+  encryptOutputOverride: {
+    type: Function,
+    required: false,
+  },
 })
 
 const emit = defineEmits<{
@@ -393,7 +397,11 @@ const showYankedTooltip = ref(false)
 let crackTimer: ReturnType<typeof setTimeout> | null = null
 
 const yankOutput = () => {
-  const output = cipherActiveTab.value === 'encrypt' ? encryptOutput.value : decryptOutput.value
+  const overriddenEncryptOutput = props.encryptOutputOverride?.()
+  const output =
+    cipherActiveTab.value === 'encrypt'
+      ? (overriddenEncryptOutput ?? encryptOutput.value)
+      : decryptOutput.value
   if (!output) return
 
   navigator.clipboard

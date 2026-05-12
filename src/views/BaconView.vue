@@ -91,6 +91,7 @@ const baconDecrypt = (input: string) => {
     title="Bacon's Cipher"
     :encrypt-algorithm="() => baconEncrypt"
     :decrypt-algorithm="() => baconDecrypt"
+    :encrypt-output-override="() => activeExport"
     v-model:cipher-key="baconCoverKey"
   >
     <template #theory>
