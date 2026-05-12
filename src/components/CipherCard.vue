@@ -246,8 +246,8 @@ const isKeyMode = ref(false)
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.defaultPrevented) return
 
-  // Ignore shortcuts if Ctrl, Meta (Cmd), or Alt are pressed
-  if (e.ctrlKey || e.metaKey || e.altKey) return
+  // Ignore shortcuts if any modifier key is pressed
+  if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
 
   const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)
   const isKeyInput = (e.target as HTMLElement).classList.contains('cipher-input')
