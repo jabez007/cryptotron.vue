@@ -7,7 +7,7 @@ const baconCipherKey = ref({})
 const baconCoverKey = ref({ coverText: '' })
 const secretMessage = ref('')
 const encodedInput = ref('')
-const revealMode = ref(false)
+const highlightHiddenBits = ref(false)
 const exportMode = ref<'html' | 'markdown'>('html')
 const copiedNotice = ref('')
 
@@ -200,11 +200,11 @@ const baconDecrypt = (input: string) => {
         <div class="control-group">
           <div class="bacon-preview-header">
             <label class="control-label">Live Preview</label>
-            <button class="cipher-button bacon-secondary-button" type="button" @click="revealMode = !revealMode">
-              {{ revealMode ? 'Hide Reveal' : 'Reveal Bits' }}
+            <button class="cipher-button" type="button" @click="highlightHiddenBits = !highlightHiddenBits">
+              {{ highlightHiddenBits ? 'Normal Preview' : 'Highlight Hidden Bits' }}
             </button>
           </div>
-          <div class="bacon-preview" :class="{ reveal: revealMode }">
+          <div class="bacon-preview" :class="{ reveal: highlightHiddenBits }">
             <span v-for="(item, idx) in preview" :key="idx" :class="`b-${item.type}`">{{ item.char }}</span>
           </div>
         </div>
@@ -229,10 +229,6 @@ const baconDecrypt = (input: string) => {
           <textarea :value="activeExport" rows="8" class="cipher-textarea" readonly />
         </div>
 
-        <div class="control-group">
-          <label class="control-label">Decoded Secret Preview</label>
-          <textarea :value="extracted" rows="3" class="cipher-textarea" readonly />
-        </div>
       </div>
     </template>
 
@@ -264,10 +260,6 @@ const baconDecrypt = (input: string) => {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
-}
-
-.bacon-secondary-button {
-  padding: 0.6rem 1rem;
 }
 
 .bacon-preview {
