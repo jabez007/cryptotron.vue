@@ -26,8 +26,8 @@ const preview = computed<StyledChar[]>(() => {
   } catch (error) {
     console.error('Bacon encoder preview failed', {
       error,
-      secretMessage: secretMessage.value,
-      coverText: coverText.value,
+      secretLength: secretMessage.value.length,
+      coverLength: coverText.value.length,
     })
     return [...coverText.value].map((char) => ({ char, type: 'a' as const }))
   }
@@ -47,7 +47,7 @@ const extracted = computed(() => {
   } catch (error) {
     console.error('Bacon decoder extraction failed', {
       error,
-      encodedInput: encodedInput.value,
+      inputLength: encodedInput.value.length,
     })
     return ''
   }

@@ -289,7 +289,11 @@ const handleKeydown = (e: KeyboardEvent) => {
     switch (key) {
       case 'i': {
         const target =
-          cipherActiveTab.value === 'encrypt' ? encryptInputField.value : decryptInputField.value
+          cipherActiveTab.value === 'encrypt'
+            ? encryptInputField.value
+            : cipherActiveTab.value === 'decrypt'
+              ? decryptInputField.value
+              : null
         if (target) {
           e.preventDefault()
           isInsertMode.value = true

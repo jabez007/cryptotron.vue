@@ -52,6 +52,8 @@ export const toMarkdown = (styled: StyledChar[]): string =>
 
 export const baconDecoder = (styledInput: string): string => {
   const normalized = styledInput
+    .replace(/<\s*style\b[^>]*>[\s\S]*?<\s*\/\s*style>/gim, '')
+    .replace(/<\s*script\b[^>]*>[\s\S]*?<\s*\/\s*script>/gim, '')
     .replace(/\*\*([^*]+)\*\*/g, (_, inner: string) => `[[B]]${inner}[[/B]]`)
     .replace(/<\s*strong\b[^>]*>(.*?)<\s*\/\s*strong>/gim, '[[B]]$1[[/B]]')
     .replace(/<\s*b\b[^>]*>(.*?)<\s*\/\s*b>/gim, '[[B]]$1[[/B]]')
