@@ -29,7 +29,7 @@ const preview = computed<StyledChar[]>(() => {
       secretLength: secretMessage.value.length,
       coverLength: coverText.value.length,
     })
-    return [...coverText.value].map((char) => ({ char, type: 'a' as const }))
+    return [...coverText.value].map((char) => ({ char, type: 'a' as const, carriesBit: false }))
   }
 })
 

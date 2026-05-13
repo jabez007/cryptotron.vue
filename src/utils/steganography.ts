@@ -5,6 +5,7 @@ export type BaconType = 'a' | 'b'
 export interface StyledChar {
   char: string
   type: BaconType
+  carriesBit: boolean
 }
 
 const encodeChar = (char: string): string => {
@@ -30,38 +31,56 @@ export const baconEncoder = (secret: string, cover: string): StyledChar[] => {
   let bitIndex = 0
   return [...cover].map((char) => {
     if (!/[A-Za-z]/.test(char) || bitIndex >= bits.length) {
-      return { char, type: 'a' }
+      return { char, type: 'a', carriesBit: false }
     }
 
     const type = bits[bitIndex] as BaconType
     bitIndex += 1
-    return { char, type }
+    return { char, type, carriesBit: true }
   })
 }
 
 export const toHtmlSnippet = (styled: StyledChar[]): string => {
+  const carrierCount = styled.filter(({ carriesBit }) => carriesBit).length
   const spans = styled
-    .map(({ char, type }) => `<span class="b-${type}">${escapeHtml(char)}</span>`)
+    .map(({ char, type, carriesBit }) =>
+      carriesBit
+        ? `<span class="b-${type}">${escapeHtml(char)}</span>`
+        : `<span class="b-n">${escapeHtml(char)}</span>`,
+    )
     .join('')
 
-  return `<style>\n.b-a{font-weight:400;color:#e5e7eb;}\n.b-b{font-weight:700;color:#00ff41;text-shadow:0 0 5px #00ff41;}\n</style>\n<p>${spans}</p>`
+  return `<style>\n.b-a{font-weight:400;color:#e5e7eb;}\n.b-b{font-weight:700;color:#00ff41;text-shadow:0 0 5px #00ff41;}\n.b-n{font-weight:400;color:#e5e7eb;}\n</style>\n<p data-bacon-carriers="${carrierCount}">${spans}</p>`
 }
 
-export const toMarkdown = (styled: StyledChar[]): string =>
-  styled.map(({ char, type }) => (type === 'b' ? `**${char}**` : char)).join('')
+export const toMarkdown = (styled: StyledChar[]): string => {
+  const carrierCount = styled.filter(({ carriesBit }) => carriesBit).length
+  const markdownBody = styled.map(({ char, type }) => (type === 'b' ? `**${char}**` : char)).join('')
+  return `<!--BACON:CARRIERS=${carrierCount}-->\n${markdownBody}`
+}
 
 export const baconDecoder = (styledInput: string): string => {
-  const normalized = styledInput
-    .replace(/<\s*style\b[^>]*>[\s\S]*?<\s*\/\s*style>/gim, '')
-    .replace(/<\s*script\b[^>]*>[\s\S]*?<\s*\/\s*script>/gim, '')
-    .replace(/\*\*([^*]+)\*\*/g, (_, inner: string) => `[[B]]${inner}[[/B]]`)
-    .replace(/<\s*strong\b[^>]*>(.*?)<\s*\/\s*strong>/gim, '[[B]]$1[[/B]]')
-    .replace(/<\s*b\b[^>]*>(.*?)<\s*\/\s*b>/gim, '[[B]]$1[[/B]]')
-    .replace(/<\s*span\b[^>]*class=["'][^"']*b-b[^"']*["'][^>]*>(.*?)<\s*\/\s*span>/gim, '[[B]]$1[[/B]]')
-    .replace(/<[^>]+>/g, '')
+  const carrierCountMatch =
+    styledInput.match(/data-bacon-carriers=["'](\d+)["']/i) ?? styledInput.match(/<!--\s*BACON:CARRIERS=(\d+)\s*-->/i)
+  const carrierCount = carrierCountMatch ? Number.parseInt(carrierCountMatch[1], 10) : null
+
+  const normalized = decodeHtmlEntities(
+    styledInput
+      .replace(/<\s*style\b[^>]*>[\s\S]*?<\s*\/\s*style>/gim, '')
+      .replace(/<\s*script\b[^>]*>[\s\S]*?<\s*\/\s*script>/gim, '')
+      .replace(/\*\*([^*]+)\*\*/g, (_, inner: string) => `[[B]]${inner}[[/B]]`)
+      .replace(/<\s*strong\b[^>]*>(.*?)<\s*\/\s*strong>/gim, '[[B]]$1[[/B]]')
+      .replace(/<\s*b\b[^>]*>(.*?)<\s*\/\s*b>/gim, '[[B]]$1[[/B]]')
+      .replace(/<\s*span\b[^>]*class=["'][^"']*b-b[^"']*["'][^>]*>(.*?)<\s*\/\s*span>/gim, '[[B]]$1[[/B]]')
+      .replace(/<\s*span\b[^>]*class=["'][^"']*b-a[^"']*["'][^>]*>(.*?)<\s*\/\s*span>/gim, '[[A]]$1[[/A]]')
+      .replace(/<\s*span\b[^>]*class=["'][^"']*b-n[^"']*["'][^>]*>(.*?)<\s*\/\s*span>/gim, '$1')
+      .replace(/<[^>]+>/g, ''),
+  )
 
   const bits: BaconType[] = []
   let inBold = false
+  let inExplicitA = false
+  let consumedCarriers = 0
 
   for (let i = 0; i < normalized.length; i += 1) {
     if (normalized.startsWith('[[B]]', i)) {
@@ -74,10 +93,25 @@ export const baconDecoder = (styledInput: string): string => {
       i += 5
       continue
     }
+    if (normalized.startsWith('[[A]]', i)) {
+      inExplicitA = true
+      i += 4
+      continue
+    }
+    if (normalized.startsWith('[[/A]]', i)) {
+      inExplicitA = false
+      i += 5
+      continue
+    }
+
+    if (carrierCount !== null && consumedCarriers >= carrierCount) {
+      continue
+    }
 
     const char = normalized[i]
-    if (/[A-Za-z]/.test(char)) {
+    if (/[A-Za-z]/.test(char) && (inBold || inExplicitA || carrierCount !== null)) {
       bits.push(inBold ? 'b' : 'a')
+      consumedCarriers += 1
     }
   }
 
@@ -88,6 +122,14 @@ export const baconDecoder = (styledInput: string): string => {
 
   return output
 }
+
+const decodeHtmlEntities = (input: string): string =>
+  input
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
 
 const escapeHtml = (input: string): string =>
   input
