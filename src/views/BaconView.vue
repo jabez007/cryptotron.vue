@@ -3,7 +3,6 @@ import CipherCard from '@/components/CipherCard.vue'
 import { computed, ref } from 'vue'
 import { baconDecoder, baconEncoder, toHtmlSnippet, toMarkdown, type StyledChar } from '@/utils/steganography'
 
-const baconCipherKey = ref({})
 const baconCoverKey = ref({ coverText: '' })
 const secretMessage = ref('')
 const encodedInput = ref('')
