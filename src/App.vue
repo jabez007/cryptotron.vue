@@ -132,7 +132,7 @@ const baseMenuItems = [
   { name: 'cryptotron-autokey', label: 'Autokey', category: 'Polyalphabetic Ciphers' },
   { name: 'cryptotron-beaufort', label: 'Beaufort', category: 'Polyalphabetic Ciphers' },
   { name: 'cryptotron-vigenere', label: 'Vigenère', category: 'Polyalphabetic Ciphers' },
-  { name: 'cryptotron-bacon', label: "Bacon's", category: 'Steganography Ciphers' },
+  { name: 'cryptotron-bacon', label: "Bacon's Encoding", category: 'Steganography' },
   { name: 'cryptotron-rail-fence', label: 'Rail-Fence', category: 'Transposition Ciphers' },
   { name: 'cryptotron-columnar', label: 'Columnar', category: 'Transposition Ciphers' },
 ]

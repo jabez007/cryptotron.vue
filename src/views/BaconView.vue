@@ -96,7 +96,7 @@ const baconDecrypt = (input: string) => {
 
 <template>
   <CipherCard
-    title="Bacon's Cipher"
+    title="Bacon's Encoding"
     :encrypt-algorithm="() => baconEncrypt"
     :decrypt-algorithm="() => baconDecrypt"
     :encrypt-output-override="() => activeExport"
@@ -106,7 +106,7 @@ const baconDecrypt = (input: string) => {
     <template #theory>
       <h3>The Origin Story</h3>
       <p>
-        <strong>Bacon's Cipher</strong> is a steganographic system attributed to Francis Bacon in the
+        <strong>Bacon's Encoding</strong> is a steganographic system attributed to Francis Bacon in the
         early 1600s. Instead of disguising a message by shifting or scrambling letters, it hides the
         payload inside an innocent-looking cover text by giving letters one of two visual styles.
       </p>
@@ -175,7 +175,7 @@ const baconDecrypt = (input: string) => {
 
       <h3>Modern Perspective</h3>
       <p>
-        Bacon's Cipher is a good lesson in the difference between <strong>encryption</strong> and
+        Bacon's Encoding is a good lesson in the difference between <strong>encryption</strong> and
         <strong>steganography</strong>. The message is not mathematically protected against a curious
         observer who notices the pattern; instead, the goal is to avoid attracting attention in the
         first place.
