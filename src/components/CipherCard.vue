@@ -152,6 +152,7 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import type { PropType } from 'vue'
 import CipherOutput from './CipherOutput.vue'
 import ScanLine from './ScanLine.vue'
 import CyberIcon from './icons/CyberIcon.vue'
@@ -178,11 +179,11 @@ const props = defineProps({
     required: false,
   },
   encryptOutputOverride: {
-    type: Function,
+    type: Function as PropType<(() => string) | undefined>,
     required: false,
   },
   normalModeKeyHandler: {
-    type: Function,
+    type: Function as PropType<((key: string, activeTab: string) => boolean) | undefined>,
     required: false,
   },
 })

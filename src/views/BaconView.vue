@@ -83,11 +83,19 @@ const handleBaconNormalModeKey = (key: string, activeTab: string) => {
   return true
 }
 
+/**
+ * Adapter used by CipherCard: mutates reactive state, then returns a computed value.
+ * This relies on Vue's synchronous ref updates; use pure encoder/decoder helpers for non-mutating transforms.
+ */
 const baconEncrypt = (input: string) => {
   secretMessage.value = input
   return activeExport.value
 }
 
+/**
+ * Adapter used by CipherCard: mutates reactive state, then returns a computed value.
+ * This relies on Vue's synchronous ref updates; use pure encoder/decoder helpers for non-mutating transforms.
+ */
 const baconDecrypt = (input: string) => {
   encodedInput.value = input
   return extracted.value
