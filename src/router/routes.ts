@@ -72,5 +72,10 @@ export default (parentRouteName?: string) => {
       path: `${rootPath}bacon`,
       component: () => import('@/views/BaconView.vue'),
     },
+    {
+      name: 'cryptotron-invisible-tags',
+      path: `${rootPath}invisible-tags`,
+      component: () => import('@/views/InvisibleTagsView.vue'),
+    },
   ]
 }

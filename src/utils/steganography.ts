@@ -142,3 +142,45 @@ const escapeHtml = (input: string): string =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')
+
+const TAG_OFFSET = 0xe0000
+const TAG_MIN = 0xe0020
+const TAG_MAX = 0xe007e
+
+export const tagsEncoder = (secret: string, cover: string): string => {
+  let invisible = ''
+  for (const char of secret) {
+    const cp = char.codePointAt(0)
+    if (cp !== undefined && cp >= 0x20 && cp <= 0x7e) {
+      invisible += String.fromCodePoint(cp + TAG_OFFSET)
+    }
+  }
+  return `${cover}${invisible}`
+}
+
+export const tagsDecoder = (encodedText: string): string => {
+  let secret = ''
+  for (const char of encodedText) {
+    const cp = char.codePointAt(0)
+    if (cp !== undefined && cp >= TAG_MIN && cp <= TAG_MAX) {
+      secret += String.fromCodePoint(cp - TAG_OFFSET)
+    }
+  }
+  return secret
+}
+
+export const stripTagsPayload = (encodedText: string): string => {
+  let cover = ''
+  for (const char of encodedText) {
+    const cp = char.codePointAt(0)
+    if (cp === undefined || cp < TAG_MIN || cp > TAG_MAX) {
+      cover += char
+    }
+  }
+  return cover
+}
+
+export const splitTagsMessage = (encodedText: string): { cover: string; secret: string } => ({
+  cover: stripTagsPayload(encodedText),
+  secret: tagsDecoder(encodedText),
+})
