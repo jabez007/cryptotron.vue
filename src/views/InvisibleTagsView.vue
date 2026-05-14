@@ -19,7 +19,22 @@ const coverText = computed({
 const secretMessage = ref('')
 const encodedInput = ref('')
 
-const encodedOutput = computed(() => tagsEncoder(secretMessage.value, coverText.value))
+const encodeResult = computed(() => {
+  try {
+    return {
+      encoded: tagsEncoder(secretMessage.value, coverText.value),
+      warning: '',
+    }
+  } catch (error) {
+    return {
+      encoded: coverText.value,
+      warning: error instanceof Error ? error.message : 'Unsupported characters detected.',
+    }
+  }
+})
+
+const encodedOutput = computed(() => encodeResult.value.encoded)
+const encodingWarning = computed(() => encodeResult.value.warning)
 const meter = computed(() => `${encodedOutput.value.length} / 2000`)
 
 const extracted = computed(() => tagsDecoder(encodedInput.value))
@@ -34,8 +49,6 @@ const handleNormalModeKey = (key: string, activeTab: string) => {
     revealMode.value = !revealMode.value
     return true
   }
-  if (key === 'e') return false
-  if (key === 'd') return false
   return false
 }
 
@@ -98,6 +111,9 @@ const tagsDecrypt = (input: string) => {
         <div class="control-group">
           <label class="control-label">Payload Meter</label>
           <p class="tags-meter">Total Characters: {{ meter }}</p>
+          <p v-if="encodingWarning" class="status-error tags-warning">
+            <span>{{ encodingWarning }}</span>
+          </p>
         </div>
 
         <div class="control-group">
@@ -149,11 +165,16 @@ const tagsDecrypt = (input: string) => {
 }
 
 .tags-hint,
-.tags-meter {
+.tags-meter,
+.tags-warning {
   margin-top: 0.5rem;
   font-size: 0.85rem;
   color: var(--text-secondary);
   font-family: 'Space Mono', monospace;
+}
+
+.tags-warning {
+  margin-bottom: 0;
 }
 
 .tags-hint code {

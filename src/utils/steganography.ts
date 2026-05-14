@@ -148,13 +148,26 @@ const TAG_MIN = 0xe0020
 const TAG_MAX = 0xe007e
 
 export const tagsEncoder = (secret: string, cover: string): string => {
+  const unsupported: string[] = []
   let invisible = ''
+
   for (const char of secret) {
     const cp = char.codePointAt(0)
     if (cp !== undefined && cp >= 0x20 && cp <= 0x7e) {
       invisible += String.fromCodePoint(cp + TAG_OFFSET)
+    } else if (cp !== undefined) {
+      unsupported.push(char)
     }
   }
+
+  if (unsupported.length > 0) {
+    const uniqueUnsupported = [...new Set(unsupported)].slice(0, 8)
+    const suffix = unsupported.length > uniqueUnsupported.length ? ', ...' : ''
+    throw new Error(
+      `Invisible Tags supports printable ASCII only (U+0020-U+007E). Unsupported characters: ${uniqueUnsupported.join(' ')}${suffix}`,
+    )
+  }
+
   return `${cover}${invisible}`
 }
 
