@@ -149,15 +149,20 @@ const TAG_MAX = 0xe007e
 const ALT_TAG_OFFSET = 0xe00f0
 const ALT_TAG_MIN = 0xe0110
 const ALT_TAG_MAX = 0xe016e
+const ZW_ZERO = '\u200c'
+const ZW_ONE = '\u200d'
+const ZW_SEP = '\u200b'
 
-export const tagsEncoder = (secret: string, cover: string): string => {
+export type InvisibleEncodingMode = 'tags' | 'zero-width-binary'
+
+export const tagsEncoder = (secret: string, cover: string, mode: InvisibleEncodingMode = 'tags'): string => {
   const unsupported: string[] = []
-  let invisible = ''
+  const asciiCodes: number[] = []
 
   for (const char of secret) {
     const cp = char.codePointAt(0)
     if (cp !== undefined && cp >= 0x20 && cp <= 0x7e) {
-      invisible += String.fromCodePoint(cp + TAG_OFFSET)
+      asciiCodes.push(cp)
     } else if (cp !== undefined) {
       unsupported.push(char)
     }
@@ -171,39 +176,56 @@ export const tagsEncoder = (secret: string, cover: string): string => {
     )
   }
 
+  if (mode === 'zero-width-binary') {
+    const invisible = asciiCodes
+      .map((cp) => cp.toString(2).padStart(8, '0').replace(/0/g, ZW_ZERO).replace(/1/g, ZW_ONE))
+      .join(ZW_SEP)
+    return `${cover}${invisible}`
+  }
+
+  const invisible = asciiCodes.map((cp) => String.fromCodePoint(cp + TAG_OFFSET)).join('')
   return `${cover}${invisible}`
 }
 
 const decodeZeroWidthBinary = (encodedText: string): string => {
-  const ZERO = '\u200c'
-  const ONE = '\u200d'
-  const SEP = '\u200b'
-
   let bits = ''
   for (const char of encodedText) {
-    if (char === ZERO) bits += '0'
-    else if (char === ONE) bits += '1'
-    else if (char === SEP) bits += ' '
+    if (char === ZW_ZERO) bits += '0'
+    else if (char === ZW_ONE) bits += '1'
+    else if (char === ZW_SEP) bits += ' '
   }
 
   if (!bits.trim()) return ''
 
-  const normalized = bits
+  const decodeChunk = (chunk: string): string => {
+    if (!/^[01]{7,8}$/.test(chunk)) return ''
+    const code = Number.parseInt(chunk, 2)
+    return code >= 0x20 && code <= 0x7e ? String.fromCharCode(code) : ''
+  }
+
+  const tokens = bits
     .trim()
     .replace(/\s+/g, ' ')
     .split(' ')
     .filter((chunk) => chunk.length > 0)
 
-  let output = ''
-  for (const chunk of normalized) {
-    if (!/^[01]{7,8}$/.test(chunk)) continue
-    const code = Number.parseInt(chunk, 2)
-    if (code >= 0x20 && code <= 0x7e) {
-      output += String.fromCharCode(code)
+  let tokenOutput = ''
+  for (const token of tokens) tokenOutput += decodeChunk(token)
+  if (tokenOutput.length > 0) return tokenOutput
+
+  const compact = bits.replace(/\s+/g, '')
+  const tryFixedWidth = (width: 8 | 7): string => {
+    if (compact.length < width || compact.length % width !== 0) return ''
+    let out = ''
+    for (let i = 0; i < compact.length; i += width) {
+      const code = Number.parseInt(compact.slice(i, i + width), 2)
+      if (code < 0x20 || code > 0x7e) return ''
+      out += String.fromCharCode(code)
     }
+    return out
   }
 
-  return output
+  return tryFixedWidth(8) || tryFixedWidth(7)
 }
 
 export const tagsDecoder = (encodedText: string): string => {
@@ -238,7 +260,8 @@ export const stripTagsPayload = (encodedText: string): string => {
 
     const isPrimaryTag = cp >= TAG_MIN && cp <= TAG_MAX
     const isAltTag = cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX
-    if (!isPrimaryTag && !isAltTag) {
+    const isZeroWidthPayload = char === ZW_ZERO || char === ZW_ONE || char === ZW_SEP
+    if (!isPrimaryTag && !isAltTag && !isZeroWidthPayload) {
       cover += char
     }
   }

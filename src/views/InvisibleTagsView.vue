@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
 import { computed, ref } from 'vue'
-import { tagsDecoder, tagsEncoder } from '@/utils/steganography'
+import { tagsDecoder, tagsEncoder, type InvisibleEncodingMode } from '@/utils/steganography'
 
 const emojiOptions = ['👍', '🤓', '😎', '🫥', '🕵️', '🧠', '🔐', '🛰️']
 const tagsKey = ref({ coverText: '👍' })
 const revealMode = ref(false)
+const encodingMode = ref<InvisibleEncodingMode>('tags')
 
 const coverText = computed({
   get: () => tagsKey.value.coverText ?? '',
@@ -23,7 +24,7 @@ const encodedInput = ref('')
 const encodeResult = computed(() => {
   try {
     return {
-      encoded: tagsEncoder(secretMessage.value, coverText.value),
+      encoded: tagsEncoder(secretMessage.value, coverText.value, encodingMode.value),
       warning: '',
     }
   } catch (error) {
@@ -89,37 +90,81 @@ const tagsDecrypt = (input: string) => {
     <template #theory>
       <h3>Invisible Text Tradecraft: How This Works</h3>
       <p>
-        Invisible Tags hides text by converting printable ASCII into Unicode tag code points and
-        appending them after visible carrier text (often emojis). Most apps render those tag
-        code points invisibly, so the message appears normal at a glance.
+        Invisible text steganography works by carrying a second message inside characters that are
+        either non-rendering (zero-width code points) or rendered in ways humans usually ignore.
+        In this view, the visible carrier is typically an emoji string, but the hidden payload is
+        appended behind it.
       </p>
       <p>
-        This module now supports extraction from two families seen in the wild:
+        In operational terms, this is useful for analysts because it allows hidden instructions,
+        command fragments, or social-engineering bait to move through everyday chat channels while
+        appearing harmless. The payload can survive screenshots and casual moderation, then only
+        appears when someone inspects code points directly.
       </p>
+      <h4>Encoding Families You’ll See</h4>
       <ul>
-        <li><strong>Unicode Tags payloads</strong> (the standard Invisible Tags approach)</li>
-        <li><strong>Zero-width binary payloads</strong> that use invisible joiners/separators</li>
+        <li><strong>Unicode Tags payloads:</strong> printable ASCII shifted into tag ranges.</li>
+        <li><strong>Zero-width binary payloads:</strong> bits encoded with ZWNJ/ZWJ and separators.</li>
       </ul>
       <p>
-        Why this matters: different platforms, keyboards, and tooling often produce different
-        invisible encodings. Broad extraction support improves recovery when users paste messages
-        from mixed sources.
+        This view now lets you <strong>encode</strong> using either family and attempts to
+        <strong>decode</strong> both automatically, so mixed-source samples from different
+        platforms can be recovered in one place.
+      </p>
+      <h4>Why Cross-Platform Handling Matters</h4>
+      <p>
+        Different apps normalize text differently. Some preserve Unicode tag ranges but collapse
+        zero-width separators. Others strip tag ranges while keeping joiners. Even keyboard
+        behavior, copy/paste paths, and cloud sanitizers can mutate payload structure. A decoder
+        that assumes one strict format will miss real-world samples.
       </p>
       <p>
-        Practical constraints:
+        In practice, you should expect partial corruption. If output looks wrong, compare character
+        counts, inspect for dropped separators, and test both decoding assumptions before discarding
+        a lead.
       </p>
+      <h4>Threat-Model Notes</h4>
       <ul>
-        <li>Encoding is ASCII-only for predictable cross-platform results</li>
-        <li>Some platforms strip or normalize invisible code points</li>
-        <li>Copy/paste and moderation pipelines may silently alter payloads</li>
+        <li>Hidden payloads are great for low-noise signaling in public channels.</li>
+        <li>Detection often fails when teams inspect rendered text only.</li>
+        <li>Automated scanners may miss payloads if they tokenize on visible graphemes.</li>
+        <li>Defenders should normalize and diff raw code points, not just visible strings.</li>
       </ul>
+      <h4>Mini Lab Workflow (5–8 min)</h4>
+      <ol>
+        <li>Pick a carrier emoji and write a short secret.</li>
+        <li>Encode once with <em>Unicode Tags</em>, then with <em>Zero-width Binary</em>.</li>
+        <li>Paste both outputs into another app and copy them back.</li>
+        <li>Decode both and compare what survived.</li>
+        <li>Observe whether platform transfer modified separators or tag ranges.</li>
+      </ol>
       <p>
-        Analyst workflow: capture raw text, decode invisibles, verify recovered plaintext, and
-        compare against carrier-visible text for tampering clues.
+        Reference reading:
+        <a
+          href="https://sosintel.co.uk/emoji-smuggling-hiding-malicious-code-in-plain-sight/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Emoji Smuggling: Hiding Malicious Code in Plain Sight
+        </a>
       </p>
     </template>
 
     <template #cipherKey>
+      <div class="control-group">
+        <label class="control-label">Encoding Mode</label>
+        <div class="mode-picker">
+          <label class="mode-option">
+            <input v-model="encodingMode" type="radio" value="tags" />
+            Unicode Tags
+          </label>
+          <label class="mode-option">
+            <input v-model="encodingMode" type="radio" value="zero-width-binary" />
+            Zero-width Binary
+          </label>
+        </div>
+      </div>
+
       <div class="control-group">
         <label class="control-label">Carrier Emoji / Cover Text</label>
         <div class="emoji-picker">
@@ -228,6 +273,20 @@ const tagsDecrypt = (input: string) => {
 
 .tags-hint code {
   color: var(--neon-green);
+}
+
+.mode-picker {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.mode-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: 'Space Mono', monospace;
+  color: var(--cryptotron-text-primary);
 }
 
 .emoji-picker {
