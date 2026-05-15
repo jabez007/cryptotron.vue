@@ -146,6 +146,9 @@ const escapeHtml = (input: string): string =>
 const TAG_OFFSET = 0xe0000
 const TAG_MIN = 0xe0020
 const TAG_MAX = 0xe007e
+const ALT_TAG_OFFSET = 0xe00f0
+const ALT_TAG_MIN = 0xe0110
+const ALT_TAG_MAX = 0xe016e
 
 export const tagsEncoder = (secret: string, cover: string): string => {
   const unsupported: string[] = []
@@ -207,8 +210,15 @@ export const tagsDecoder = (encodedText: string): string => {
   let secret = ''
   for (const char of encodedText) {
     const cp = char.codePointAt(0)
-    if (cp !== undefined && cp >= TAG_MIN && cp <= TAG_MAX) {
+    if (cp === undefined) continue
+
+    if (cp >= TAG_MIN && cp <= TAG_MAX) {
       secret += String.fromCodePoint(cp - TAG_OFFSET)
+      continue
+    }
+
+    if (cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) {
+      secret += String.fromCodePoint(cp - ALT_TAG_OFFSET)
     }
   }
 
@@ -220,7 +230,14 @@ export const stripTagsPayload = (encodedText: string): string => {
   let cover = ''
   for (const char of encodedText) {
     const cp = char.codePointAt(0)
-    if (cp === undefined || cp < TAG_MIN || cp > TAG_MAX) {
+    if (cp === undefined) {
+      cover += char
+      continue
+    }
+
+    const isPrimaryTag = cp >= TAG_MIN && cp <= TAG_MAX
+    const isAltTag = cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX
+    if (!isPrimaryTag && !isAltTag) {
       cover += char
     }
   }
