@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
 import { computed, ref } from 'vue'
-import { tagsDecoder, tagsEncoder, type InvisibleEncodingMode } from '@/utils/steganography'
+import { detectTagsPayloadFormat, tagsDecoder, tagsEncoder, type InvisibleEncodingMode } from '@/utils/steganography'
 
 const emojiOptions = ['👍', '🤓', '😎', '🫥', '🕵️', '🧠', '🔐', '🛰️']
 const tagsKey = ref({ coverText: '👍' })
@@ -40,6 +40,7 @@ const encodingWarning = computed(() => encodeResult.value.warning)
 const meter = computed(() => `${encodedOutput.value.length} / 2000`)
 
 const extracted = computed(() => tagsDecoder(encodedInput.value))
+const detectedFormat = computed(() => detectTagsPayloadFormat(encodedInput.value))
 
 const revealText = computed(() =>
   revealMode.value ? `${coverText.value}\n\n[REVEALED]\n${secretMessage.value}` : coverText.value,
@@ -238,6 +239,7 @@ const tagsDecrypt = (input: string) => {
       <div class="tags-stack">
         <div class="control-group">
           <label class="control-label">Recovered Secret</label>
+          <p class="tags-hint">Auto-detected format: <strong>{{ detectedFormat }}</strong></p>
           <textarea :value="extracted" rows="4" class="cipher-textarea" readonly />
         </div>
       </div>

@@ -272,6 +272,30 @@ const decodeZeroWidthBinary = (encodedText: string): string => {
   return tryFixedWidth(8) || tryFixedWidth(7)
 }
 
+export const detectTagsPayloadFormat = (encodedText: string): string => {
+  let hasPrimary = false
+  let hasAlt = false
+
+  for (const char of encodedText) {
+    const cp = char.codePointAt(0)
+    if (cp === undefined) continue
+    if (cp >= TAG_MIN && cp <= TAG_MAX) hasPrimary = true
+    if (cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) hasAlt = true
+  }
+
+  if (hasPrimary && hasAlt) return 'Unicode Tags + Alt Tags'
+  if (hasPrimary) return 'Unicode Tags'
+  if (hasAlt) return 'Alt Tags'
+
+  const variationSecret = decodeVariationSelectors(encodedText)
+  if (variationSecret.length > 0) return 'Variation Selectors (UTF-8 bytes)'
+
+  const zeroWidthSecret = decodeZeroWidthBinary(encodedText)
+  if (zeroWidthSecret.length > 0) return 'Zero-width Binary'
+
+  return 'No hidden payload detected'
+}
+
 export const tagsDecoder = (encodedText: string): string => {
   let secret = ''
   for (const char of encodedText) {
