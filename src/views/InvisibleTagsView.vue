@@ -45,11 +45,25 @@ const revealText = computed(() =>
   revealMode.value ? `${coverText.value}\n\n[REVEALED]\n${secretMessage.value}` : coverText.value,
 )
 
+const nextMode = (mode: InvisibleEncodingMode): InvisibleEncodingMode => {
+  if (mode === 'tags') return 'zero-width-binary'
+  if (mode === 'zero-width-binary') return 'variation-selectors'
+  return 'tags'
+}
+
 const handleNormalModeKey = (key: string, activeTab: string) => {
-  if (key === 'r' && activeTab === 'encrypt') {
+  if (activeTab !== 'encrypt') return false
+
+  if (key === 'r') {
     revealMode.value = !revealMode.value
     return true
   }
+
+  if (key === 'm') {
+    encodingMode.value = nextMode(encodingMode.value)
+    return true
+  }
+
   return false
 }
 
@@ -130,23 +144,18 @@ const tagsDecrypt = (input: string) => {
         <li>Automated scanners may miss payloads if they tokenize on visible graphemes.</li>
         <li>Defenders should normalize and diff raw code points, not just visible strings.</li>
       </ul>
-      <h4>Mini Lab Workflow (5–8 min)</h4>
-      <ol>
-        <li>Pick a carrier emoji and write a short secret.</li>
-        <li>Encode once with <em>Unicode Tags</em>, then with <em>Zero-width Binary</em>.</li>
-        <li>Paste both outputs into another app and copy them back.</li>
-        <li>Decode both and compare what survived.</li>
-        <li>Observe whether platform transfer modified separators or tag ranges.</li>
-      </ol>
+      <h4>What the Reference Material Adds</h4>
       <p>
-        Reference reading:
-        <a
-          href="https://sosintel.co.uk/emoji-smuggling-hiding-malicious-code-in-plain-sight/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Emoji Smuggling: Hiding Malicious Code in Plain Sight
-        </a>
+        The emoji-smuggling research highlights a practical defender lesson: payloads are often
+        converted to bytes first, then mapped into invisible selector-like ranges, which means
+        two payloads can look nearly identical but decode differently depending on byte framing.
+        That is why this view now supports three families: direct Unicode Tags, zero-width binary,
+        and UTF-8-byte mapping via variation selectors.
+      </p>
+      <p>
+        It also reinforces that detection should not trust rendered output. Reliable analysis needs
+        code-point inspection, normalization checks after copy/paste, and cross-tool comparison
+        because different platforms sanitize different invisible ranges.
       </p>
     </template>
 
@@ -161,6 +170,10 @@ const tagsDecrypt = (input: string) => {
           <label class="mode-option">
             <input v-model="encodingMode" type="radio" value="zero-width-binary" />
             Zero-width Binary
+          </label>
+          <label class="mode-option">
+            <input v-model="encodingMode" type="radio" value="variation-selectors" />
+            Variation Selectors (UTF-8 bytes)
           </label>
         </div>
       </div>
@@ -203,7 +216,7 @@ const tagsDecrypt = (input: string) => {
         <div class="control-group">
           <label class="control-label">Live Preview</label>
           <div class="tags-preview" :class="{ reveal: revealMode }">{{ revealText }}</div>
-          <p class="tags-hint">Press <code>r</code> in normal mode to toggle reveal.</p>
+          <p class="tags-hint">Press <code>r</code> to toggle reveal, <code>m</code> to switch encoding mode.</p>
         </div>
 
         <div class="control-group">

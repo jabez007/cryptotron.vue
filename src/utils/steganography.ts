@@ -153,7 +153,23 @@ const ZW_ZERO = '\u200c'
 const ZW_ONE = '\u200d'
 const ZW_SEP = '\u200b'
 
-export type InvisibleEncodingMode = 'tags' | 'zero-width-binary'
+export type InvisibleEncodingMode = 'tags' | 'zero-width-binary' | 'variation-selectors'
+
+const VS_OFFSET = 0xfe00
+const VS_MIN = 0xfe00
+const VS_MAX = 0xfe0f
+const VS_SUP_MIN = 0xe0100
+const VS_SUP_MAX = 0xe01ef
+const BYTE_SEP = 0x20
+
+const byteToVariationSelector = (byte: number): string =>
+  byte <= 0x0f ? String.fromCodePoint(VS_OFFSET + byte) : String.fromCodePoint(0xe0100 + (byte - 0x10))
+
+const variationSelectorToByte = (cp: number): number | null => {
+  if (cp >= VS_MIN && cp <= VS_MAX) return cp - VS_OFFSET
+  if (cp >= VS_SUP_MIN && cp <= VS_SUP_MAX) return cp - 0xe0100 + 0x10
+  return null
+}
 
 export const tagsEncoder = (secret: string, cover: string, mode: InvisibleEncodingMode = 'tags'): string => {
   const unsupported: string[] = []
@@ -183,8 +199,36 @@ export const tagsEncoder = (secret: string, cover: string, mode: InvisibleEncodi
     return `${cover}${invisible}`
   }
 
+  if (mode === 'variation-selectors') {
+    const bytes = new TextEncoder().encode(secret)
+    const invisible = [...bytes, BYTE_SEP].map(byteToVariationSelector).join('')
+    return `${cover}${invisible}`
+  }
+
   const invisible = asciiCodes.map((cp) => String.fromCodePoint(cp + TAG_OFFSET)).join('')
   return `${cover}${invisible}`
+}
+
+const decodeVariationSelectors = (encodedText: string): string => {
+  const bytes: number[] = []
+  for (const char of encodedText) {
+    const cp = char.codePointAt(0)
+    if (cp === undefined) continue
+    const byte = variationSelectorToByte(cp)
+    if (byte !== null) bytes.push(byte)
+  }
+
+  if (bytes.length === 0) return ''
+
+  const boundary = bytes.lastIndexOf(BYTE_SEP)
+  const payload = boundary >= 0 ? bytes.slice(0, boundary) : bytes
+  if (payload.length === 0) return ''
+
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(payload))
+  } catch {
+    return ''
+  }
 }
 
 const decodeZeroWidthBinary = (encodedText: string): string => {
@@ -246,6 +290,8 @@ export const tagsDecoder = (encodedText: string): string => {
   }
 
   if (secret.length > 0) return secret
+  const variationSecret = decodeVariationSelectors(encodedText)
+  if (variationSecret.length > 0) return variationSecret
   return decodeZeroWidthBinary(encodedText)
 }
 
@@ -260,8 +306,9 @@ export const stripTagsPayload = (encodedText: string): string => {
 
     const isPrimaryTag = cp >= TAG_MIN && cp <= TAG_MAX
     const isAltTag = cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX
+    const isVariationSelector = (cp >= VS_MIN && cp <= VS_MAX) || (cp >= VS_SUP_MIN && cp <= VS_SUP_MAX)
     const isZeroWidthPayload = char === ZW_ZERO || char === ZW_ONE || char === ZW_SEP
-    if (!isPrimaryTag && !isAltTag && !isZeroWidthPayload) {
+    if (!isPrimaryTag && !isAltTag && !isVariationSelector && !isZeroWidthPayload) {
       cover += char
     }
   }
