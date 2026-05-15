@@ -219,6 +219,7 @@ export const tagsDecoder = (encodedText: string): string => {
 
     if (cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) {
       secret += String.fromCodePoint(cp - ALT_TAG_OFFSET)
+      continue
     }
   }
 
