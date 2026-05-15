@@ -97,7 +97,7 @@
         <div ref="decryptPanel" class="tab-panel">
           <div class="cipher-practice">
             <h2 class="section-title">Decrypt Messages</h2>
-            <div class="control-group">
+            <div v-if="props.showCipherKeyOnDecrypt" class="control-group">
               <slot name="cipherKey"></slot>
             </div>
 
@@ -151,7 +151,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { PropType } from 'vue'
 import CipherOutput from './CipherOutput.vue'
 import ScanLine from './ScanLine.vue'
@@ -184,6 +184,15 @@ const props = defineProps({
   },
   normalModeKeyHandler: {
     type: Function as PropType<((key: string, activeTab: string) => boolean) | undefined>,
+    required: false,
+  },
+  showCipherKeyOnDecrypt: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
+  onEncryptInputChange: {
+    type: Function as PropType<((value: string) => void) | undefined>,
     required: false,
   },
 })
@@ -384,9 +393,14 @@ const encrypt = () => {
 
 const clearEncrypt = () => {
   encryptInput.value = ''
+  props.onEncryptInputChange?.('')
   encryptOutput.value = ''
   encryptError.value = ''
 }
+
+watch(encryptInput, (value) => {
+  props.onEncryptInputChange?.(value)
+})
 
 const decryptInput = ref('')
 const decryptOutput = ref('')

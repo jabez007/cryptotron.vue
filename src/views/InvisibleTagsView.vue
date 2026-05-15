@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
 import { computed, ref } from 'vue'
-import { splitTagsMessage, tagsDecoder, tagsEncoder } from '@/utils/steganography'
+import { tagsDecoder, tagsEncoder } from '@/utils/steganography'
 
+const emojiOptions = ['👍', '🤓', '😎', '🫥', '🕵️', '🧠', '🔐', '🛰️']
 const tagsKey = ref({ coverText: '👍' })
 const revealMode = ref(false)
 
@@ -38,7 +39,6 @@ const encodingWarning = computed(() => encodeResult.value.warning)
 const meter = computed(() => `${encodedOutput.value.length} / 2000`)
 
 const extracted = computed(() => tagsDecoder(encodedInput.value))
-const extractedCover = computed(() => splitTagsMessage(encodedInput.value).cover)
 
 const revealText = computed(() =>
   revealMode.value ? `${coverText.value}\n\n[REVEALED]\n${secretMessage.value}` : coverText.value,
@@ -57,6 +57,18 @@ const tagsEncrypt = (input: string) => {
   return encodedOutput.value
 }
 
+const setSecretMessage = (value: string) => {
+  secretMessage.value = value
+}
+
+const useEmojiCarrier = (emoji: string) => {
+  coverText.value = emoji
+}
+
+const appendEmojiCarrier = (emoji: string) => {
+  coverText.value = `${coverText.value}${emoji}`
+}
+
 const tagsDecrypt = (input: string) => {
   encodedInput.value = input
   return extracted.value
@@ -70,32 +82,73 @@ const tagsDecrypt = (input: string) => {
     :decrypt-algorithm="() => tagsDecrypt"
     :encrypt-output-override="() => encodedOutput"
     :normal-mode-key-handler="handleNormalModeKey"
+    :show-cipher-key-on-decrypt="false"
+    :on-encrypt-input-change="setSecretMessage"
     v-model:cipher-key="tagsKey"
   >
     <template #theory>
-      <h3>Shadow Strings</h3>
+      <h3>Invisible Text Tradecraft: How This Works</h3>
       <p>
-        This module hides printable ASCII characters in the Unicode <code>Tags</code> block. The
-        hidden payload is fully invisible in normal rendering while still preserved in raw text.
+        Invisible Tags hides text by converting printable ASCII into Unicode tag code points and
+        appending them after visible carrier text (often emojis). Most apps render those tag
+        code points invisibly, so the message appears normal at a glance.
       </p>
       <p>
-        Every supported ASCII character (<code>0x20</code> to <code>0x7E</code>) is shifted by
-        <code>0xE0000</code> and appended to the cover text. Extraction reverses the shift.
+        This module now supports extraction from two families seen in the wild:
+      </p>
+      <ul>
+        <li><strong>Unicode Tags payloads</strong> (the standard Invisible Tags approach)</li>
+        <li><strong>Zero-width binary payloads</strong> that use invisible joiners/separators</li>
+      </ul>
+      <p>
+        Why this matters: different platforms, keyboards, and tooling often produce different
+        invisible encodings. Broad extraction support improves recovery when users paste messages
+        from mixed sources.
       </p>
       <p>
-        Some platforms sanitize tag code points. If extraction fails after sharing, the destination
-        may be stripping the payload.
+        Practical constraints:
+      </p>
+      <ul>
+        <li>Encoding is ASCII-only for predictable cross-platform results</li>
+        <li>Some platforms strip or normalize invisible code points</li>
+        <li>Copy/paste and moderation pipelines may silently alter payloads</li>
+      </ul>
+      <p>
+        Analyst workflow: capture raw text, decode invisibles, verify recovered plaintext, and
+        compare against carrier-visible text for tampering clues.
       </p>
     </template>
 
     <template #cipherKey>
       <div class="control-group">
-        <label class="control-label">Cover Text</label>
+        <label class="control-label">Carrier Emoji / Cover Text</label>
+        <div class="emoji-picker">
+          <button
+            v-for="emoji in emojiOptions"
+            :key="emoji"
+            type="button"
+            class="emoji-chip"
+            @click="useEmojiCarrier(emoji)"
+          >
+            {{ emoji }}
+          </button>
+        </div>
+        <div class="emoji-picker">
+          <button
+            v-for="emoji in emojiOptions"
+            :key="`${emoji}-append`"
+            type="button"
+            class="emoji-chip secondary"
+            @click="appendEmojiCarrier(emoji)"
+          >
+            +{{ emoji }}
+          </button>
+        </div>
         <textarea
           v-model="coverText"
-          rows="4"
+          rows="3"
           class="cipher-textarea cipher-input"
-          placeholder="Visible text or emoji carrier..."
+          placeholder="Optional: customize carrier text"
         />
       </div>
     </template>
@@ -125,10 +178,6 @@ const tagsDecrypt = (input: string) => {
 
     <template #decryptOutput>
       <div class="tags-stack">
-        <div class="control-group">
-          <label class="control-label">Recovered Cover Text</label>
-          <textarea :value="extractedCover" rows="3" class="cipher-textarea" readonly />
-        </div>
         <div class="control-group">
           <label class="control-label">Recovered Secret</label>
           <textarea :value="extracted" rows="4" class="cipher-textarea" readonly />
@@ -179,5 +228,25 @@ const tagsDecrypt = (input: string) => {
 
 .tags-hint code {
   color: var(--neon-green);
+}
+
+.emoji-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.emoji-chip {
+  border: 1px solid var(--cryptotron-border-glow);
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--cryptotron-text-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 0.35rem 0.55rem;
+}
+
+.emoji-chip.secondary {
+  opacity: 0.85;
 }
 </style>

@@ -171,6 +171,38 @@ export const tagsEncoder = (secret: string, cover: string): string => {
   return `${cover}${invisible}`
 }
 
+const decodeZeroWidthBinary = (encodedText: string): string => {
+  const ZERO = '\u200c'
+  const ONE = '\u200d'
+  const SEP = '\u200b'
+
+  let bits = ''
+  for (const char of encodedText) {
+    if (char === ZERO) bits += '0'
+    else if (char === ONE) bits += '1'
+    else if (char === SEP) bits += ' '
+  }
+
+  if (!bits.trim()) return ''
+
+  const normalized = bits
+    .trim()
+    .replace(/\s+/g, ' ')
+    .split(' ')
+    .filter((chunk) => chunk.length > 0)
+
+  let output = ''
+  for (const chunk of normalized) {
+    if (!/^[01]{7,8}$/.test(chunk)) continue
+    const code = Number.parseInt(chunk, 2)
+    if (code >= 0x20 && code <= 0x7e) {
+      output += String.fromCharCode(code)
+    }
+  }
+
+  return output
+}
+
 export const tagsDecoder = (encodedText: string): string => {
   let secret = ''
   for (const char of encodedText) {
@@ -179,7 +211,9 @@ export const tagsDecoder = (encodedText: string): string => {
       secret += String.fromCodePoint(cp - TAG_OFFSET)
     }
   }
-  return secret
+
+  if (secret.length > 0) return secret
+  return decodeZeroWidthBinary(encodedText)
 }
 
 export const stripTagsPayload = (encodedText: string): string => {
