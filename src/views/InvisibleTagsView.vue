@@ -6,7 +6,7 @@ import { detectTagsPayloadFormat, tagsDecoder, tagsEncoder, type InvisibleEncodi
 const emojiOptions = ['👍', '🤓', '😎', '🫥', '🕵️', '🧠', '🔐', '🛰️']
 const tagsKey = ref({ coverText: '👍' })
 const revealMode = ref(false)
-const encodingMode = ref<InvisibleEncodingMode>('tags')
+const encodingMode = ref<InvisibleEncodingMode>('variation-selectors')
 
 const coverText = computed({
   get: () => tagsKey.value.coverText ?? '',
@@ -118,13 +118,13 @@ const tagsDecrypt = (input: string) => {
       </p>
       <h4>Encoding Families You’ll See</h4>
       <ul>
+        <li><strong>Variation selectors (default):</strong> UTF-8 bytes mapped into VS ranges for broad web-app compatibility.</li>
         <li><strong>Unicode Tags payloads:</strong> printable ASCII shifted into tag ranges.</li>
         <li><strong>Zero-width binary payloads:</strong> bits encoded with ZWNJ/ZWJ and separators.</li>
       </ul>
       <p>
-        This view now lets you <strong>encode</strong> using either family and attempts to
-        <strong>decode</strong> both automatically, so mixed-source samples from different
-        platforms can be recovered in one place.
+        We default to <strong>Variation Selectors (UTF-8 bytes)</strong> because several public emoji stego tools use that
+        representation, while still supporting the other two paths for decode and for controlled testing.
       </p>
       <h4>Why Cross-Platform Handling Matters</h4>
       <p>
@@ -146,10 +146,9 @@ const tagsDecrypt = (input: string) => {
         <li>Defenders should normalize and diff raw code points, not just visible strings.</li>
       </ul>
       <p>
-        Real emoji-smuggling cases also show a third family: payload bytes mapped into variation
-        selector ranges. Two samples can look almost identical but decode differently depending on
-        whether the hidden stream was encoded as shifted code points, binary bits, or UTF-8 bytes.
-        That is why this view supports all three decode paths.
+        Real emoji-smuggling cases show all three families in the wild. Two samples can look nearly
+        identical but decode differently depending on whether the hidden stream used shifted code
+        points, bitstreams, or UTF-8 bytes. That is why this view supports all three decode paths.
       </p>
       <p>
         The key defensive takeaway is to never trust rendered text alone. Reliable analysis requires

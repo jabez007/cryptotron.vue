@@ -184,6 +184,12 @@ export const tagsEncoder = (secret: string, cover: string, mode: InvisibleEncodi
     }
   }
 
+  if (mode === 'variation-selectors') {
+    const bytes = new TextEncoder().encode(secret)
+    const invisible = [...bytes, BYTE_SEP].map(byteToVariationSelector).join('')
+    return `${cover}${invisible}`
+  }
+
   if (unsupported.length > 0) {
     const uniqueUnsupported = [...new Set(unsupported)].slice(0, 8)
     const suffix = unsupported.length > uniqueUnsupported.length ? ', ...' : ''
@@ -196,12 +202,6 @@ export const tagsEncoder = (secret: string, cover: string, mode: InvisibleEncodi
     const invisible = asciiCodes
       .map((cp) => cp.toString(2).padStart(8, '0').replace(/0/g, ZW_ZERO).replace(/1/g, ZW_ONE))
       .join(ZW_SEP)
-    return `${cover}${invisible}`
-  }
-
-  if (mode === 'variation-selectors') {
-    const bytes = new TextEncoder().encode(secret)
-    const invisible = [...bytes, BYTE_SEP].map(byteToVariationSelector).join('')
     return `${cover}${invisible}`
   }
 
