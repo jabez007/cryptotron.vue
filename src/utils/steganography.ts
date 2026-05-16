@@ -209,15 +209,7 @@ export const tagsEncoder = (secret: string, cover: string, mode: InvisibleEncodi
   return `${cover}${invisible}`
 }
 
-const decodeVariationSelectors = (encodedText: string): string => {
-  const bytes: number[] = []
-  for (const char of encodedText) {
-    const cp = char.codePointAt(0)
-    if (cp === undefined) continue
-    const byte = variationSelectorToByte(cp)
-    if (byte !== null) bytes.push(byte)
-  }
-
+const decodeUtf8Bytes = (bytes: number[]): string => {
   if (bytes.length === 0) return ''
 
   const boundary = bytes.lastIndexOf(BYTE_SEP)
@@ -229,6 +221,31 @@ const decodeVariationSelectors = (encodedText: string): string => {
   } catch {
     return ''
   }
+}
+
+const decodeVariationSelectors = (encodedText: string): string => {
+  const bytes: number[] = []
+  for (const char of encodedText) {
+    const cp = char.codePointAt(0)
+    if (cp === undefined) continue
+    const byte = variationSelectorToByte(cp)
+    if (byte !== null) bytes.push(byte)
+  }
+
+  if (bytes.length === 0) return ''
+
+  const direct = decodeUtf8Bytes(bytes)
+  if (direct.length > 0) return direct
+
+  if (bytes.every((b) => b >= 0x0 && b <= 0xf)) {
+    const hexBytes: number[] = []
+    for (let i = 0; i + 1 < bytes.length; i += 2) {
+      hexBytes.push((bytes[i] << 4) | bytes[i + 1])
+    }
+    return decodeUtf8Bytes(hexBytes)
+  }
+
+  return ''
 }
 
 const decodeZeroWidthBinary = (encodedText: string): string => {
@@ -258,18 +275,34 @@ const decodeZeroWidthBinary = (encodedText: string): string => {
   if (tokenOutput.length > 0) return tokenOutput
 
   const compact = bits.replace(/\s+/g, '')
-  const tryFixedWidth = (width: 8 | 7): string => {
-    if (compact.length < width || compact.length % width !== 0) return ''
+  const tryFixedWidth = (value: string, width: 7 | 8 | 16): string => {
+    if (value.length < width || value.length % width !== 0) return ''
     let out = ''
-    for (let i = 0; i < compact.length; i += width) {
-      const code = Number.parseInt(compact.slice(i, i + width), 2)
+    for (let i = 0; i < value.length; i += width) {
+      const code = Number.parseInt(value.slice(i, i + width), 2)
       if (code < 0x20 || code > 0x7e) return ''
       out += String.fromCharCode(code)
     }
     return out
   }
 
-  return tryFixedWidth(8) || tryFixedWidth(7)
+  const reverseBits = compact.replace(/[01]/g, (b) => (b === '0' ? '1' : '0'))
+  const widths: (7 | 8 | 16)[] = [8, 7, 16]
+
+  for (const candidate of [compact, reverseBits]) {
+    for (const width of widths) {
+      const direct = tryFixedWidth(candidate, width)
+      if (direct.length > 0) return direct
+
+      for (let offset = 1; offset < width; offset += 1) {
+        const sliced = candidate.slice(offset)
+        const maybe = tryFixedWidth(sliced, width)
+        if (maybe.length > 0) return maybe
+      }
+    }
+  }
+
+  return ''
 }
 
 export const detectTagsPayloadFormat = (encodedText: string): string => {

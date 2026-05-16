@@ -145,16 +145,14 @@ const tagsDecrypt = (input: string) => {
         <li>Automated scanners may miss payloads if they tokenize on visible graphemes.</li>
         <li>Defenders should normalize and diff raw code points, not just visible strings.</li>
       </ul>
-      <h4>What the Reference Material Adds</h4>
       <p>
-        The emoji-smuggling research highlights a practical defender lesson: payloads are often
-        converted to bytes first, then mapped into invisible selector-like ranges, which means
-        two payloads can look nearly identical but decode differently depending on byte framing.
-        That is why this view now supports three families: direct Unicode Tags, zero-width binary,
-        and UTF-8-byte mapping via variation selectors.
+        Real emoji-smuggling cases also show a third family: payload bytes mapped into variation
+        selector ranges. Two samples can look almost identical but decode differently depending on
+        whether the hidden stream was encoded as shifted code points, binary bits, or UTF-8 bytes.
+        That is why this view supports all three decode paths.
       </p>
       <p>
-        It also reinforces that detection should not trust rendered output. Reliable analysis needs
+        The key defensive takeaway is to never trust rendered text alone. Reliable analysis requires
         code-point inspection, normalization checks after copy/paste, and cross-tool comparison
         because different platforms sanitize different invisible ranges.
       </p>
