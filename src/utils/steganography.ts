@@ -223,6 +223,26 @@ const decodeUtf8Bytes = (bytes: number[]): string => {
   }
 }
 
+const isLikelyReadableText = (value: string): boolean => {
+  if (value.length === 0) return false
+
+  let printable = 0
+  for (const char of value) {
+    const cp = char.codePointAt(0)
+    if (cp === undefined) continue
+    if (cp === 0x09 || cp === 0x0a || cp === 0x0d) {
+      printable += 1
+      continue
+    }
+    if (cp >= 0x20) {
+      printable += 1
+      continue
+    }
+  }
+
+  return printable / value.length >= 0.85
+}
+
 const decodeVariationSelectors = (encodedText: string): string => {
   const bytes: number[] = []
   for (const char of encodedText) {
@@ -235,14 +255,51 @@ const decodeVariationSelectors = (encodedText: string): string => {
   if (bytes.length === 0) return ''
 
   const direct = decodeUtf8Bytes(bytes)
-  if (direct.length > 0) return direct
+  if (isLikelyReadableText(direct)) return direct
 
   if (bytes.every((b) => b >= 0x0 && b <= 0xf)) {
     const hexBytes: number[] = []
     for (let i = 0; i + 1 < bytes.length; i += 2) {
       hexBytes.push((bytes[i] << 4) | bytes[i + 1])
     }
-    return decodeUtf8Bytes(hexBytes)
+    const hexDecoded = decodeUtf8Bytes(hexBytes)
+    if (isLikelyReadableText(hexDecoded)) return hexDecoded
+  }
+
+  // Compatibility fallback seen in some web emoji tools:
+  // variation-selector values encode decimal digits and VS-11 (value 10) acts as token separator.
+  // Example groups: 8|5|12|12|15|27|23|15|18|12|4 -> "hello world".
+  if (bytes.includes(10) && bytes.every((b) => b >= 0 && b <= 10)) {
+    const groups: number[][] = []
+    let current: number[] = []
+
+    for (const value of bytes) {
+      if (value === 10) {
+        if (current.length > 0) groups.push(current)
+        current = []
+      } else {
+        current.push(value)
+      }
+    }
+    if (current.length > 0) groups.push(current)
+
+    if (groups.length > 0) {
+      let out = ''
+      for (const group of groups) {
+        const num = Number.parseInt(group.join(''), 10)
+        if (Number.isNaN(num)) return ''
+        if (num >= 1 && num <= 26) {
+          out += String.fromCharCode(96 + num)
+          continue
+        }
+        if (num === 27) {
+          out += ' '
+          continue
+        }
+        return ''
+      }
+      if (out.length > 0) return out
+    }
   }
 
   return ''
