@@ -195,6 +195,14 @@ const props = defineProps({
     type: Function as PropType<((value: string) => void) | undefined>,
     required: false,
   },
+  onEncryptClear: {
+    type: Function as PropType<(() => void) | undefined>,
+    required: false,
+  },
+  onDecryptClear: {
+    type: Function as PropType<(() => void) | undefined>,
+    required: false,
+  },
 })
 
 const emit = defineEmits<{
@@ -394,6 +402,7 @@ const encrypt = () => {
 const clearEncrypt = () => {
   encryptInput.value = ''
   props.onEncryptInputChange?.('')
+  props.onEncryptClear?.()
   encryptOutput.value = ''
   encryptError.value = ''
 }
@@ -421,6 +430,7 @@ const decrypt = () => {
 
 const clearDecrypt = () => {
   decryptInput.value = ''
+  props.onDecryptClear?.()
   decryptOutput.value = ''
   decryptError.value = ''
 }

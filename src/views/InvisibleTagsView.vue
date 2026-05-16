@@ -85,6 +85,17 @@ const appendEmojiCarrier = (emoji: string) => {
   coverText.value = `${coverText.value}${emoji}`
 }
 
+const clearEncryptState = () => {
+  secretMessage.value = ''
+  revealMode.value = false
+  coverText.value = '👍'
+  encodingMode.value = 'variation-selectors'
+}
+
+const clearDecryptState = () => {
+  encodedInput.value = ''
+}
+
 const tagsDecrypt = (input: string) => {
   encodedInput.value = input
   return extracted.value
@@ -100,6 +111,8 @@ const tagsDecrypt = (input: string) => {
     :normal-mode-key-handler="handleNormalModeKey"
     :show-cipher-key-on-decrypt="false"
     :on-encrypt-input-change="setSecretMessage"
+    :on-encrypt-clear="clearEncryptState"
+    :on-decrypt-clear="clearDecryptState"
     v-model:cipher-key="tagsKey"
   >
     <template #theory>
