@@ -84,11 +84,7 @@
               <span>{{ encryptError }}</span>
             </div>
 
-            <slot
-              name="encryptOutput"
-              :text="encryptOutput"
-              :label="'Output'"
-            >
+            <slot name="encryptOutput" :text="encryptOutput" :label="'Output'">
               <CipherOutput label="Output" :text="encryptOutput" />
             </slot>
           </div>
@@ -136,11 +132,7 @@
               <span>{{ decryptError }}</span>
             </div>
 
-            <slot
-              name="decryptOutput"
-              :text="decryptOutput"
-              :label="'Output'"
-            >
+            <slot name="decryptOutput" :text="decryptOutput" :label="'Output'">
               <CipherOutput label="Output" :text="decryptOutput" />
             </slot>
           </div>
