@@ -73,9 +73,9 @@ export default (parentRouteName?: string) => {
       component: () => import('@/views/BaconView.vue'),
     },
     {
-      name: 'cryptotron-invisible-tags',
-      path: `${rootPath}invisible-tags`,
-      component: () => import('@/views/InvisibleTagsView.vue'),
+      name: 'cryptotron-emoji-smuggling',
+      path: `${rootPath}emoji-smuggling`,
+      component: () => import('@/views/EmojiSmugglingView.vue'),
     },
   ]
 }

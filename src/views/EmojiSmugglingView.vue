@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
 import { computed, ref } from 'vue'
-import { detectTagsPayloadFormat, tagsDecoder, tagsEncoder, type InvisibleEncodingMode } from '@/utils/steganography'
+import {
+  detectTagsPayloadFormat,
+  tagsDecoder,
+  tagsEncoder,
+  type InvisibleEncodingMode,
+} from '@/utils/steganography'
 
 const emojiOptions = ['👍', '🤓', '😎', '🫥', '🕵️', '🧠', '🔐', '🛰️']
 const tagsKey = ref({ coverText: '👍' })
@@ -49,6 +54,7 @@ const revealText = computed(() =>
 const nextMode = (mode: InvisibleEncodingMode): InvisibleEncodingMode => {
   if (mode === 'tags') return 'zero-width-binary'
   if (mode === 'zero-width-binary') return 'variation-selectors'
+  if (mode === 'variation-selectors') return 'variation-selectors-legacy'
   return 'tags'
 }
 
@@ -104,7 +110,7 @@ const tagsDecrypt = (input: string) => {
 
 <template>
   <CipherCard
-    title="Invisible Tags (Ghost Messages)"
+    title="Emoji Smuggling (Ghost Messages)"
     :encrypt-algorithm="() => tagsEncrypt"
     :decrypt-algorithm="() => tagsDecrypt"
     :encrypt-output-override="() => encodedOutput"
@@ -116,58 +122,81 @@ const tagsDecrypt = (input: string) => {
     v-model:cipher-key="tagsKey"
   >
     <template #theory>
-      <h3>Invisible Text Tradecraft: How This Works</h3>
+      <h3>Invisible Text & Emoji Steganography</h3>
       <p>
-        Invisible text steganography works by carrying a second message inside characters that are
-        either non-rendering (zero-width code points) or rendered in ways humans usually ignore.
-        In this view, the visible carrier is typically an emoji string, but the hidden payload is
-        appended behind it.
+        Emoji steganography generally falls into two operational branches:
+        <strong>Invisible Cargo</strong> (appending hidden data behind a carrier) and
+        <strong>Semantic/Visual Obfuscation</strong> (using the emojis themselves, or platform
+        features, as the cipher). This tool focuses on the Invisible Cargo branch.
+      </p>
+
+      <h4>1. The "Invisible Cargo" Branch (Implemented Here)</h4>
+      <p>
+        This works by carrying a second message inside characters that are either non-rendering
+        (zero-width code points) or rendered in ways humans usually ignore. The visible carrier is
+        typically an emoji string, but the hidden payload is appended behind it.
       </p>
       <p>
-        In operational terms, this is useful for analysts because it allows hidden instructions,
-        command fragments, or social-engineering bait to move through everyday chat channels while
-        appearing harmless. The payload can survive screenshots and casual moderation, then only
-        appears when someone inspects code points directly.
+        In operational terms, this allows hidden instructions, C2 command fragments, or
+        social-engineering bait to move through everyday chat channels while appearing harmless. The
+        payload can survive screenshots and casual moderation.
       </p>
-      <h4>Encoding Families You’ll See</h4>
       <ul>
-        <li><strong>Variation selectors (default):</strong> UTF-8 bytes mapped into VS ranges for broad web-app compatibility.</li>
+        <li>
+          <strong>Variation selectors (default):</strong> UTF-8 bytes mapped into VS ranges for
+          broad web-app compatibility.
+        </li>
         <li><strong>Unicode Tags payloads:</strong> printable ASCII shifted into tag ranges.</li>
-        <li><strong>Zero-width binary payloads:</strong> bits encoded with ZWNJ/ZWJ and separators.</li>
+        <li>
+          <strong>Zero-width binary payloads:</strong> bits encoded with ZWNJ/ZWJ and separators.
+        </li>
       </ul>
+
+      <h4>2. The "Semantic/Visual Obfuscation" Branch</h4>
       <p>
-        We default to <strong>Variation Selectors (UTF-8 bytes)</strong> because several public emoji stego tools use that
-        representation, while still supporting the other two paths for decode and for controlled testing.
+        Instead of relying on invisible code points, attackers also use the visible emojis or image
+        data:
       </p>
+      <ul>
+        <li>
+          <strong>Substitution Ciphers (e.g., Disgomoji):</strong> A pre-shared "codebook" maps
+          specific emojis to commands. A string like 🔥🌐💀 looks like chat but executes malware
+          instructions.
+        </li>
+        <li>
+          <strong>Image-Based Custom Emojis:</strong> On platforms like Discord or Slack, classic
+          steganography (LSB manipulation, EXIF data) is applied directly to the uploaded
+          <code>.png</code> or <code>.gif</code> of a custom emoji.
+        </li>
+        <li>
+          <strong>Bidi Overrides:</strong> Combining emojis with Right-to-Left Override characters
+          to spoof file extensions or URLs (e.g. <code>document[U+202E]exe.txt</code>).
+        </li>
+      </ul>
+
       <h4>Why Cross-Platform Handling Matters</h4>
       <p>
         Different apps normalize text differently. Some preserve Unicode tag ranges but collapse
-        zero-width separators. Others strip tag ranges while keeping joiners. Even keyboard
-        behavior, copy/paste paths, and cloud sanitizers can mutate payload structure. A decoder
-        that assumes one strict format will miss real-world samples.
+        zero-width separators. Even keyboard behavior, copy/paste paths, and cloud sanitizers can
+        mutate payload structure. In practice, you should expect partial corruption. If output looks
+        wrong, test multiple decoding paths before discarding a lead.
       </p>
-      <p>
-        In practice, you should expect partial corruption. If output looks wrong, compare character
-        counts, inspect for dropped separators, and test both decoding assumptions before discarding
-        a lead.
-      </p>
+
       <h4>Threat-Model Notes</h4>
       <ul>
-        <li>Hidden payloads are great for low-noise signaling in public channels.</li>
-        <li>Detection often fails when teams inspect rendered text only.</li>
-        <li>Automated scanners may miss payloads if they tokenize on visible graphemes.</li>
-        <li>Defenders should normalize and diff raw code points, not just visible strings.</li>
+        <li>
+          Hidden payloads provide low-noise signaling in public channels, often bypassing WYSIWYG
+          protections.
+        </li>
+        <li>
+          Automated scanners often miss payloads if they tokenize only on visible graphemes or
+          ignore custom emoji image data.
+        </li>
+        <li>
+          Defenders must normalize and diff raw code points, not just visible strings, and treat
+          custom emojis as potential binary carriers.
+        </li>
       </ul>
-      <p>
-        Real emoji-smuggling cases show all three families in the wild. Two samples can look nearly
-        identical but decode differently depending on whether the hidden stream used shifted code
-        points, bitstreams, or UTF-8 bytes. That is why this view supports all three decode paths.
-      </p>
-      <p>
-        The key defensive takeaway is to never trust rendered text alone. Reliable analysis requires
-        code-point inspection, normalization checks after copy/paste, and cross-tool comparison
-        because different platforms sanitize different invisible ranges.
-      </p>
     </template>
 
     <template #cipherKey>
@@ -185,6 +214,10 @@ const tagsDecrypt = (input: string) => {
           <label class="mode-option">
             <input v-model="encodingMode" type="radio" value="variation-selectors" />
             Variation Selectors (UTF-8 bytes)
+          </label>
+          <label class="mode-option">
+            <input v-model="encodingMode" type="radio" value="variation-selectors-legacy" />
+            Variation Selectors (Legacy A=1)
           </label>
         </div>
       </div>
@@ -227,7 +260,9 @@ const tagsDecrypt = (input: string) => {
         <div class="control-group">
           <label class="control-label">Live Preview</label>
           <div class="tags-preview" :class="{ reveal: revealMode }">{{ revealText }}</div>
-          <p class="tags-hint">Press <code>r</code> to toggle reveal, <code>m</code> to switch encoding mode.</p>
+          <p class="tags-hint">
+            Press <code>r</code> to toggle reveal, <code>m</code> to switch encoding mode.
+          </p>
         </div>
 
         <div class="control-group">
@@ -249,7 +284,9 @@ const tagsDecrypt = (input: string) => {
       <div class="tags-stack">
         <div class="control-group">
           <label class="control-label">Recovered Secret</label>
-          <p class="tags-hint">Auto-detected format: <strong>{{ detectedFormat }}</strong></p>
+          <p class="tags-hint">
+            Auto-detected format: <strong>{{ detectedFormat }}</strong>
+          </p>
           <textarea :value="extracted" rows="4" class="cipher-textarea" readonly />
         </div>
       </div>

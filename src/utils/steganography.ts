@@ -55,13 +55,16 @@ export const toHtmlSnippet = (styled: StyledChar[]): string => {
 
 export const toMarkdown = (styled: StyledChar[]): string => {
   const carrierCount = styled.filter(({ carriesBit }) => carriesBit).length
-  const markdownBody = styled.map(({ char, type }) => (type === 'b' ? `**${char}**` : char)).join('')
+  const markdownBody = styled
+    .map(({ char, type }) => (type === 'b' ? `**${char}**` : char))
+    .join('')
   return `<!--BACON:CARRIERS=${carrierCount}-->\n${markdownBody}`
 }
 
 export const baconDecoder = (styledInput: string): string => {
   const carrierCountMatch =
-    styledInput.match(/data-bacon-carriers=["'](\d+)["']/i) ?? styledInput.match(/<!--\s*BACON:CARRIERS=(\d+)\s*-->/i)
+    styledInput.match(/data-bacon-carriers=["'](\d+)["']/i) ??
+    styledInput.match(/<!--\s*BACON:CARRIERS=(\d+)\s*-->/i)
   const carrierCount = carrierCountMatch ? Number.parseInt(carrierCountMatch[1], 10) : null
 
   const normalized = decodeHtmlEntities(
@@ -71,8 +74,14 @@ export const baconDecoder = (styledInput: string): string => {
       .replace(/\*\*([^*]+)\*\*/g, (_, inner: string) => `[[B]]${inner}[[/B]]`)
       .replace(/<\s*strong\b[^>]*>(.*?)<\s*\/\s*strong>/gim, '[[B]]$1[[/B]]')
       .replace(/<\s*b\b[^>]*>(.*?)<\s*\/\s*b>/gim, '[[B]]$1[[/B]]')
-      .replace(/<\s*span\b[^>]*class=["'][^"']*b-b[^"']*["'][^>]*>(.*?)<\s*\/\s*span>/gim, '[[B]]$1[[/B]]')
-      .replace(/<\s*span\b[^>]*class=["'][^"']*b-a[^"']*["'][^>]*>(.*?)<\s*\/\s*span>/gim, '[[A]]$1[[/A]]')
+      .replace(
+        /<\s*span\b[^>]*class=["'][^"']*b-b[^"']*["'][^>]*>(.*?)<\s*\/\s*span>/gim,
+        '[[B]]$1[[/B]]',
+      )
+      .replace(
+        /<\s*span\b[^>]*class=["'][^"']*b-a[^"']*["'][^>]*>(.*?)<\s*\/\s*span>/gim,
+        '[[A]]$1[[/A]]',
+      )
       .replace(/<\s*span\b[^>]*class=["'][^"']*b-n[^"']*["'][^>]*>(.*?)<\s*\/\s*span>/gim, '$1')
       .replace(/<[^>]+>/g, ''),
   )
@@ -132,7 +141,9 @@ const decodeHtmlEntities = (input: string): string =>
     .replace(/&#39;/g, "'")
     .replace(/&apos;/g, "'")
     .replace(/&nbsp;/g, ' ')
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) =>
+      String.fromCodePoint(Number.parseInt(hex, 16)),
+    )
     .replace(/&#(\d+);/g, (_, dec: string) => String.fromCodePoint(Number.parseInt(dec, 10)))
 
 const escapeHtml = (input: string): string =>
@@ -153,7 +164,11 @@ const ZW_ZERO = '\u200c'
 const ZW_ONE = '\u200d'
 const ZW_SEP = '\u200b'
 
-export type InvisibleEncodingMode = 'tags' | 'zero-width-binary' | 'variation-selectors'
+export type InvisibleEncodingMode =
+  | 'tags'
+  | 'zero-width-binary'
+  | 'variation-selectors'
+  | 'variation-selectors-legacy'
 
 const VS_OFFSET = 0xfe00
 const VS_MIN = 0xfe00
@@ -163,7 +178,9 @@ const VS_SUP_MAX = 0xe01ef
 const BYTE_SEP = 0x20
 
 const byteToVariationSelector = (byte: number): string =>
-  byte <= 0x0f ? String.fromCodePoint(VS_OFFSET + byte) : String.fromCodePoint(0xe0100 + (byte - 0x10))
+  byte <= 0x0f
+    ? String.fromCodePoint(VS_OFFSET + byte)
+    : String.fromCodePoint(0xe0100 + (byte - 0x10))
 
 const variationSelectorToByte = (cp: number): number | null => {
   if (cp >= VS_MIN && cp <= VS_MAX) return cp - VS_OFFSET
@@ -171,7 +188,11 @@ const variationSelectorToByte = (cp: number): number | null => {
   return null
 }
 
-export const tagsEncoder = (secret: string, cover: string, mode: InvisibleEncodingMode = 'tags'): string => {
+export const tagsEncoder = (
+  secret: string,
+  cover: string,
+  mode: InvisibleEncodingMode = 'tags',
+): string => {
   const unsupported: string[] = []
   const asciiCodes: number[] = []
 
@@ -184,6 +205,25 @@ export const tagsEncoder = (secret: string, cover: string, mode: InvisibleEncodi
     }
   }
 
+  if (mode === 'variation-selectors-legacy') {
+    const tokens: number[] = []
+    for (const char of secret.toLowerCase()) {
+      if (char >= 'a' && char <= 'z') {
+        const num = char.charCodeAt(0) - 96 // a=1, b=2
+        const digits = num.toString(10).split('').map(Number)
+        tokens.push(...digits)
+      } else if (char === ' ') {
+        const digits = (27).toString(10).split('').map(Number)
+        tokens.push(...digits)
+      } else {
+        continue // Ignore unsupported characters in legacy mode
+      }
+      tokens.push(10) // VS-11 acts as token separator
+    }
+    const invisible = tokens.map(byteToVariationSelector).join('')
+    return `${cover}${invisible}`
+  }
+
   if (mode === 'variation-selectors') {
     const bytes = new TextEncoder().encode(secret)
     const invisible = [...bytes, BYTE_SEP].map(byteToVariationSelector).join('')
@@ -194,7 +234,7 @@ export const tagsEncoder = (secret: string, cover: string, mode: InvisibleEncodi
     const uniqueUnsupported = [...new Set(unsupported)].slice(0, 8)
     const suffix = unsupported.length > uniqueUnsupported.length ? ', ...' : ''
     throw new Error(
-      `Invisible Tags supports printable ASCII only (U+0020-U+007E). Unsupported characters: ${uniqueUnsupported.join(' ')}${suffix}`,
+      `Emoji Smuggling (Tags mode) supports printable ASCII only (U+0020-U+007E). Unsupported characters: ${uniqueUnsupported.join(' ')}${suffix}`,
     )
   }
 
@@ -420,7 +460,8 @@ export const stripTagsPayload = (encodedText: string): string => {
 
     const isPrimaryTag = cp >= TAG_MIN && cp <= TAG_MAX
     const isAltTag = cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX
-    const isVariationSelector = (cp >= VS_MIN && cp <= VS_MAX) || (cp >= VS_SUP_MIN && cp <= VS_SUP_MAX)
+    const isVariationSelector =
+      (cp >= VS_MIN && cp <= VS_MAX) || (cp >= VS_SUP_MIN && cp <= VS_SUP_MAX)
     const isZeroWidthPayload = char === ZW_ZERO || char === ZW_ONE || char === ZW_SEP
     if (!isPrimaryTag && !isAltTag && !isVariationSelector && !isZeroWidthPayload) {
       cover += char

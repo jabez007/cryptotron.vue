@@ -53,7 +53,7 @@ CryptoTron is designed to be operated like a high-tech terminal. Use the followi
 | **Polyalphabetic** | Vigenère, Autokey, Beaufort |
 | **Grid & Fractionation** | Polybius Square |
 | **Transposition** | Rail-Fence |
-| **Steganography** | Bacon's Encoding, Invisible Tags |
+| **Steganography** | Bacon's Encoding, Emoji Smuggling |
 
 ---
 
