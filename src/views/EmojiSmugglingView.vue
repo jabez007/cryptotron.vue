@@ -103,6 +103,7 @@ const clearEncryptState = () => {
   revealMode.value = false
   coverText.value = '👍'
   encodingMode.value = 'variation-selectors'
+  interleave.value = false
 }
 
 const clearDecryptState = () => {
