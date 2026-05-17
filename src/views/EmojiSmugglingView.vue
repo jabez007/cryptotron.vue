@@ -12,6 +12,7 @@ const emojiOptions = ['👍', '🤓', '😎', '🫥', '🕵️', '🧠', '🔐',
 const tagsKey = ref({ coverText: '👍' })
 const revealMode = ref(false)
 const encodingMode = ref<InvisibleEncodingMode>('variation-selectors')
+const interleave = ref(false)
 
 const coverText = computed({
   get: () => tagsKey.value.coverText ?? '',
@@ -29,7 +30,12 @@ const encodedInput = ref('')
 const encodeResult = computed(() => {
   try {
     return {
-      encoded: tagsEncoder(secretMessage.value, coverText.value, encodingMode.value),
+      encoded: tagsEncoder(
+        secretMessage.value,
+        coverText.value,
+        encodingMode.value,
+        interleave.value,
+      ),
       warning: '',
     }
   } catch (error) {
@@ -130,7 +136,6 @@ const tagsDecrypt = (input: string) => {
         <strong>Semantic/Visual Obfuscation</strong> (using the emojis themselves, or platform
         features, as the cipher). This tool focuses on the Invisible Cargo branch.
       </p>
-
       <h4>1. The "Invisible Cargo" Branch (Implemented Here)</h4>
       <p>
         This works by carrying a second message inside characters that are either non-rendering
@@ -138,7 +143,13 @@ const tagsDecrypt = (input: string) => {
         typically an emoji string, but the hidden payload is appended behind it.
       </p>
       <p>
-        In operational terms, this allows hidden instructions, C2 command fragments, or
+        <strong>Advanced Technique: Interleaving</strong><br />
+        By default, payload characters are appended to the end of the carrier. However, this tool
+        supports <strong>Interleaving</strong>, which distributes the hidden characters throughout
+        the visible carrier (e.g., placing one hidden byte after each emoji).
+      </p>
+      <p>
+        In operational terms, this allows hidden instructions, C2 command fragments, or ...
         social-engineering bait to move through everyday chat channels while appearing harmless. The
         payload can survive screenshots and casual moderation.
       </p>
@@ -228,6 +239,15 @@ const tagsDecrypt = (input: string) => {
       </div>
 
       <div class="control-group">
+        <div class="mode-picker">
+          <label class="mode-option">
+            <input v-model="interleave" type="checkbox" />
+            Interleave Payload (distribute throughout carrier)
+          </label>
+        </div>
+      </div>
+
+      <div class="control-group">
         <label class="control-label">Carrier Emoji / Cover Text</label>
         <div class="emoji-picker">
           <button
@@ -255,7 +275,7 @@ const tagsDecrypt = (input: string) => {
           v-model="coverText"
           rows="3"
           class="cipher-textarea cipher-input"
-          placeholder="Optional: customize carrier text"
+          placeholder="Paste your own emoji or custom carrier text here..."
         />
       </div>
     </template>

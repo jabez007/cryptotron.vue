@@ -195,6 +195,7 @@ export const tagsEncoder = (
   secret: string,
   cover: string,
   mode: InvisibleEncodingMode = 'tags',
+  interleave: boolean = false,
 ): string => {
   const unsupported: string[] = []
   const asciiCodes: number[] = []
@@ -208,62 +209,75 @@ export const tagsEncoder = (
     }
   }
 
+  let invisible = ''
+
   if (mode === 'variation-selectors-nibbles') {
     const bytes = new TextEncoder().encode(secret)
     const selectors: string[] = []
     for (const b of bytes) {
-      // Split byte into two 4-bit nibbles
       const high = (b >> 4) & 0x0f
       const low = b & 0x0f
       selectors.push(String.fromCodePoint(VS_OFFSET + high))
       selectors.push(String.fromCodePoint(VS_OFFSET + low))
     }
-    return `${cover}${selectors.join('')}`
-  }
-
-  if (mode === 'variation-selectors-legacy') {
+    invisible = selectors.join('')
+  } else if (mode === 'variation-selectors-legacy') {
     const tokens: number[] = []
     for (const char of secret.toLowerCase()) {
       if (char >= 'a' && char <= 'z') {
-        const num = char.charCodeAt(0) - 96 // a=1, b=2
+        const num = char.charCodeAt(0) - 96
         const digits = num.toString(10).split('').map(Number)
         tokens.push(...digits)
       } else if (char === ' ') {
         const digits = (27).toString(10).split('').map(Number)
         tokens.push(...digits)
       } else {
-        continue // Ignore unsupported characters in legacy mode
+        continue
       }
-      tokens.push(10) // VS-11 acts as token separator
+      tokens.push(10)
     }
-    const invisible = tokens.map(byteToVariationSelector).join('')
-    return `${cover}${invisible}`
-  }
-
-  if (mode === 'variation-selectors') {
+    invisible = tokens.map(byteToVariationSelector).join('')
+  } else if (mode === 'variation-selectors') {
     const bytes = new TextEncoder().encode(secret)
-    const invisible = [...bytes, BYTE_SEP].map(byteToVariationSelector).join('')
-    return `${cover}${invisible}`
-  }
-
-  if (unsupported.length > 0) {
-    const uniqueUnsupported = [...new Set(unsupported)].slice(0, 8)
-    const suffix = unsupported.length > uniqueUnsupported.length ? ', ...' : ''
-    throw new Error(
-      `Emoji Smuggling (Tags mode) supports printable ASCII only (U+0020-U+007E). Unsupported characters: ${uniqueUnsupported.join(' ')}${suffix}`,
-    )
-  }
-
-  if (mode === 'zero-width-binary') {
-    const invisible = asciiCodes
+    invisible = [...bytes, BYTE_SEP].map(byteToVariationSelector).join('')
+  } else if (mode === 'zero-width-binary') {
+    invisible = asciiCodes
       .map((cp) => cp.toString(2).padStart(8, '0').replace(/0/g, ZW_ZERO).replace(/1/g, ZW_ONE))
       .join(ZW_SEP)
+  } else {
+    if (unsupported.length > 0) {
+      const uniqueUnsupported = [...new Set(unsupported)].slice(0, 8)
+      const suffix = unsupported.length > uniqueUnsupported.length ? ', ...' : ''
+      throw new Error(
+        `Emoji Smuggling (Tags mode) supports printable ASCII only (U+0020-U+007E). Unsupported characters: ${uniqueUnsupported.join(' ')}${suffix}`,
+      )
+    }
+    invisible =
+      TAG_START + asciiCodes.map((cp) => String.fromCodePoint(cp + TAG_OFFSET)).join('') + TAG_END
+  }
+
+  if (!interleave) {
     return `${cover}${invisible}`
   }
 
-  const invisible =
-    TAG_START + asciiCodes.map((cp) => String.fromCodePoint(cp + TAG_OFFSET)).join('') + TAG_END
-  return `${cover}${invisible}`
+  const coverChars = [...cover]
+  const payloadChars = [...invisible]
+  let result = ''
+  let payloadIdx = 0
+
+  for (let i = 0; i < coverChars.length; i += 1) {
+    result += coverChars[i]
+    if (payloadIdx < payloadChars.length) {
+      result += payloadChars[payloadIdx]
+      payloadIdx += 1
+    }
+  }
+
+  if (payloadIdx < payloadChars.length) {
+    result += payloadChars.slice(payloadIdx).join('')
+  }
+
+  return result
 }
 
 const decodeUtf8Bytes = (bytes: number[]): string => {
