@@ -171,6 +171,7 @@ export type InvisibleEncodingMode =
   | 'zero-width-binary'
   | 'variation-selectors'
   | 'variation-selectors-legacy'
+  | 'variation-selectors-nibbles'
 
 const VS_OFFSET = 0xfe00
 const VS_MIN = 0xfe00
@@ -205,6 +206,19 @@ export const tagsEncoder = (
     } else if (cp !== undefined) {
       unsupported.push(char)
     }
+  }
+
+  if (mode === 'variation-selectors-nibbles') {
+    const bytes = new TextEncoder().encode(secret)
+    const selectors: string[] = []
+    for (const b of bytes) {
+      // Split byte into two 4-bit nibbles
+      const high = (b >> 4) & 0x0f
+      const low = b & 0x0f
+      selectors.push(String.fromCodePoint(VS_OFFSET + high))
+      selectors.push(String.fromCodePoint(VS_OFFSET + low))
+    }
+    return `${cover}${selectors.join('')}`
   }
 
   if (mode === 'variation-selectors-legacy') {
@@ -412,7 +426,8 @@ export const detectTagsPayloadFormat = (encodedText: string): string => {
   for (const char of encodedText) {
     const cp = char.codePointAt(0)
     if (cp === undefined) continue
-    if ((cp >= TAG_MIN && cp <= TAG_MAX) || char === TAG_START || char === TAG_END) hasPrimary = true
+    if ((cp >= TAG_MIN && cp <= TAG_MAX) || char === TAG_START || char === TAG_END)
+      hasPrimary = true
     if (cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) hasAlt = true
   }
 
@@ -420,8 +435,23 @@ export const detectTagsPayloadFormat = (encodedText: string): string => {
   if (hasPrimary) return 'Unicode Tags'
   if (hasAlt) return 'Alt Tags'
 
-  const variationSecret = decodeVariationSelectors(encodedText)
-  if (variationSecret.length > 0) return 'Variation Selectors (UTF-8 bytes)'
+  const variationBytes: number[] = []
+  for (const char of encodedText) {
+    const cp = char.codePointAt(0)
+    if (cp === undefined) continue
+    const byte = variationSelectorToByte(cp)
+    if (byte !== null) variationBytes.push(byte)
+  }
+
+  if (variationBytes.length > 0) {
+    const variationSecret = decodeVariationSelectors(encodedText)
+    if (variationSecret.length > 0) {
+      if (variationBytes.every((b) => b >= 0x0 && b <= 0xf)) {
+        return 'Variation Selectors (4-bit nibbles)'
+      }
+      return 'Variation Selectors (UTF-8 bytes)'
+    }
+  }
 
   const zeroWidthSecret = decodeZeroWidthBinary(encodedText)
   if (zeroWidthSecret.length > 0) return 'Zero-width Binary'

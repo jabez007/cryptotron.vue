@@ -54,7 +54,8 @@ const revealText = computed(() =>
 const nextMode = (mode: InvisibleEncodingMode): InvisibleEncodingMode => {
   if (mode === 'tags') return 'zero-width-binary'
   if (mode === 'zero-width-binary') return 'variation-selectors'
-  if (mode === 'variation-selectors') return 'variation-selectors-legacy'
+  if (mode === 'variation-selectors') return 'variation-selectors-nibbles'
+  if (mode === 'variation-selectors-nibbles') return 'variation-selectors-legacy'
   return 'tags'
 }
 
@@ -214,6 +215,10 @@ const tagsDecrypt = (input: string) => {
           <label class="mode-option">
             <input v-model="encodingMode" type="radio" value="variation-selectors" />
             Variation Selectors (UTF-8 bytes)
+          </label>
+          <label class="mode-option">
+            <input v-model="encodingMode" type="radio" value="variation-selectors-nibbles" />
+            Variation Selectors (4-bit nibbles)
           </label>
           <label class="mode-option">
             <input v-model="encodingMode" type="radio" value="variation-selectors-legacy" />
