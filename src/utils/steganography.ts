@@ -155,6 +155,8 @@ const escapeHtml = (input: string): string =>
     .replace(/'/g, '&#39;')
 
 const TAG_OFFSET = 0xe0000
+const TAG_START = '\u{e0001}'
+const TAG_END = '\u{e007f}'
 const TAG_MIN = 0xe0020
 const TAG_MAX = 0xe007e
 const ALT_TAG_OFFSET = 0xe00f0
@@ -245,7 +247,8 @@ export const tagsEncoder = (
     return `${cover}${invisible}`
   }
 
-  const invisible = asciiCodes.map((cp) => String.fromCodePoint(cp + TAG_OFFSET)).join('')
+  const invisible =
+    TAG_START + asciiCodes.map((cp) => String.fromCodePoint(cp + TAG_OFFSET)).join('') + TAG_END
   return `${cover}${invisible}`
 }
 
@@ -409,7 +412,7 @@ export const detectTagsPayloadFormat = (encodedText: string): string => {
   for (const char of encodedText) {
     const cp = char.codePointAt(0)
     if (cp === undefined) continue
-    if (cp >= TAG_MIN && cp <= TAG_MAX) hasPrimary = true
+    if ((cp >= TAG_MIN && cp <= TAG_MAX) || char === TAG_START || char === TAG_END) hasPrimary = true
     if (cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) hasAlt = true
   }
 
@@ -458,7 +461,7 @@ export const stripTagsPayload = (encodedText: string): string => {
       continue
     }
 
-    const isPrimaryTag = cp >= TAG_MIN && cp <= TAG_MAX
+    const isPrimaryTag = (cp >= TAG_MIN && cp <= TAG_MAX) || char === TAG_START || char === TAG_END
     const isAltTag = cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX
     const isVariationSelector =
       (cp >= VS_MIN && cp <= VS_MAX) || (cp >= VS_SUP_MIN && cp <= VS_SUP_MAX)
