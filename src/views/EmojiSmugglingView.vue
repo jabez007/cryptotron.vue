@@ -10,7 +10,7 @@ import {
 
 const emojiOptions = ['👍', '🤓', '😎', '🫥', '🕵️', '🧠', '🔐', '🛰️']
 const tagsKey = ref({ coverText: '👍' })
-const revealMode = ref(false)
+const revealMode = ref(true)
 const encodingMode = ref<InvisibleEncodingMode>('variation-selectors')
 const interleave = ref(false)
 
