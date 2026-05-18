@@ -393,7 +393,6 @@ const encrypt = () => {
 
 const clearEncrypt = () => {
   encryptInput.value = ''
-  props.onEncryptInputChange?.('')
   props.onEncryptClear?.()
   encryptOutput.value = ''
   encryptError.value = ''
