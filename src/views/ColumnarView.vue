@@ -33,9 +33,7 @@ const columnarCipherKey = ref({
           <strong>Choose a Keyword:</strong> The length of the keyword determines the number of
           columns in the grid.
         </li>
-        <li>
-          <strong>Write the Message:</strong> Fill the message into the grid row by row.
-        </li>
+        <li><strong>Write the Message:</strong> Fill the message into the grid row by row.</li>
         <li>
           <strong>Sort the Keyword:</strong> Alphabetize the letters of the keyword to determine the
           reading order of the columns.
@@ -57,8 +55,8 @@ const columnarCipherKey = ref({
           ---------<br />
           H A C K T<br />
           H E P L A<br />
-          N E T
-        </code><br />
+          N E T </code
+        ><br />
         <br />
         <strong>Read columns by rank:</strong><br />
         Rank 1 (Col 5): TA<br />
@@ -82,16 +80,21 @@ const columnarCipherKey = ref({
           reducing the chance of manual error.
         </li>
         <li>
-          <strong>Obfuscation:</strong> It disguised the true length of the underlying message, making
-          it harder for codebreakers to guess the grid dimensions.
+          <strong>Obfuscation:</strong> It disguised the true length of the underlying message,
+          making it harder for codebreakers to guess the grid dimensions.
         </li>
       </ul>
 
       <div class="cipher-example historical-note">
         <strong>Historical Padding Example:</strong><br />
         To fill the 5x3 grid for "HACKTHEPLANET" (13 chars), two 'X's would be added:<br />
-        <code>... N E T <strong>X X</strong></code><br />
-        This would result in a ciphertext like: <code><strong>TA</strong>X <strong>CPT</strong> <strong>AEE</strong> <strong>KL</strong>X <strong>HHN</strong></code>
+        <code>... N E T <strong>X X</strong></code
+        ><br />
+        This would result in a ciphertext like:
+        <code
+          ><strong>TA</strong>X <strong>CPT</strong> <strong>AEE</strong> <strong>KL</strong>X
+          <strong>HHN</strong></code
+        >
       </div>
 
       <p>

@@ -72,5 +72,10 @@ export default (parentRouteName?: string) => {
       path: `${rootPath}bacon`,
       component: () => import('@/views/BaconView.vue'),
     },
+    {
+      name: 'cryptotron-emoji-smuggling',
+      path: `${rootPath}emoji-smuggling`,
+      component: () => import('@/views/EmojiSmugglingView.vue'),
+    },
   ]
 }
