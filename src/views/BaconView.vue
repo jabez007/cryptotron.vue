@@ -8,6 +8,7 @@ import {
   toMarkdown,
   type StyledChar,
 } from '@/utils/steganography'
+import { generateBaconCover } from '@/utils/text-gen'
 
 const baconCoverKey = ref({ coverText: '' })
 const secretMessage = ref('')
@@ -25,6 +26,15 @@ const coverText = computed({
   },
 })
 
+const bitLength = computed(
+  () => secretMessage.value.toUpperCase().replace(/[^A-Z]/g, '').length * 5,
+)
+
+const handleGenerateCover = () => {
+  if (bitLength.value === 0) return
+  coverText.value = generateBaconCover(bitLength.value)
+}
+
 const preview = computed<StyledChar[]>(() => {
   try {
     return baconEncoder(secretMessage.value, coverText.value)
@@ -38,9 +48,6 @@ const preview = computed<StyledChar[]>(() => {
   }
 })
 
-const bitLength = computed(
-  () => secretMessage.value.toUpperCase().replace(/[^A-Z]/g, '').length * 5,
-)
 const alphaLength = computed(() => [...coverText.value].filter((c) => /[A-Za-z]/.test(c)).length)
 const lengthError = computed(() =>
   bitLength.value > 0 && alphaLength.value < bitLength.value
@@ -86,10 +93,18 @@ const copyActiveExport = async () => {
 
 const handleBaconNormalModeKey = (key: string, activeTab: string) => {
   if (activeTab !== 'encrypt') return false
-  if (key !== 'm') return false
 
-  exportMode.value = exportMode.value === 'html' ? 'markdown' : 'html'
-  return true
+  if (key === 'm') {
+    exportMode.value = exportMode.value === 'html' ? 'markdown' : 'html'
+    return true
+  }
+
+  if (key === 'g') {
+    handleGenerateCover()
+    return true
+  }
+
+  return false
 }
 
 /**
@@ -208,12 +223,22 @@ const baconDecrypt = (input: string) => {
 
     <template #cipherKey="{ panel }">
       <div v-if="panel !== 'decrypt'" class="control-group">
-        <label class="control-label">Cover Text</label>
+        <div class="bacon-preview-header">
+          <label class="control-label">Cover Text</label>
+          <button
+            class="cipher-button bacon-secondary-button"
+            type="button"
+            @click="handleGenerateCover"
+            :disabled="bitLength === 0"
+          >
+            Generate Cover (g)
+          </button>
+        </div>
         <textarea
           v-model="coverText"
           rows="6"
           class="cipher-textarea cipher-input"
-          placeholder="Enter the visible carrier text..."
+          placeholder="Enter the visible carrier text or generate one..."
         />
       </div>
     </template>
