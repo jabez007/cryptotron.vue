@@ -393,9 +393,9 @@ const encrypt = () => {
 
 const clearEncrypt = () => {
   encryptInput.value = ''
-  props.onEncryptClear?.()
   encryptOutput.value = ''
   encryptError.value = ''
+  props.onEncryptClear?.()
 }
 
 watch(encryptInput, (value) => {
@@ -421,9 +421,9 @@ const decrypt = () => {
 
 const clearDecrypt = () => {
   decryptInput.value = ''
-  props.onDecryptClear?.()
   decryptOutput.value = ''
   decryptError.value = ''
+  props.onDecryptClear?.()
 }
 
 const isCracking = ref(false)
