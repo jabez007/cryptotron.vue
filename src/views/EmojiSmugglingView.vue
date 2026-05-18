@@ -233,37 +233,22 @@ const tagsDecrypt = (input: string) => {
     </template>
 
     <template #cipherKey>
-      <div class="control-group">
-        <label class="control-label">Encoding Mode</label>
-        <div class="mode-picker">
-          <label class="mode-option">
-            <input v-model="encodingMode" type="radio" value="tags" />
-            Unicode Tags
-          </label>
-          <label class="mode-option">
-            <input v-model="encodingMode" type="radio" value="zero-width-binary" />
-            Zero-width Binary
-          </label>
-          <label class="mode-option">
-            <input v-model="encodingMode" type="radio" value="variation-selectors" />
-            Variation Selectors (UTF-8 bytes)
-          </label>
-          <label class="mode-option">
-            <input v-model="encodingMode" type="radio" value="variation-selectors-nibbles" />
-            Variation Selectors (4-bit nibbles)
-          </label>
-          <label class="mode-option">
-            <input v-model="encodingMode" type="radio" value="variation-selectors-legacy" />
-            Variation Selectors (Legacy A=1)
-          </label>
+      <div class="control-grid">
+        <div class="control-group">
+          <label class="control-label">Encoding Mode</label>
+          <select v-model="encodingMode" class="cipher-select">
+            <option value="tags">Unicode Tags</option>
+            <option value="zero-width-binary">Zero-width Binary</option>
+            <option value="variation-selectors">Variation Selectors (UTF-8 bytes)</option>
+            <option value="variation-selectors-nibbles">Variation Selectors (4-bit nibbles)</option>
+            <option value="variation-selectors-legacy">Variation Selectors (Legacy A=1)</option>
+          </select>
         </div>
-      </div>
 
-      <div class="control-group">
-        <div class="mode-picker">
+        <div class="control-group checkbox-group">
           <label class="mode-option">
             <input v-model="interleave" type="checkbox" />
-            Interleave Payload (distribute throughout carrier)
+            Interleave Payload
           </label>
         </div>
       </div>
@@ -389,12 +374,25 @@ const tagsDecrypt = (input: string) => {
   margin-bottom: 0.5rem;
 }
 
+.control-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  align-items: end;
+  margin-bottom: 1.5rem;
+}
+
+.checkbox-group {
+  margin-bottom: 0.75rem;
+}
+
 .mode-option {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
   font-family: 'Space Mono', monospace;
   color: var(--cryptotron-text-primary);
+  cursor: pointer;
 }
 
 .emoji-picker {
