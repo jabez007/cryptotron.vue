@@ -206,8 +206,8 @@ const baconDecrypt = (input: string) => {
       </p>
     </template>
 
-    <template #cipherKey>
-      <div class="control-group">
+    <template #cipherKey="{ panel }">
+      <div v-if="panel !== 'decrypt'" class="control-group">
         <label class="control-label">Cover Text</label>
         <textarea
           v-model="coverText"
