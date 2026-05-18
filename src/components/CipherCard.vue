@@ -61,7 +61,7 @@
           <div class="cipher-practice">
             <h2 class="section-title">Encrypt Messages</h2>
             <div class="control-group">
-              <slot name="cipherKey"></slot>
+              <slot name="cipherKey" panel="encrypt"></slot>
             </div>
 
             <div class="control-group">
@@ -98,7 +98,7 @@
           <div class="cipher-practice">
             <h2 class="section-title">Decrypt Messages</h2>
             <div class="control-group">
-              <slot name="cipherKey"></slot>
+              <slot name="cipherKey" panel="decrypt"></slot>
             </div>
 
             <div class="control-group">
