@@ -317,11 +317,10 @@ const tagsDecrypt = (input: string) => {
     <template #decryptOutput>
       <div class="tags-stack">
         <div class="control-group">
-          <label class="control-label">Recovered Secret</label>
           <p class="tags-hint">
             Auto-detected format: <strong>{{ detectedFormat }}</strong>
           </p>
-          <textarea :value="extracted" rows="4" class="cipher-textarea" readonly />
+          <CipherOutput label="Recovered Secret" :text="extracted" />
         </div>
       </div>
     </template>
