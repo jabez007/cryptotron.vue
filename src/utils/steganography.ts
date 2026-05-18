@@ -434,20 +434,8 @@ const decodeZeroWidthBinary = (encodedText: string): string => {
 }
 
 export const detectTagsPayloadFormat = (encodedText: string): string => {
-  let hasPrimary = false
-  let hasAlt = false
-
-  for (const char of encodedText) {
-    const cp = char.codePointAt(0)
-    if (cp === undefined) continue
-    if ((cp >= TAG_MIN && cp <= TAG_MAX) || char === TAG_START || char === TAG_END)
-      hasPrimary = true
-    if (cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) hasAlt = true
-  }
-
-  if (hasPrimary && hasAlt) return 'Unicode Tags + Alt Tags'
-  if (hasPrimary) return 'Unicode Tags'
-  if (hasAlt) return 'Alt Tags'
+  const zeroWidthSecret = decodeZeroWidthBinary(encodedText)
+  if (zeroWidthSecret.length > 0) return 'Zero-width Binary'
 
   const variationBytes: number[] = []
   for (const char of encodedText) {
@@ -467,33 +455,54 @@ export const detectTagsPayloadFormat = (encodedText: string): string => {
     }
   }
 
-  const zeroWidthSecret = decodeZeroWidthBinary(encodedText)
-  if (zeroWidthSecret.length > 0) return 'Zero-width Binary'
+  let hasPrimary = false
+  let hasAlt = false
+
+  for (const char of encodedText) {
+    const cp = char.codePointAt(0)
+    if (cp === undefined) continue
+    if ((cp >= TAG_MIN && cp <= TAG_MAX) || char === TAG_START || char === TAG_END)
+      hasPrimary = true
+    if (cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) hasAlt = true
+  }
+
+  if (hasPrimary && hasAlt) return 'Unicode Tags + Alt Tags'
+  if (hasPrimary) return 'Unicode Tags'
+  if (hasAlt) return 'Alt Tags'
 
   return 'No hidden payload detected'
 }
 
 export const tagsDecoder = (encodedText: string): string => {
-  let secret = ''
-  for (const char of encodedText) {
-    const cp = char.codePointAt(0)
-    if (cp === undefined) continue
+  // 1. Try Zero-width Binary
+  const zeroWidthSecret = decodeZeroWidthBinary(encodedText)
+  if (zeroWidthSecret.length > 0) return zeroWidthSecret
 
-    if (cp >= TAG_MIN && cp <= TAG_MAX) {
-      secret += String.fromCodePoint(cp - TAG_OFFSET)
-      continue
-    }
-
-    if (cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) {
-      secret += String.fromCodePoint(cp - ALT_TAG_OFFSET)
-      continue
-    }
-  }
-
-  if (secret.length > 0) return secret
+  // 2. Try Variation Selectors
   const variationSecret = decodeVariationSelectors(encodedText)
   if (variationSecret.length > 0) return variationSecret
-  return decodeZeroWidthBinary(encodedText)
+
+  // 3. Try Standard Unicode Tags
+  let primarySecret = ''
+  for (const char of encodedText) {
+    const cp = char.codePointAt(0)
+    if (cp !== undefined && cp >= TAG_MIN && cp <= TAG_MAX) {
+      primarySecret += String.fromCodePoint(cp - TAG_OFFSET)
+    }
+  }
+  if (primarySecret.length > 0) return primarySecret
+
+  // 4. Try Alt Tags (with readability check to avoid VS overlap garbage)
+  let altSecret = ''
+  for (const char of encodedText) {
+    const cp = char.codePointAt(0)
+    if (cp !== undefined && cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) {
+      altSecret += String.fromCodePoint(cp - ALT_TAG_OFFSET)
+    }
+  }
+  if (isLikelyReadableText(altSecret)) return altSecret
+
+  return ''
 }
 
 export const stripTagsPayload = (encodedText: string): string => {
