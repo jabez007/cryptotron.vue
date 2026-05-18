@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
+import CipherOutput from '@/components/CipherOutput.vue'
 import { computed, ref } from 'vue'
 import {
   detectTagsPayloadFormat,
@@ -308,8 +309,7 @@ const tagsDecrypt = (input: string) => {
         </div>
 
         <div class="control-group">
-          <label class="control-label">Raw Encoded Output</label>
-          <textarea :value="encodedOutput" rows="6" class="cipher-textarea" readonly />
+          <CipherOutput label="Raw Encoded Output" :text="encodedOutput" />
         </div>
       </div>
     </template>
