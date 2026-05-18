@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
 import { computed, ref } from 'vue'
-import { baconDecoder, baconEncoder, toHtmlSnippet, toMarkdown, type StyledChar } from '@/utils/steganography'
+import {
+  baconDecoder,
+  baconEncoder,
+  toHtmlSnippet,
+  toMarkdown,
+  type StyledChar,
+} from '@/utils/steganography'
 
 const baconCoverKey = ref({ coverText: '' })
 const secretMessage = ref('')
@@ -32,7 +38,9 @@ const preview = computed<StyledChar[]>(() => {
   }
 })
 
-const bitLength = computed(() => secretMessage.value.toUpperCase().replace(/[^A-Z]/g, '').length * 5)
+const bitLength = computed(
+  () => secretMessage.value.toUpperCase().replace(/[^A-Z]/g, '').length * 5,
+)
 const alphaLength = computed(() => [...coverText.value].filter((c) => /[A-Za-z]/.test(c)).length)
 const lengthError = computed(() =>
   bitLength.value > 0 && alphaLength.value < bitLength.value
@@ -54,7 +62,9 @@ const extracted = computed(() => {
 
 const htmlExport = computed(() => toHtmlSnippet(preview.value))
 const markdownExport = computed(() => toMarkdown(preview.value))
-const activeExport = computed(() => (exportMode.value === 'html' ? htmlExport.value : markdownExport.value))
+const activeExport = computed(() =>
+  exportMode.value === 'html' ? htmlExport.value : markdownExport.value,
+)
 
 const copyActiveExport = async () => {
   if (!activeExport.value) return
@@ -113,13 +123,14 @@ const baconDecrypt = (input: string) => {
     <template #theory>
       <h3>The Origin Story</h3>
       <p>
-        <strong>Bacon's Encoding</strong> is a steganographic system attributed to Francis Bacon in the
-        early 1600s. Instead of disguising a message by shifting or scrambling letters, it hides the
-        payload inside an innocent-looking cover text by giving letters one of two visual styles.
+        <strong>Bacon's Encoding</strong> is a steganographic system attributed to Francis Bacon in
+        the early 1600s. Instead of disguising a message by shifting or scrambling letters, it hides
+        the payload inside an innocent-looking cover text by giving letters one of two visual
+        styles.
       </p>
       <p>
-        That distinction matters: this is less about secret math and more about covert signaling.
-        To a casual reader the text still looks readable, but to someone who knows the pattern, the
+        That distinction matters: this is less about secret math and more about covert signaling. To
+        a casual reader the text still looks readable, but to someone who knows the pattern, the
         typography itself becomes the channel.
       </p>
 
@@ -146,8 +157,8 @@ const baconDecrypt = (input: string) => {
 
       <h3>The Binary Mapping</h3>
       <p>
-        Internally, the encoder converts each secret letter to its alphabet index using A=0,
-        B=1, ..., Z=25. That number is then written as a five-bit binary value and translated into
+        Internally, the encoder converts each secret letter to its alphabet index using A=0, B=1,
+        ..., Z=25. That number is then written as a five-bit binary value and translated into
         <code>a</code>/<code>b</code> symbols.
       </p>
       <div class="cipher-example">
@@ -155,8 +166,8 @@ const baconDecrypt = (input: string) => {
         H = 7<br />
         7 in binary = <code>00111</code><br />
         <code>00111</code> becomes <code>aabbb</code><br />
-        So the next five alphabetic letters in the cover text are styled as:
-        normal, normal, emphasized, emphasized, emphasized.
+        So the next five alphabetic letters in the cover text are styled as: normal, normal,
+        emphasized, emphasized, emphasized.
       </div>
       <p>
         If your secret message is <code>HELLO</code>, the encoder creates 25 total bits, so you need
@@ -176,16 +187,16 @@ const baconDecrypt = (input: string) => {
         0, and the stream is then chunked into five-bit groups to recover the hidden message.
       </p>
       <p>
-        The HTML export preserves explicit <code>span</code> classes for reliable recovery, while the
-        Markdown export uses bold formatting as a lightweight fallback.
+        The HTML export preserves explicit <code>span</code> classes for reliable recovery, while
+        the Markdown export uses bold formatting as a lightweight fallback.
       </p>
 
       <h3>Modern Perspective</h3>
       <p>
         Bacon's Encoding is a good lesson in the difference between <strong>encryption</strong> and
-        <strong>steganography</strong>. The message is not mathematically protected against a curious
-        observer who notices the pattern; instead, the goal is to avoid attracting attention in the
-        first place.
+        <strong>steganography</strong>. The message is not mathematically protected against a
+        curious observer who notices the pattern; instead, the goal is to avoid attracting attention
+        in the first place.
       </p>
       <p>
         So the real risk is not brute force. It is detection. If the styling contrast is too loud,
@@ -218,7 +229,9 @@ const baconDecrypt = (input: string) => {
             <label class="control-label">Live Preview</label>
           </div>
           <div class="bacon-preview">
-            <span v-for="(item, idx) in preview" :key="idx" :class="`b-${item.type}`">{{ item.char }}</span>
+            <span v-for="(item, idx) in preview" :key="idx" :class="`b-${item.type}`">{{
+              item.char
+            }}</span>
           </div>
         </div>
 
@@ -233,7 +246,11 @@ const baconDecrypt = (input: string) => {
               >
                 {{ exportMode === 'html' ? 'Switch to Markdown (m)' : 'Switch to HTML (m)' }}
               </button>
-              <button class="cipher-button bacon-secondary-button" type="button" @click="copyActiveExport">
+              <button
+                class="cipher-button bacon-secondary-button"
+                type="button"
+                @click="copyActiveExport"
+              >
                 Copy {{ exportMode.toUpperCase() }}
               </button>
             </div>
@@ -241,7 +258,6 @@ const baconDecrypt = (input: string) => {
           <p v-if="copiedNotice" class="bacon-copy-notice">{{ copiedNotice }}</p>
           <textarea :value="activeExport" rows="8" class="cipher-textarea" readonly />
         </div>
-
       </div>
     </template>
 
@@ -276,7 +292,6 @@ const baconDecrypt = (input: string) => {
   gap: 0.75rem;
   flex-wrap: wrap;
 }
-
 
 .bacon-preview {
   border: 1px solid var(--cryptotron-border-glow);

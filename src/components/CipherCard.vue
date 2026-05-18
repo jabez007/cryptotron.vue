@@ -84,11 +84,7 @@
               <span>{{ encryptError }}</span>
             </div>
 
-            <slot
-              name="encryptOutput"
-              :text="encryptOutput"
-              :label="'Output'"
-            >
+            <slot name="encryptOutput" :text="encryptOutput" :label="'Output'">
               <CipherOutput label="Output" :text="encryptOutput" />
             </slot>
           </div>
@@ -97,7 +93,7 @@
         <div ref="decryptPanel" class="tab-panel">
           <div class="cipher-practice">
             <h2 class="section-title">Decrypt Messages</h2>
-            <div class="control-group">
+            <div v-if="props.showCipherKeyOnDecrypt" class="control-group">
               <slot name="cipherKey" panel="decrypt"></slot>
             </div>
 
@@ -136,11 +132,7 @@
               <span>{{ decryptError }}</span>
             </div>
 
-            <slot
-              name="decryptOutput"
-              :text="decryptOutput"
-              :label="'Output'"
-            >
+            <slot name="decryptOutput" :text="decryptOutput" :label="'Output'">
               <CipherOutput label="Output" :text="decryptOutput" />
             </slot>
           </div>
@@ -151,7 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { PropType } from 'vue'
 import CipherOutput from './CipherOutput.vue'
 import ScanLine from './ScanLine.vue'
@@ -184,6 +176,23 @@ const props = defineProps({
   },
   normalModeKeyHandler: {
     type: Function as PropType<((key: string, activeTab: string) => boolean) | undefined>,
+    required: false,
+  },
+  showCipherKeyOnDecrypt: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
+  onEncryptInputChange: {
+    type: Function as PropType<((value: string) => void) | undefined>,
+    required: false,
+  },
+  onEncryptClear: {
+    type: Function as PropType<(() => void) | undefined>,
+    required: false,
+  },
+  onDecryptClear: {
+    type: Function as PropType<(() => void) | undefined>,
     required: false,
   },
 })
@@ -386,7 +395,12 @@ const clearEncrypt = () => {
   encryptInput.value = ''
   encryptOutput.value = ''
   encryptError.value = ''
+  props.onEncryptClear?.()
 }
+
+watch(encryptInput, (value) => {
+  props.onEncryptInputChange?.(value)
+})
 
 const decryptInput = ref('')
 const decryptOutput = ref('')
@@ -409,6 +423,7 @@ const clearDecrypt = () => {
   decryptInput.value = ''
   decryptOutput.value = ''
   decryptError.value = ''
+  props.onDecryptClear?.()
 }
 
 const isCracking = ref(false)

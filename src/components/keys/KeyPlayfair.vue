@@ -1,7 +1,12 @@
 <template>
   <div class="form-control">
     <label class="control-label">Keyword:</label>
-    <input class="cipher-input" type="text" v-model.lazy="keyword.value" placeholder="e.g. MONARCHY" />
+    <input
+      class="cipher-input"
+      type="text"
+      v-model.lazy="keyword.value"
+      placeholder="e.g. MONARCHY"
+    />
     <div v-if="keyword.hasError" class="error-messages">
       <p v-for="error in keyword.errors" :key="error">{{ error }}</p>
     </div>
