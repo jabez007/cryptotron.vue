@@ -235,7 +235,10 @@ const tagsDecrypt = (input: string) => {
     <template #cipherKey>
       <div class="control-grid">
         <div class="control-group">
-          <label class="control-label">Encoding Mode</label>
+          <label class="control-label">
+            Encoding Mode
+            <span class="label-hint">(m)</span>
+          </label>
           <select v-model="encodingMode" class="cipher-select">
             <option value="tags">Unicode Tags</option>
             <option value="zero-width-binary">Zero-width Binary</option>
@@ -378,12 +381,21 @@ const tagsDecrypt = (input: string) => {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 1.5rem;
-  align-items: end;
+  align-items: center;
   margin-bottom: 1.5rem;
 }
 
 .checkbox-group {
-  margin-bottom: 0.75rem;
+  margin-bottom: 0;
+  padding-top: 1.25rem;
+}
+
+.label-hint {
+  font-size: 0.75rem;
+  color: var(--neon-cyan);
+  text-transform: lowercase;
+  margin-left: 0.5rem;
+  opacity: 0.8;
 }
 
 .mode-option {
