@@ -1157,46 +1157,55 @@ export const generateAcrostic = (
     const level = LOG_LEVELS[Math.floor(Math.random() * LOG_LEVELS.length)]
     const sub = SUBSYSTEMS[Math.floor(Math.random() * SUBSYSTEMS.length)]
 
-    // Find a word for the constraint
-    let anchorWord = ''
+    // Find words for the constraints
+    let anchorStart = ''
+    let anchorEnd = ''
 
     // 1. Try our curated Log Lexicon first for realism
-    const isTrailing = mode === 'telestic' || mode === 'compound'
-    const curated = (isTrailing ? LOG_LEXICON_END[char] : LOG_LEXICON[char]) || []
-    if (curated.length > 0) {
-      anchorWord = curated[Math.floor(Math.random() * curated.length)]
+    const isTrailing = mode === 'telestic'
+    if (mode === 'acrostic' || mode === 'compound') {
+      const pool = LOG_LEXICON[char] || []
+      if (pool.length > 0) anchorStart = pool[Math.floor(Math.random() * pool.length)]
+    }
+    if (isTrailing || mode === 'compound') {
+      const pool = (LOG_LEXICON_END[char] || []).filter((w) => w !== anchorStart)
+      if (pool.length > 0) anchorEnd = pool[Math.floor(Math.random() * pool.length)]
     }
 
     // 2. Fallback to RiTa if curated list is empty or for extra variety (20% chance)
-    if (!anchorWord || Math.random() < 0.2) {
-      const searchRegex = isTrailing ? new RegExp(`${char}$`, 'i') : new RegExp(`^${char}`, 'i')
-
-      const candidates = RiTa.searchSync(searchRegex, {
+    if ((mode === 'acrostic' || mode === 'compound') && (!anchorStart || Math.random() < 0.2)) {
+      const candidates = RiTa.searchSync(new RegExp(`^${char}`, 'i'), {
         limit: 50,
         pos: 'nn|jj|vb',
       })
-
       if (candidates.length > 0) {
-        // Prefer technical-sounding fallback words
         const technical = candidates.filter((w) =>
           /sync|node|data|crypt|core|pulse|link|void|dark|neon|host|port|scan|test|auth|admin|user|file/i.test(
             w,
           ),
         )
         const pool = technical.length > 0 ? technical : candidates
-        anchorWord = pool[Math.floor(Math.random() * pool.length)]
+        anchorStart = pool[Math.floor(Math.random() * pool.length)]
+      }
+    }
+    if ((isTrailing || mode === 'compound') && (!anchorEnd || Math.random() < 0.2)) {
+      const candidates = RiTa.searchSync(new RegExp(`${char}$`, 'i'), {
+        limit: 50,
+        pos: 'nn|jj|vb',
+      }).filter((w) => w !== anchorStart)
+      if (candidates.length > 0) {
+        const technical = candidates.filter((w) =>
+          /sync|node|data|crypt|core|pulse|link|void|dark|neon|host|port|scan|test|auth|admin|user|file/i.test(
+            w,
+          ),
+        )
+        const pool = technical.length > 0 ? technical : candidates
+        anchorEnd = pool[Math.floor(Math.random() * pool.length)]
       }
     }
 
-    // 3. Final Fallback to original logic (leading match) if trailing-match failed everywhere
-    if (!anchorWord && isTrailing) {
-      const originalCurated = LOG_LEXICON[char] || []
-      if (originalCurated.length > 0) {
-        anchorWord = originalCurated[Math.floor(Math.random() * originalCurated.length)]
-      }
-    }
-
-    if (!anchorWord) anchorWord = char.toUpperCase()
+    if (!anchorStart) anchorStart = char.toUpperCase()
+    if (!anchorEnd) anchorEnd = char.toUpperCase()
 
     // Generate filler that sounds like the end of a log line
     const markov = RiTa.markov(2)
@@ -1207,12 +1216,12 @@ export const generateAcrostic = (
     filler = filler.replace(/^(\[[^\]]+\]\s*)+/, '')
 
     if (mode === 'acrostic') {
-      return `[${ts}] [${level}] [${sub}] [PID:${pid}] ${anchorWord.toUpperCase()} ${filler}`
+      return `[${ts}] [${level}] [${sub}] [PID:${pid}] ${anchorStart.toUpperCase()} ${filler}`
     } else if (mode === 'telestic') {
-      return `[${ts}] [${level}] [PID:${pid}] ${sub}: ${filler} ${anchorWord.toUpperCase()}`
+      return `[${ts}] [${level}] [PID:${pid}] ${sub}: ${filler} ${anchorEnd.toUpperCase()}`
     } else {
       // Compound
-      return `[${ts}] [${level}] [${sub}] [PID:${pid}] ${anchorWord.toUpperCase()} ${filler} ${anchorWord.toUpperCase()}`
+      return `[${ts}] [${level}] [${sub}] [PID:${pid}] ${anchorStart.toUpperCase()} ${filler} ${anchorEnd.toUpperCase()}`
     }
   })
 
