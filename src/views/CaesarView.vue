@@ -17,7 +17,7 @@ const caesarCipherKey = ref({
     :crack-algorithm="caesar.crack"
     v-model:cipher-key="caesarCipherKey"
   >
-    <template v-slot:theory>
+    <template #theory>
       <h3>The Origin Story</h3>
       <p>
         The Caesar cipher is named after Julius Caesar (100 BC – 44 BC), who reportedly used it with
@@ -69,8 +69,12 @@ const caesarCipherKey = ref({
         ciphers like the Vigenère.
       </p>
     </template>
-    <template v-slot:cipherKey>
+    <template #cipherKey>
       <KeyCaesar v-model:cipherKey="caesarCipherKey" />
     </template>
   </CipherCard>
 </template>
+
+<style scoped>
+@import '@/assets/cipher-card.css';
+</style>

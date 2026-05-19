@@ -61,12 +61,13 @@
           <div class="cipher-practice">
             <h2 class="section-title">Encrypt Messages</h2>
             <div class="control-group">
-              <slot name="cipherKey"></slot>
+              <slot name="cipherKey" panel="encrypt"></slot>
             </div>
 
             <div class="control-group">
               <label class="control-label">Input Text:</label>
               <textarea
+                ref="encryptInputField"
                 v-model="encryptInput"
                 placeholder="Enter text to encrypt..."
                 class="cipher-textarea"
@@ -83,20 +84,23 @@
               <span>{{ encryptError }}</span>
             </div>
 
-            <CipherOutput label="Output" :text="encryptOutput" />
+            <slot name="encryptOutput" :text="encryptOutput" :label="'Output'">
+              <CipherOutput label="Output" :text="encryptOutput" />
+            </slot>
           </div>
         </div>
 
         <div ref="decryptPanel" class="tab-panel">
           <div class="cipher-practice">
             <h2 class="section-title">Decrypt Messages</h2>
-            <div class="control-group">
-              <slot name="cipherKey"></slot>
+            <div v-if="props.showCipherKeyOnDecrypt" class="control-group">
+              <slot name="cipherKey" panel="decrypt"></slot>
             </div>
 
             <div class="control-group">
               <label class="control-label">Input Text:</label>
               <textarea
+                ref="decryptInputField"
                 v-model="decryptInput"
                 placeholder="Enter text to decrypt..."
                 class="cipher-textarea"
@@ -128,7 +132,9 @@
               <span>{{ decryptError }}</span>
             </div>
 
-            <CipherOutput label="Output" :text="decryptOutput" />
+            <slot name="decryptOutput" :text="decryptOutput" :label="'Output'">
+              <CipherOutput label="Output" :text="decryptOutput" />
+            </slot>
           </div>
         </div>
       </div>
@@ -137,7 +143,8 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import type { PropType } from 'vue'
 import CipherOutput from './CipherOutput.vue'
 import ScanLine from './ScanLine.vue'
 import CyberIcon from './icons/CyberIcon.vue'
@@ -163,6 +170,31 @@ const props = defineProps({
     type: Function,
     required: false,
   },
+  encryptOutputOverride: {
+    type: Function as PropType<(() => string) | undefined>,
+    required: false,
+  },
+  normalModeKeyHandler: {
+    type: Function as PropType<((key: string, activeTab: string) => boolean) | undefined>,
+    required: false,
+  },
+  showCipherKeyOnDecrypt: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
+  onEncryptInputChange: {
+    type: Function as PropType<((value: string) => void) | undefined>,
+    required: false,
+  },
+  onEncryptClear: {
+    type: Function as PropType<(() => void) | undefined>,
+    required: false,
+  },
+  onDecryptClear: {
+    type: Function as PropType<(() => void) | undefined>,
+    required: false,
+  },
 })
 
 const emit = defineEmits<{
@@ -174,6 +206,8 @@ const root = ref<HTMLElement | null>(null)
 const theoryPanel = ref<HTMLElement | null>(null)
 const encryptPanel = ref<HTMLElement | null>(null)
 const decryptPanel = ref<HTMLElement | null>(null)
+const encryptInputField = ref<HTMLTextAreaElement | null>(null)
+const decryptInputField = ref<HTMLTextAreaElement | null>(null)
 
 const getPanel = (tabId: string) => {
   if (tabId === 'theory') return theoryPanel.value
@@ -226,8 +260,8 @@ const isKeyMode = ref(false)
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.defaultPrevented) return
 
-  // Ignore shortcuts if Ctrl, Meta (Cmd), or Alt are pressed
-  if (e.ctrlKey || e.metaKey || e.altKey) return
+  // Ignore shortcuts if any modifier key is pressed
+  if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
 
   const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)
   const isKeyInput = (e.target as HTMLElement).classList.contains('cipher-input')
@@ -263,13 +297,17 @@ const handleKeydown = (e: KeyboardEvent) => {
   if (!isInsertMode.value) {
     switch (key) {
       case 'i': {
-        const panel = getPanel(cipherActiveTab.value)
-        const textarea = panel?.querySelector('textarea') as HTMLTextAreaElement
-        if (textarea) {
+        const target =
+          cipherActiveTab.value === 'encrypt'
+            ? encryptInputField.value
+            : cipherActiveTab.value === 'decrypt'
+              ? decryptInputField.value
+              : null
+        if (target) {
           e.preventDefault()
           isInsertMode.value = true
           isKeyMode.value = false
-          setTimeout(() => textarea.focus(), 0)
+          setTimeout(() => target.focus(), 0)
         }
         break
       }
@@ -309,6 +347,12 @@ const handleKeydown = (e: KeyboardEvent) => {
         break
       case 'y':
         yankOutput()
+        break
+      default:
+        if (props.normalModeKeyHandler) {
+          const handled = props.normalModeKeyHandler(key, cipherActiveTab.value)
+          if (handled) e.preventDefault()
+        }
         break
     }
   }
@@ -351,7 +395,12 @@ const clearEncrypt = () => {
   encryptInput.value = ''
   encryptOutput.value = ''
   encryptError.value = ''
+  props.onEncryptClear?.()
 }
+
+watch(encryptInput, (value) => {
+  props.onEncryptInputChange?.(value)
+})
 
 const decryptInput = ref('')
 const decryptOutput = ref('')
@@ -374,6 +423,7 @@ const clearDecrypt = () => {
   decryptInput.value = ''
   decryptOutput.value = ''
   decryptError.value = ''
+  props.onDecryptClear?.()
 }
 
 const isCracking = ref(false)
@@ -381,7 +431,11 @@ const showYankedTooltip = ref(false)
 let crackTimer: ReturnType<typeof setTimeout> | null = null
 
 const yankOutput = () => {
-  const output = cipherActiveTab.value === 'encrypt' ? encryptOutput.value : decryptOutput.value
+  const overriddenEncryptOutput = props.encryptOutputOverride?.()
+  const output =
+    cipherActiveTab.value === 'encrypt'
+      ? (overriddenEncryptOutput ?? encryptOutput.value)
+      : decryptOutput.value
   if (!output) return
 
   navigator.clipboard

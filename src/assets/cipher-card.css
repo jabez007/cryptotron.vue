@@ -49,18 +49,18 @@
   color: var(--cryptotron-text-secondary);
 }
 
-.theory-content :deep(h3) {
+.theory-content h3 {
   color: var(--neon-green);
   font-family: 'Orbitron', monospace;
   margin: 1.5rem 0 1rem 0;
   font-size: 1.2rem;
 }
 
-.theory-content :deep(p) {
+.theory-content p {
   margin-bottom: 1rem;
 }
 
-:deep(.cipher-example) {
+.cipher-example {
   background: rgba(0, 255, 255, 0.05);
   border: 1px solid rgba(0, 255, 255, 0.2);
   border-radius: 8px;
@@ -75,7 +75,7 @@
   margin-bottom: 1.5rem;
 }
 
-:deep(.control-label) {
+.control-label {
   display: block;
   color: var(--neon-green);
   font-weight: 700;
@@ -85,7 +85,8 @@
   font-size: 0.9rem;
 }
 
-:deep(.cipher-input),
+.cipher-input,
+.cipher-select,
 .cipher-textarea {
   width: 100%;
   background: rgba(0, 0, 0, 0.7);
@@ -98,8 +99,19 @@
   transition: all 0.3s ease;
 }
 
+.cipher-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300ff41' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  appearance: none;
+}
+
 .cipher-input:focus,
-.cipher-textarea:focus {
+.cipher-textarea:focus,
+.cipher-select:focus {
   outline: none;
   border-color: var(--neon-cyan);
   box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
@@ -258,4 +270,48 @@
   flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1rem;
+}
+
+/* Shared Theory Styles */
+.theory-content code {
+  font-family: var(--font-mono);
+  color: var(--neon-green);
+}
+
+.theory-content ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.theory-content li {
+  line-height: 1.6;
+}
+
+.anatomy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.anatomy-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--cryptotron-border-glow);
+  padding: 1.25rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.anatomy-card h4 {
+  color: var(--neon-green);
+  margin-bottom: 0.75rem;
+  font-family: Orbitron, sans-serif;
+  font-size: 1rem;
+}
+
+.anatomy-card p {
+  font-size: 0.95rem;
+  margin-bottom: 0;
 }

@@ -57,5 +57,30 @@ export default (parentRouteName?: string) => {
       path: `${rootPath}rail-fence`,
       component: () => import('@/views/RailFenceView.vue'),
     },
+    {
+      name: 'cryptotron-columnar',
+      path: `${rootPath}columnar`,
+      component: () => import('@/views/ColumnarView.vue'),
+    },
+    {
+      name: 'cryptotron-playfair',
+      path: `${rootPath}playfair`,
+      component: () => import('@/views/PlayfairView.vue'),
+    },
+    {
+      name: 'cryptotron-bacon',
+      path: `${rootPath}bacon`,
+      component: () => import('@/views/BaconView.vue'),
+    },
+    {
+      name: 'cryptotron-emoji-smuggling',
+      path: `${rootPath}emoji-smuggling`,
+      component: () => import('@/views/EmojiSmugglingView.vue'),
+    },
+    {
+      name: 'cryptotron-acrostic',
+      path: `${rootPath}acrostic`,
+      component: () => import('@/views/AcrosticsView.vue'),
+    },
   ]
 }
