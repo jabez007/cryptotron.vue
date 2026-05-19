@@ -376,7 +376,7 @@ const decodeVariationSelectors = (encodedText: string): string => {
   return ''
 }
 
-const decodeZeroWidthBinary = (encodedText: string): string => {
+export const decodeZeroWidthBinary = (encodedText: string): string => {
   let bits = ''
   for (const char of encodedText) {
     if (char === ZW_ZERO) bits += '0'
@@ -387,7 +387,7 @@ const decodeZeroWidthBinary = (encodedText: string): string => {
   if (!bits.trim()) return ''
 
   const decodeChunk = (chunk: string): string => {
-    if (!/^[01]{7,8}$/.test(chunk)) return ''
+    if (chunk.length < 7) return ''
     const code = Number.parseInt(chunk, 2)
     return code >= 0x20 && code <= 0x7e ? String.fromCharCode(code) : ''
   }
@@ -403,11 +403,12 @@ const decodeZeroWidthBinary = (encodedText: string): string => {
   if (tokenOutput.length > 0) return tokenOutput
 
   const compact = bits.replace(/\s+/g, '')
-  const tryFixedWidth = (value: string, width: 7 | 8 | 16): string => {
+  const tryFixedWidth = (value: string, width: number): string => {
     if (value.length < width || value.length % width !== 0) return ''
     let out = ''
     for (let i = 0; i < value.length; i += width) {
       const code = Number.parseInt(value.slice(i, i + width), 2)
+      // Standard printable ASCII only
       if (code < 0x20 || code > 0x7e) return ''
       out += String.fromCharCode(code)
     }
@@ -415,7 +416,7 @@ const decodeZeroWidthBinary = (encodedText: string): string => {
   }
 
   const reverseBits = compact.replace(/[01]/g, (b) => (b === '0' ? '1' : '0'))
-  const widths: (7 | 8 | 16)[] = [8, 7, 16]
+  const widths = [8, 7, 16]
 
   for (const candidate of [compact, reverseBits]) {
     for (const width of widths) {
