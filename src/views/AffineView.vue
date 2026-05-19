@@ -18,7 +18,7 @@ const affineCipherKey = ref({
     :crack-algorithm="affine.crack"
     v-model:cipher-key="affineCipherKey"
   >
-    <template v-slot:theory>
+    <template #theory>
       <h3>The Origin Story</h3>
       <p>
         The Affine cipher is an affine substitution cipher over modular arithmetic, combining
@@ -75,8 +75,12 @@ const affineCipherKey = ref({
         significantly, underpins much of modern symmetric encryption.
       </p>
     </template>
-    <template v-slot:cipherKey>
+    <template #cipherKey>
       <KeyAffine v-model:cipherKey="affineCipherKey" />
     </template>
   </CipherCard>
 </template>
+
+<style scoped>
+@import '@/assets/cipher-card.css';
+</style>

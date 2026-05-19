@@ -18,7 +18,7 @@ const autokeyCipherKey = ref({
     :crack-algorithm="autokey.crack"
     v-model:cipher-key="autokeyCipherKey"
   >
-    <template v-slot:theory>
+    <template #theory>
       <h3>The Origin Story</h3>
       <p>
         The Autokey cipher was designed to fix the greatest weakness of the Vigenère cipher: the
@@ -77,12 +77,13 @@ const autokeyCipherKey = ref({
         non-repeating as possible.
       </p>
     </template>
-    <template v-slot:cipherKey>
+    <template #cipherKey>
       <KeyAutokey v-model:cipher-key="autokeyCipherKey" />
     </template>
   </CipherCard>
 </template>
 
 <style scoped>
+@import '@/assets/cipher-card.css';
 @import '@/assets/example-grid.css';
 </style>

@@ -271,3 +271,47 @@
   gap: 1rem;
   margin-top: 1rem;
 }
+
+/* Shared Theory Styles */
+.theory-content code {
+  font-family: var(--font-mono);
+  color: var(--neon-green);
+}
+
+.theory-content ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.theory-content li {
+  line-height: 1.6;
+}
+
+.anatomy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.anatomy-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--cryptotron-border-glow);
+  padding: 1.25rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.anatomy-card h4 {
+  color: var(--neon-green);
+  margin-bottom: 0.75rem;
+  font-family: Orbitron, sans-serif;
+  font-size: 1rem;
+}
+
+.anatomy-card p {
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}

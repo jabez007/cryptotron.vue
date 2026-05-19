@@ -17,7 +17,7 @@ const columnarCipherKey = ref({
     :crack-algorithm="columnar.crack"
     v-model:cipher-key="columnarCipherKey"
   >
-    <template v-slot:theory>
+    <template #theory>
       <h3>Scrambling the Grid</h3>
       <p>
         Unlike substitution ciphers that replace letters, the Columnar Transposition cipher is a
@@ -119,8 +119,12 @@ const columnarCipherKey = ref({
         manual nature made it ideal for agents in the field who lacked complex machines.
       </p>
     </template>
-    <template v-slot:cipherKey>
+    <template #cipherKey>
       <KeyColumnar v-model:cipherKey="columnarCipherKey" />
     </template>
   </CipherCard>
 </template>
+
+<style scoped>
+@import '@/assets/cipher-card.css';
+</style>

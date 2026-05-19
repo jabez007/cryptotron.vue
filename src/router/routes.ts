@@ -77,5 +77,10 @@ export default (parentRouteName?: string) => {
       path: `${rootPath}emoji-smuggling`,
       component: () => import('@/views/EmojiSmugglingView.vue'),
     },
+    {
+      name: 'cryptotron-acrostic',
+      path: `${rootPath}acrostic`,
+      component: () => import('@/views/AcrosticsView.vue'),
+    },
   ]
 }

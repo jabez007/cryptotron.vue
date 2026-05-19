@@ -17,7 +17,7 @@ const playfairCipherKey = ref({
     :crack-algorithm="playfair.crack"
     v-model:cipher-key="playfairCipherKey"
   >
-    <template v-slot:theory>
+    <template #theory>
       <h3>The Origin Story</h3>
       <p>
         The Playfair cipher was the first practical digraph substitution cipher. It was invented in
@@ -87,8 +87,12 @@ const playfairCipherKey = ref({
         vulnerable to frequency analysis of digraphs and can be broken with modern cryptanalysis.
       </p>
     </template>
-    <template v-slot:cipherKey>
+    <template #cipherKey>
       <KeyPlayfair v-model:cipherKey="playfairCipherKey" />
     </template>
   </CipherCard>
 </template>
+
+<style scoped>
+@import '@/assets/cipher-card.css';
+</style>
