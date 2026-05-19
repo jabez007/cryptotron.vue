@@ -164,8 +164,8 @@ const TAG_END = '\u{e007f}'
 const TAG_MIN = 0xe0020
 const TAG_MAX = 0xe007e
 const ALT_TAG_OFFSET = 0xe00f0
-const ALT_TAG_MIN = 0xe0110
-const ALT_TAG_MAX = 0xe016e
+const ALT_TAG_MIN = 0xe00f1
+const ALT_TAG_MAX = 0xe00ff
 const ZW_ZERO = '\u200c'
 const ZW_ONE = '\u200d'
 const ZW_SEP = '\u200b'
@@ -243,7 +243,7 @@ export const tagsEncoder = (
     invisible = tokens.map(byteToVariationSelector).join('')
   } else if (mode === 'variation-selectors') {
     const bytes = new TextEncoder().encode(secret)
-    invisible = [...bytes, BYTE_SEP].map(byteToVariationSelector).join('')
+    invisible = [...bytes].map(byteToVariationSelector).join('')
   } else if (mode === 'zero-width-binary') {
     invisible = asciiCodes
       .map((cp) => cp.toString(2).padStart(8, '0').replace(/0/g, ZW_ZERO).replace(/1/g, ZW_ONE))
@@ -287,12 +287,8 @@ export const tagsEncoder = (
 const decodeUtf8Bytes = (bytes: number[]): string => {
   if (bytes.length === 0) return ''
 
-  const boundary = bytes.lastIndexOf(BYTE_SEP)
-  const payload = boundary >= 0 ? bytes.slice(0, boundary) : bytes
-  if (payload.length === 0) return ''
-
   try {
-    return new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(payload))
+    return new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(bytes))
   } catch {
     return ''
   }
@@ -441,6 +437,21 @@ export const detectTagsPayloadFormat = (encodedText: string): string => {
   const zeroWidthSecret = decodeZeroWidthBinary(encodedText)
   if (zeroWidthSecret.length > 0) return 'Zero-width Binary'
 
+  let hasPrimary = false
+  let hasAlt = false
+
+  for (const char of encodedText) {
+    const cp = char.codePointAt(0)
+    if (cp === undefined) continue
+    if ((cp >= TAG_MIN && cp <= TAG_MAX) || char === TAG_START || char === TAG_END)
+      hasPrimary = true
+    if (cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) hasAlt = true
+  }
+
+  if (hasPrimary && hasAlt) return 'Unicode Tags + Alt Tags'
+  if (hasPrimary) return 'Unicode Tags'
+  if (hasAlt) return 'Alt Tags'
+
   const variationBytes: number[] = []
   for (const char of encodedText) {
     const cp = char.codePointAt(0)
@@ -464,21 +475,6 @@ export const detectTagsPayloadFormat = (encodedText: string): string => {
       return 'Variation Selectors (UTF-8 bytes)'
     }
   }
-
-  let hasPrimary = false
-  let hasAlt = false
-
-  for (const char of encodedText) {
-    const cp = char.codePointAt(0)
-    if (cp === undefined) continue
-    if ((cp >= TAG_MIN && cp <= TAG_MAX) || char === TAG_START || char === TAG_END)
-      hasPrimary = true
-    if (cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) hasAlt = true
-  }
-
-  if (hasPrimary && hasAlt) return 'Unicode Tags + Alt Tags'
-  if (hasPrimary) return 'Unicode Tags'
-  if (hasAlt) return 'Alt Tags'
 
   return 'No hidden payload detected'
 }

@@ -168,7 +168,7 @@ describe('Invisible Steganography (Tags, ZW, VS)', () => {
     })
 
     it('detects Alt Tags format (using a range that triggers it)', () => {
-      const ALT_TAG_MIN = 0xe0110
+      const ALT_TAG_MIN = 0xe00f1
       const encoded = String.fromCodePoint(ALT_TAG_MIN)
       expect(detectTagsPayloadFormat(encoded)).toBe('Alt Tags')
     })
