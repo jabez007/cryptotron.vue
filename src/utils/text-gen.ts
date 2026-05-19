@@ -1150,6 +1150,10 @@ export const generateAcrostic = (
   const fiveMinutesAgo = Date.now() - 5 * 60 * 1000
   const timeStep = (5 * 60 * 1000) / (letters.length || 1)
 
+  // Pre-build Markov model once for efficiency
+  const markov = RiTa.markov(2)
+  markov.addText(REALISTIC_LOGS)
+
   const lines = letters.map((char, index) => {
     const entryTime = new Date(fiveMinutesAgo + index * timeStep + Math.random() * timeStep)
     const ts = getTimestamp(entryTime)
@@ -1208,8 +1212,6 @@ export const generateAcrostic = (
     if (!anchorEnd) anchorEnd = char.toUpperCase()
 
     // Generate filler that sounds like the end of a log line
-    const markov = RiTa.markov(2)
-    markov.addText(REALISTIC_LOGS)
     let filler = markov.generate() || 'protocol execution completed'
 
     // Clean filler to remove leading timestamps if Markov hallucinated them
