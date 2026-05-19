@@ -263,8 +263,9 @@ const handleKeydown = (e: KeyboardEvent) => {
   // Ignore shortcuts if any modifier key is pressed
   if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
 
-  const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)
-  const isKeyInput = (e.target as HTMLElement).classList.contains('cipher-input')
+  const target = e.target as HTMLElement
+  const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable
+  const isKeyInput = target.classList.contains('cipher-input')
 
   // Prevent collision with global navigation menu
   const isMenuOpen = document.querySelector('.nav-overlay.active') !== null
