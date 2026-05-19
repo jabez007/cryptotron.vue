@@ -17,7 +17,7 @@ const substitutionCipherKey = ref({
     :crack-algorithm="substitution.crack"
     v-model:cipher-key="substitutionCipherKey"
   >
-    <template v-slot:theory>
+    <template #theory>
       <h3>The Origin Story</h3>
       <p>
         The simple substitution cipher is one of the oldest forms of encryption, with variants like
@@ -72,7 +72,7 @@ const substitutionCipherKey = ref({
         structure of the language is not obscured.
       </p>
     </template>
-    <template v-slot:cipherKey>
+    <template #cipherKey>
       <KeySubstitution v-model:cipher-key="substitutionCipherKey" />
     </template>
   </CipherCard>

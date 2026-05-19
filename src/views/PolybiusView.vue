@@ -18,7 +18,7 @@ const polybiusCipherKey = ref({
     :crack-algorithm="polybius.crack"
     v-model:cipher-key="polybiusCipherKey"
   >
-    <template v-slot:theory>
+    <template #theory>
       <h3>The Origin Story</h3>
       <p>
         The Polybius Square is one of the earliest examples of <strong>fractionation</strong> in
@@ -87,7 +87,7 @@ const polybiusCipherKey = ref({
         layers.
       </p>
     </template>
-    <template v-slot:cipherKey>
+    <template #cipherKey>
       <KeyPolybius v-model:cipher-key="polybiusCipherKey" />
     </template>
   </CipherCard>

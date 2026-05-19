@@ -73,7 +73,7 @@ const vigenereCipherKey = ref({
         <strong>One-Time Pad</strong>, which remains mathematically unbreakable if used correctly.
       </p>
     </template>
-    <template v-slot:cipherKey>
+    <template #cipherKey>
       <KeyVigenere v-model:cipher-key="vigenereCipherKey" />
     </template>
   </CipherCard>
