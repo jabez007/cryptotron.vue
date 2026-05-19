@@ -23,9 +23,9 @@ const props = defineProps<{
 const iconSize = computed(() => props.size || 20)
 
 const colors = {
-  cyan: 'var(--neon-cyan)',
-  magenta: 'var(--neon-magenta)',
-  green: 'var(--neon-green)',
+  cyan: 'var(--cryptotron-neon-cyan)',
+  magenta: 'var(--cryptotron-neon-magenta)',
+  green: 'var(--cryptotron-neon-green)',
   secondary: 'var(--cryptotron-text-secondary)',
 }
 </script>

@@ -502,6 +502,49 @@ const crack = async () => {
 <style scoped>
 @import '@/assets/cipher-card.css';
 
+/* Slotted Style Overrides */
+:slotted(.theory-content h3) {
+  color: var(--cryptotron-neon-green);
+  font-family: 'Orbitron', monospace;
+  margin: 1.5rem 0 1rem 0;
+  font-size: 1.2rem;
+}
+
+:slotted(.theory-content p) {
+  margin-bottom: 1rem;
+}
+
+:slotted(.control-label) {
+  display: block;
+  color: var(--cryptotron-neon-green);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+}
+
+:slotted(.cipher-example) {
+  background: rgba(0, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.9rem;
+}
+
+:slotted(ul) {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+:slotted(li) {
+  line-height: 1.6;
+}
+
 .cipher-content {
   min-width: 100%;
   max-width: calc(100vw - 5rem);
@@ -515,7 +558,7 @@ const crack = async () => {
   font-weight: 700;
   text-align: center;
   margin-bottom: 3rem;
-  background: linear-gradient(45deg, var(--neon-green), var(--neon-cyan));
+  background: linear-gradient(45deg, var(--cryptotron-neon-green), var(--cryptotron-neon-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -553,9 +596,9 @@ const crack = async () => {
 }
 
 .yank-alert {
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   font-weight: 700;
-  text-shadow: 0 0 5px var(--neon-green);
+  text-shadow: 0 0 5px var(--cryptotron-neon-green);
   animation: yank-flicker 0.2s infinite;
 }
 
@@ -572,28 +615,28 @@ const crack = async () => {
 
 .vim-status-bar.mode-insert {
   background: rgba(255, 0, 255, 0.15);
-  border-bottom-color: var(--neon-magenta);
+  border-bottom-color: var(--cryptotron-neon-magenta);
 }
 
 .vim-status-bar.mode-key {
   background: rgba(0, 255, 65, 0.15);
-  border-bottom-color: var(--neon-green);
+  border-bottom-color: var(--cryptotron-neon-green);
 }
 
 .mode-tag {
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   font-weight: 700;
   letter-spacing: 1px;
 }
 
 .mode-insert .mode-tag {
-  color: var(--neon-magenta);
-  text-shadow: 0 0 5px var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
+  text-shadow: 0 0 5px var(--cryptotron-neon-magenta);
 }
 
 .mode-key .mode-tag {
-  color: var(--neon-green);
-  text-shadow: 0 0 5px var(--neon-green);
+  color: var(--cryptotron-neon-green);
+  text-shadow: 0 0 5px var(--cryptotron-neon-green);
 }
 
 .mode-hint {
@@ -606,7 +649,7 @@ const crack = async () => {
   align-items: center;
   gap: 0.5rem;
   margin-top: 1rem;
-  color: var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
   font-family: 'Space Mono', monospace;
   font-size: 0.85rem;
   text-transform: uppercase;
@@ -633,7 +676,7 @@ const crack = async () => {
   right: 0;
   height: 2px;
   /*
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta), var(--neon-green));
+  background: linear-gradient(90deg, var(--cryptotron-neon-cyan), var(--cryptotron-neon-magenta), var(--cryptotron-neon-green));
   animation: borderFlow 3s linear infinite;
   */
 }
@@ -686,20 +729,20 @@ const crack = async () => {
 }
 
 .tab-button.active .tab-label {
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
 }
 
 .tab-button.active .tab-label::before {
   content: '> [';
   opacity: 1;
-  color: var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
 }
 
 .tab-button.active .tab-label::after {
   content: '] <';
   opacity: 1;
-  color: var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
 }
 
 .tab-icon {
@@ -754,12 +797,12 @@ const crack = async () => {
 }
 
 .tab-button:hover {
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   background: rgba(0, 255, 255, 0.05);
 }
 
 .tab-button.active {
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   background: rgba(0, 255, 255, 0.1);
 }
 
@@ -770,7 +813,7 @@ const crack = async () => {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+  background: linear-gradient(90deg, var(--cryptotron-neon-cyan), var(--cryptotron-neon-magenta));
   animation: tabGlow 2s ease-in-out infinite alternate;
   will-change: box-shadow;
 }

@@ -306,7 +306,6 @@ const tagsDecrypt = (input: string) => {
 </template>
 
 <style scoped>
-@import '@/assets/cipher-card.css';
 
 .tags-stack {
   display: grid;
@@ -326,8 +325,8 @@ const tagsDecrypt = (input: string) => {
 }
 
 .tags-preview.reveal {
-  color: var(--neon-magenta);
-  text-shadow: 0 0 5px var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
+  text-shadow: 0 0 5px var(--cryptotron-neon-magenta);
   background: rgba(255, 0, 255, 0.08);
 }
 
@@ -345,7 +344,7 @@ const tagsDecrypt = (input: string) => {
 }
 
 .tags-hint code {
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
 }
 
 .mode-picker {
@@ -369,7 +368,7 @@ const tagsDecrypt = (input: string) => {
 
 .label-hint {
   font-size: 0.75rem;
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   text-transform: lowercase;
   margin-left: 0.5rem;
   opacity: 0.8;

@@ -116,7 +116,7 @@
   font-weight: 700;
   text-align: center;
   margin-bottom: 3rem;
-  background: linear-gradient(45deg, var(--neon-green), var(--neon-cyan));
+  background: linear-gradient(45deg, var(--cryptotron-neon-green), var(--cryptotron-neon-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -183,7 +183,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta), var(--neon-green));
+  background: linear-gradient(90deg, var(--cryptotron-neon-cyan), var(--cryptotron-neon-magenta), var(--cryptotron-neon-green));
   animation: borderFlow 5s linear infinite;
   animation-delay: inherit;
 }
@@ -201,7 +201,7 @@
 .card-title {
   font-family: 'Orbitron', monospace;
   font-size: 1.5rem;
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   margin-bottom: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -217,7 +217,7 @@
 }
 
 .highlight {
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   font-weight: 700;
 }
 
@@ -237,7 +237,7 @@
   content: '▶';
   position: absolute;
   left: 0;
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   font-size: 0.8rem;
 }
 
@@ -256,7 +256,7 @@
   padding: 1rem;
   text-align: center;
   font-family: 'Orbitron', monospace;
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -274,7 +274,7 @@
 
 .quote-box {
   background: rgba(0, 255, 65, 0.05);
-  border-left: 4px solid var(--neon-green);
+  border-left: 4px solid var(--cryptotron-neon-green);
   padding: 1.5rem;
   margin: 2rem 0;
   border-radius: 0 8px 8px 0;
@@ -289,7 +289,7 @@
   top: -0.5rem;
   left: 1rem;
   font-size: 3rem;
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   font-family: 'Orbitron', monospace;
 }
 </style>

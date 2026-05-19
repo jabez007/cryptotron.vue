@@ -307,7 +307,6 @@ const baconDecrypt = (input: string) => {
 </template>
 
 <style scoped>
-@import '@/assets/cipher-card.css';
 
 .bacon-practice-stack {
   display: grid;
@@ -348,8 +347,8 @@ const baconDecrypt = (input: string) => {
 
 .b-b {
   font-weight: 700;
-  color: var(--neon-green);
-  text-shadow: 0 0 5px var(--neon-green);
+  color: var(--cryptotron-neon-green);
+  text-shadow: 0 0 5px var(--cryptotron-neon-green);
 }
 
 .bacon-inline-error {
@@ -358,7 +357,7 @@ const baconDecrypt = (input: string) => {
 
 .bacon-copy-notice {
   margin: 0 0 0.5rem;
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   font-family: 'Space Mono', monospace;
   font-size: 0.85rem;
   text-transform: uppercase;

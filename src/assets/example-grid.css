@@ -41,14 +41,14 @@
 }
 
 .char-cell.highlighted {
-  color: var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
   border-color: rgba(255, 0, 255, 0.2);
   background: rgba(255, 0, 255, 0.05);
 }
 
 .char-cell.result {
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   border-color: rgba(0, 255, 65, 0.2);
   background: rgba(0, 255, 65, 0.05);
-  text-shadow: 0 0 5px var(--neon-green);
+  text-shadow: 0 0 5px var(--cryptotron-neon-green);
 }

@@ -263,24 +263,24 @@ const openIssues = () => {
 
 /* Accessibility: Respect OS-level reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
-
   /* CRT effects */
-  .crt-overlay,
-  .scanlines,
-  .crt-overlay::after {
+  .cryptotron-app .crt-overlay,
+  .cryptotron-app .scanlines,
+  .cryptotron-app .crt-overlay::after {
     display: none !important;
   }
 
   /* Glitch text */
-  .glitch-text::before,
-  .glitch-text::after {
+  .cryptotron-app .glitch-text::before,
+  .cryptotron-app .glitch-text::after {
     display: none !important;
   }
 
-  /* Global animations and transitions */
-  *,
-  *::before,
-  *::after {
+  /* Global animations and transitions - Scoped to cryptotron-app */
+  .cryptotron-app,
+  .cryptotron-app *,
+  .cryptotron-app *::before,
+  .cryptotron-app *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -288,17 +288,17 @@ const openIssues = () => {
   }
 
   /* Specific theme elements */
-  .logo,
-  .nav-overlay,
-  .cipher-button::before,
-  .tab-panel.active {
+  .cryptotron-app .logo,
+  .cryptotron-app .nav-overlay,
+  .cryptotron-app .cipher-button::before,
+  .cryptotron-app .tab-panel.active {
     animation: none !important;
     transition: none !important;
   }
 
   /* Route transitions */
-  .cyber-glitch-enter-active,
-  .cyber-glitch-leave-active {
+  .cryptotron-app .cyber-glitch-enter-active,
+  .cryptotron-app .cyber-glitch-leave-active {
     animation: none !important;
     transition: none !important;
   }
@@ -387,7 +387,7 @@ const openIssues = () => {
 header {
   min-width: 100%;
   background: linear-gradient(135deg, var(--cryptotron-darker-bg) 0%, rgba(15, 15, 25, 0.95) 100%);
-  border-bottom: 2px solid var(--neon-cyan);
+  border-bottom: 2px solid var(--cryptotron-neon-cyan);
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   padding: 1rem 2rem;
   position: sticky;
@@ -420,7 +420,7 @@ header {
 
 .crt-toggle-btn:hover {
   transform: scale(1.1);
-  filter: drop-shadow(0 0 5px var(--neon-cyan));
+  filter: drop-shadow(0 0 5px var(--cryptotron-neon-cyan));
 }
 
 .logo {
@@ -430,7 +430,7 @@ header {
   font-family: 'Orbitron', monospace;
   font-size: 2rem;
   font-weight: 900;
-  background: linear-gradient(45deg, var(--neon-cyan), var(--neon-magenta));
+  background: linear-gradient(45deg, var(--cryptotron-neon-cyan), var(--cryptotron-neon-magenta));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -464,7 +464,7 @@ header {
 .hamburger-line {
   width: 100%;
   height: 2px;
-  background: var(--neon-cyan);
+  background: var(--cryptotron-neon-cyan);
   transition: all 0.3s ease;
   transform-origin: center;
   box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
@@ -490,7 +490,7 @@ header {
   height: calc(100vh - 50px);
   background: linear-gradient(135deg, var(--cryptotron-darker-bg) 0%, rgba(15, 15, 25, 0.98) 100%);
   backdrop-filter: blur(20px);
-  border-left: 2px solid var(--neon-cyan);
+  border-left: 2px solid var(--cryptotron-neon-cyan);
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
   transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1000;
@@ -549,7 +549,7 @@ nav a {
 nav a:hover,
 nav a.router-link-exact-active,
 nav a.keyboard-selected {
-  border-color: var(--neon-cyan);
+  border-color: var(--cryptotron-neon-cyan);
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   background: rgba(0, 255, 255, 0.1);
   transform: translateX(10px);
@@ -558,7 +558,7 @@ nav a.keyboard-selected {
 .menu-selection-indicator {
   position: absolute;
   left: 10px;
-  color: var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
   font-weight: 900;
   animation: menu-pulse 1s infinite alternate;
 }
@@ -605,19 +605,19 @@ nav a.router-link-exact-active:hover {
   margin-bottom: 1.5rem;
   border-bottom: 1px solid rgba(0, 255, 255, 0.2);
   transition: all 0.3s ease;
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
 }
 
 .nav-root-link:hover {
   background: rgba(0, 255, 255, 0.1);
   box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-  border-bottom-color: var(--neon-cyan);
+  border-bottom-color: var(--cryptotron-neon-cyan);
 }
 
 .nav-category {
   font-family: 'Orbitron', monospace;
   font-size: 0.8rem;
-  color: var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
   text-transform: uppercase;
   letter-spacing: 2px;
   margin: 2rem 0 1rem 0;
@@ -646,7 +646,7 @@ nav a.router-link-exact-active:hover {
 .app-footer {
   min-width: 100%;
   background: linear-gradient(135deg, var(--cryptotron-darker-bg) 0%, rgba(15, 15, 25, 0.95) 100%);
-  /*border-top: 2px solid var(--neon-cyan);*/
+  /*border-top: 2px solid var(--cryptotron-neon-cyan);*/
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   padding: 0.5rem 2rem;
   display: flex;
@@ -663,10 +663,10 @@ nav a.router-link-exact-active:hover {
   align-items: center;
   gap: 0.5rem;
   background: transparent;
-  border: 1px solid var(--neon-cyan);
+  border: 1px solid var(--cryptotron-neon-cyan);
   border-radius: 12px;
   padding: 0.5rem;
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   font-family: 'Space Mono', monospace;
   font-size: 0.75rem;
   text-transform: uppercase;

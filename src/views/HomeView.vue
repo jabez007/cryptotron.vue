@@ -182,14 +182,14 @@ onUnmounted(() => {
   transform: translateY(-5px);
   box-shadow: 0 15px 40px rgba(0, 255, 255, 0.2);
   outline: none;
-  border-color: var(--neon-cyan);
+  border-color: var(--cryptotron-neon-cyan);
 }
 
 .selection-indicator {
   position: absolute;
   top: 1rem;
   left: 1rem;
-  color: var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
   font-family: 'Space Mono', monospace;
   font-weight: 700;
   font-size: 1.5rem;
@@ -210,7 +210,7 @@ onUnmounted(() => {
 
 .cipher-card h3 {
   font-family: 'Orbitron', monospace;
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   margin-bottom: 1rem;
   font-size: 1.3rem;
 }

@@ -81,7 +81,6 @@ W . . . E . . . C . . . R
 </template>
 
 <style scoped>
-@import '@/assets/cipher-card.css';
 
 pre.cipher-example {
   background: rgba(0, 0, 0, 0.3);

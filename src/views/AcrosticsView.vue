@@ -235,7 +235,6 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
 </template>
 
 <style scoped>
-@import '@/assets/cipher-card.css';
 
 .mode-selector {
   display: flex;
@@ -244,9 +243,9 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
 }
 
 .mode-selector .cipher-button.active {
-  background: var(--neon-cyan);
+  background: var(--cryptotron-neon-cyan);
   color: #000;
-  box-shadow: 0 0 10px var(--neon-cyan);
+  box-shadow: 0 0 10px var(--cryptotron-neon-cyan);
 }
 
 .acrostic-preview {
@@ -267,7 +266,7 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
 }
 
 .gutter-marker {
-  color: var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
   font-weight: 700;
   width: 1.5rem;
   text-align: center;

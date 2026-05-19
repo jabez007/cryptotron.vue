@@ -76,5 +76,4 @@ const caesarCipherKey = ref({
 </template>
 
 <style scoped>
-@import '@/assets/cipher-card.css';
 </style>

@@ -1,24 +1,24 @@
 /* Chrome, Edge, and Safari */
-::-webkit-scrollbar {
+.cryptotron-app ::-webkit-scrollbar {
   width: 8px;
 }
 
-::-webkit-scrollbar-track {
+.cryptotron-app ::-webkit-scrollbar-track {
   background: var(--cryptotron-darker-bg);
 }
 
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--neon-cyan), var(--neon-magenta));
+.cryptotron-app ::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--cryptotron-neon-cyan), var(--cryptotron-neon-magenta));
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(var(--neon-magenta), var(--neon-green));
+.cryptotron-app ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(var(--cryptotron-neon-magenta), var(--cryptotron-neon-green));
 }
 
 /* Firefox */
-#app-content,
-#app-content :deep(*) {
+.cryptotron-app #app-content,
+.cryptotron-app #app-content :deep(*) {
   scrollbar-width: thin;
-  scrollbar-color: var(--neon-cyan) var(--cryptotron-darker-bg);
+  scrollbar-color: var(--cryptotron-neon-cyan) var(--cryptotron-darker-bg);
 }

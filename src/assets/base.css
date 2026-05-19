@@ -2,9 +2,9 @@
 
 /* color palette and variables for cyberpunk */
 :root {
-  --neon-cyan: #00ffff;
-  --neon-magenta: #ff00ff;
-  --neon-green: #00ff41;
+  --cryptotron-neon-cyan: #00ffff;
+  --cryptotron-neon-magenta: #ff00ff;
+  --cryptotron-neon-green: #00ff41;
   --cryptotron-dark-bg: #0a0a0f;
   --cryptotron-darker-bg: #050508;
   --cryptotron-card-bg: rgba(15, 15, 25, 0.9);
@@ -12,5 +12,5 @@
   --cryptotron-text-primary: #e0e0e0;
   --cryptotron-text-secondary: #a0a0a0;
   --cryptotron-grid-color: rgba(0, 255, 255, 0.1);
-  --section-gap: 160px;
+  --cryptotron-section-gap: 160px;
 }

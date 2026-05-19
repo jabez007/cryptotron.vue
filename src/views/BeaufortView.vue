@@ -82,6 +82,5 @@ const beaufortCipherKey = ref({
 </template>
 
 <style scoped>
-@import '@/assets/cipher-card.css';
 @import '@/assets/example-grid.css';
 </style>

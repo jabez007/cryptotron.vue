@@ -153,7 +153,7 @@ const handleCopy = async () => {
 
 .control-label {
   display: block;
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   font-weight: 700;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
@@ -170,19 +170,19 @@ const handleCopy = async () => {
   height: 120px;
   overflow: auto;
   background: rgba(0, 0, 0, 0.8);
-  border: 1px solid var(--neon-green);
+  border: 1px solid var(--cryptotron-neon-green);
   border-radius: 6px;
   padding: 1rem;
   padding-right: 3rem;
   font-family: 'Space Mono', monospace;
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   word-break: break-all;
   white-space: pre-wrap;
 }
 
 /* Terminal effects */
 .terminal-text {
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
 }
 
@@ -190,9 +190,9 @@ const handleCopy = async () => {
   display: inline-block;
   width: 2px;
   height: 1.2em;
-  background: var(--neon-green);
+  background: var(--cryptotron-neon-green);
   margin-left: 2px;
-  box-shadow: 0 0 8px var(--neon-green);
+  box-shadow: 0 0 8px var(--cryptotron-neon-green);
   animation: blink 1.2s infinite;
   vertical-align: text-bottom;
 }
@@ -257,10 +257,10 @@ const handleCopy = async () => {
   top: 0.5rem;
   right: 0.5rem;
   background: rgba(0, 255, 255, 0.1);
-  border: 1px solid var(--neon-cyan);
+  border: 1px solid var(--cryptotron-neon-cyan);
   border-radius: 4px;
   padding: 0.5rem;
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1rem;
@@ -279,8 +279,8 @@ const handleCopy = async () => {
 
 .copy-button.copied {
   background: rgba(0, 255, 0, 0.2);
-  border-color: var(--neon-green);
-  color: var(--neon-green);
+  border-color: var(--cryptotron-neon-green);
+  color: var(--cryptotron-neon-green);
 }
 
 .copy-button.disabled {
