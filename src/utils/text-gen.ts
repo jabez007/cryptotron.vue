@@ -1113,7 +1113,8 @@ export const generateThematicFiller = (
     const roll = Math.random()
     let content = ''
     if (roll < 0.6) {
-      content = markov.generate()
+      const generated = markov.generate()
+      content = Array.isArray(generated) ? generated.join(' ') : (generated as string)
     } else {
       content = grammar.expand()
     }
@@ -1216,7 +1217,10 @@ export const generateAcrostic = (
     if (!anchorEnd) anchorEnd = char.toUpperCase()
 
     // Generate filler that sounds like the end of a log line
-    let filler = markov.generate() || 'protocol execution completed'
+    const generated = markov.generate()
+    let filler =
+      (Array.isArray(generated) ? generated.join(' ') : (generated as string)) ||
+      'protocol execution completed'
 
     // Clean filler to remove leading timestamps if Markov hallucinated them
     filler = filler.replace(/^(\[[^\]]+\]\s*)+/, '')
