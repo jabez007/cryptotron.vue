@@ -51,9 +51,9 @@ CryptoTron is designed to be operated like a high-tech terminal. Use the followi
 | :--- | :--- |
 | **Substitution** | Caesar, Affine, Simple Substitution |
 | **Polyalphabetic** | Vigenère, Autokey, Beaufort |
-| **Grid & Fractionation** | Polybius Square |
-| **Transposition** | Rail-Fence |
-| **Steganography** | Bacon's Encoding, Emoji Smuggling |
+| **Grid & Fractionation** | Polybius Square, Playfair |
+| **Transposition** | Rail-Fence, Columnar |
+| **Steganography** | Bacon's Encoding, Emoji Smuggling, Acrostics |
 
 ---
 
