@@ -246,8 +246,8 @@ export const tagsEncoder = (
     invisible = [...bytes].map(byteToVariationSelector).join('')
   } else if (mode === 'zero-width-binary') {
     invisible = asciiCodes
-      .map((cp) => cp.toString(2).padStart(8, '0').replace(/0/g, ZW_ZERO).replace(/1/g, ZW_ONE))
-      .join(ZW_SEP)
+      .map((cp) => cp.toString(2).padStart(16, '0').replace(/0/g, ZW_ZERO).replace(/1/g, ZW_ONE))
+      .join('')
   } else {
     if (unsupported.length > 0) {
       const uniqueUnsupported = [...new Set(unsupported)].slice(0, 8)
