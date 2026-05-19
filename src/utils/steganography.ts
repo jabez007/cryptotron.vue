@@ -506,22 +506,44 @@ export const tagsDecoder = (encodedText: string): string => {
 }
 
 export const stripTagsPayload = (encodedText: string): string => {
+  const chars = [...encodedText]
   let cover = ''
-  for (const char of encodedText) {
+
+  const isMarker = (char: string | undefined): boolean => {
+    if (char === undefined) return false
+    const cp = char.codePointAt(0)
+    if (cp === undefined) return false
+    return (
+      (cp >= TAG_MIN && cp <= TAG_MAX) ||
+      char === TAG_START ||
+      char === TAG_END ||
+      (cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX) ||
+      char === ZW_ZERO ||
+      char === ZW_ONE ||
+      char === ZW_SEP
+    )
+  }
+
+  for (let i = 0; i < chars.length; i += 1) {
+    const char = chars[i]
     const cp = char.codePointAt(0)
     if (cp === undefined) {
       cover += char
       continue
     }
 
-    const isPrimaryTag = (cp >= TAG_MIN && cp <= TAG_MAX) || char === TAG_START || char === TAG_END
-    const isAltTag = cp >= ALT_TAG_MIN && cp <= ALT_TAG_MAX
-    const isVariationSelector =
-      (cp >= VS_MIN && cp <= VS_MAX) || (cp >= VS_SUP_MIN && cp <= VS_SUP_MAX)
-    const isZeroWidthPayload = char === ZW_ZERO || char === ZW_ONE || char === ZW_SEP
-    if (!isPrimaryTag && !isAltTag && !isVariationSelector && !isZeroWidthPayload) {
-      cover += char
+    if (isMarker(char)) {
+      continue
     }
+
+    const isVariationSelector = (cp >= VS_MIN && cp <= VS_MAX) || (cp >= VS_SUP_MIN && cp <= VS_SUP_MAX)
+    if (isVariationSelector) {
+      if (isMarker(chars[i - 1]) || isMarker(chars[i + 1])) {
+        continue
+      }
+    }
+
+    cover += char
   }
   return cover
 }
