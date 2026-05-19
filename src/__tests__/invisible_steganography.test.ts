@@ -87,6 +87,11 @@ describe('Invisible Steganography (Tags, ZW, VS)', () => {
       expect(detectTagsPayloadFormat(encoded)).toBe('Variation Selectors (UTF-8 bytes)')
     })
 
+    it('detects "Variation Selectors (legacy decimal-token format)"', () => {
+      const encoded = tagsEncoder('hello', 'Cover', 'variation-selectors-legacy')
+      expect(detectTagsPayloadFormat(encoded)).toBe('Variation Selectors (legacy decimal-token format)')
+    })
+
     it('returns "No hidden payload detected" for plain text', () => {
       expect(detectTagsPayloadFormat('Plain Text')).toBe('No hidden payload detected')
     })

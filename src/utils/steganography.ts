@@ -452,6 +452,12 @@ export const detectTagsPayloadFormat = (encodedText: string): string => {
   if (variationBytes.length > 0) {
     const variationSecret = decodeVariationSelectors(encodedText)
     if (variationSecret.length > 0) {
+      if (
+        /^\d+(?:[,\s]\d+)*$/.test(variationSecret) ||
+        (variationBytes.includes(10) && variationBytes.every((b) => b <= 10))
+      ) {
+        return 'Variation Selectors (legacy decimal-token format)'
+      }
       if (variationBytes.every((b) => b >= 0x0 && b <= 0xf)) {
         return 'Variation Selectors (4-bit nibbles)'
       }
