@@ -272,7 +272,7 @@ const tagsDecrypt = (input: string) => {
       <div class="tags-stack">
         <div class="control-group">
           <label class="control-label">Live Preview</label>
-          <div class="tags-preview" :class="{ reveal: revealMode }">{{ revealText }}</div>
+          <div class="tags-preview cyber-panel" :class="{ reveal: revealMode }">{{ revealText }}</div>
           <p class="tags-hint">
             Press <code>r</code> to toggle reveal, <code>m</code> to switch encoding mode.
           </p>
@@ -313,10 +313,6 @@ const tagsDecrypt = (input: string) => {
 }
 
 .tags-preview {
-  border: 1px solid var(--cryptotron-border-glow);
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.65);
-  color: var(--cryptotron-text-primary);
   min-height: 5rem;
   padding: 1rem;
   white-space: pre-wrap;

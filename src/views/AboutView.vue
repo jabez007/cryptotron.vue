@@ -12,7 +12,7 @@
     </div>
 
     <div class="about-grid">
-      <div class="about-card" style="animation-delay: -2s">
+      <div class="about-card cyber-panel animated-border" style="animation-delay: -2s">
         <h2 class="card-title">Mission Statement</h2>
         <div class="card-content">
           <p>
@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <div class="about-card" style="animation-delay: -3s">
+      <div class="about-card cyber-panel animated-border" style="animation-delay: -3s">
         <h2 class="card-title">What You'll Find</h2>
         <div class="card-content">
           <ul class="feature-list">
@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <div class="about-card" style="animation-delay: -11s">
+      <div class="about-card cyber-panel animated-border" style="animation-delay: -11s">
         <h2 class="card-title">Why Classical Ciphers Matter</h2>
         <div class="card-content">
           <p>
@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      <div class="about-card" style="animation-delay: -19s">
+      <div class="about-card cyber-panel animated-border" style="animation-delay: -19s">
         <h2 class="card-title">Design Philosophy</h2>
         <div class="card-content">
           <p>
@@ -155,14 +155,6 @@
 .about-card {
   flex: 1 0 29%;
   margin: 2rem;
-  background: var(--cryptotron-card-bg);
-  border: 1px solid var(--cryptotron-border-glow);
-  border-radius: 12px;
-  padding: 2rem;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  position: relative;
-  overflow: hidden;
 }
 
 @media only screen and (max-width: 768px) {
@@ -173,28 +165,6 @@
   .about-card {
     min-width: 100%;
     margin: 1rem auto;
-  }
-}
-
-.about-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--cryptotron-neon-cyan), var(--cryptotron-neon-magenta), var(--cryptotron-neon-green));
-  animation: borderFlow 5s linear infinite;
-  animation-delay: inherit;
-}
-
-@keyframes borderFlow {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100%);
   }
 }
 

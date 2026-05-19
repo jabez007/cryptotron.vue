@@ -134,7 +134,7 @@ onUnmounted(() => {
     <button
       v-for="(cipher, index) in ciphers"
       :key="cipher.name"
-      class="cipher-card"
+      class="cipher-card cyber-panel"
       :class="{ 'keyboard-selected': selectedIndex === index }"
       :aria-label="`Navigate to ${cipher.label}`"
       @click="navigateToCipher(cipher.name)"
@@ -162,10 +162,6 @@ onUnmounted(() => {
   flex: 1 0 29%;
   max-width: 600px;
   margin: 2rem;
-  background: var(--cryptotron-card-bg);
-  border: 1px solid var(--cryptotron-border-glow);
-  border-radius: 12px;
-  padding: 2rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;

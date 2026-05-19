@@ -1,9 +1,46 @@
 /* Shared UI Primitives for Cryptotron */
 /* Scoped to .cryptotron-app to prevent global collisions */
 
+/* --- Layout Primitives --- */
+
 .cryptotron-app .control-group {
   margin-bottom: 1.5rem;
 }
+
+.cryptotron-app .button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* --- Shared Components: Cards & Panels --- */
+
+.cryptotron-app .cyber-panel {
+  background: var(--cryptotron-card-bg);
+  border: 1px solid var(--cryptotron-border-glow);
+  border-radius: 12px;
+  padding: 2rem;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+/* The flowing neon top border effect */
+.cryptotron-app .animated-border::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cryptotron-neon-cyan), var(--cryptotron-neon-magenta), var(--cryptotron-neon-green));
+  animation: cryptotron-borderFlow 5s linear infinite;
+  z-index: 10;
+}
+
+/* --- Form Elements --- */
 
 .cryptotron-app .control-label {
   display: block;
@@ -17,7 +54,10 @@
 
 .cryptotron-app .cipher-input,
 .cryptotron-app .cipher-select,
-.cryptotron-app .cipher-textarea {
+.cryptotron-app .cipher-textarea,
+.cryptotron-app .modal-input,
+.cryptotron-app .modal-select,
+.cryptotron-app .modal-textarea {
   width: 100%;
   background: rgba(0, 0, 0, 0.7);
   border: 1px solid var(--cryptotron-border-glow);
@@ -31,14 +71,18 @@
 
 .cryptotron-app .cipher-input:focus,
 .cryptotron-app .cipher-textarea:focus,
-.cryptotron-app .cipher-select:focus {
+.cryptotron-app .cipher-select:focus,
+.cryptotron-app .modal-input:focus,
+.cryptotron-app .modal-select:focus,
+.cryptotron-app .modal-textarea:focus {
   outline: none;
   border-color: var(--cryptotron-neon-cyan);
   box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
   background: rgba(0, 0, 0, 0.9);
 }
 
-.cryptotron-app .cipher-button {
+.cryptotron-app .cipher-button,
+.cryptotron-app .modal-button {
   background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
   border: 1px solid var(--cryptotron-neon-cyan);
   border-radius: 6px;
@@ -58,16 +102,19 @@
   gap: 0.5rem;
 }
 
-.cryptotron-app .cipher-button:hover:not(:disabled) {
+.cryptotron-app .cipher-button:hover:not(:disabled),
+.cryptotron-app .modal-button:hover:not(:disabled) {
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
   transform: translateY(-2px);
 }
 
-.cryptotron-app .cipher-button:active:not(:disabled) {
+.cryptotron-app .cipher-button:active:not(:disabled),
+.cryptotron-app .modal-button:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.cryptotron-app .cipher-button::before {
+.cryptotron-app .cipher-button::before,
+.cryptotron-app .modal-button::before {
   content: '';
   position: absolute;
   top: 0;
@@ -78,11 +125,13 @@
   transition: left 0.5s;
 }
 
-.cryptotron-app .cipher-button:hover::before {
+.cryptotron-app .cipher-button:hover::before,
+.cryptotron-app .modal-button:hover::before {
   left: 100%;
 }
 
-.cryptotron-app .cipher-button:disabled {
+.cryptotron-app .cipher-button:disabled,
+.cryptotron-app .modal-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   border-color: #555;
@@ -90,12 +139,7 @@
   transform: none !important;
 }
 
-.cryptotron-app .button-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
-}
+/* --- Feedback & Status --- */
 
 .cryptotron-app .status-error {
   display: flex;
@@ -107,4 +151,22 @@
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+  animation: cryptotron-error-flicker 0.3s ease-in-out;
+}
+
+/* --- Shared Animations --- */
+
+@keyframes cryptotron-borderFlow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes cryptotron-pulse {
+  from { opacity: 0.5; transform: scale(1); }
+  to { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes cryptotron-error-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }

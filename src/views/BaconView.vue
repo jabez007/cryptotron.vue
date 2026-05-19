@@ -264,7 +264,7 @@ const baconDecrypt = (input: string) => {
           <div class="bacon-preview-header">
             <label class="control-label">Live Preview</label>
           </div>
-          <div class="bacon-preview">
+          <div class="bacon-preview cyber-panel">
             <span v-for="(item, idx) in preview" :key="idx" :class="`b-${item.type}`">{{
               item.char
             }}</span>
@@ -329,10 +329,6 @@ const baconDecrypt = (input: string) => {
 }
 
 .bacon-preview {
-  border: 1px solid var(--cryptotron-border-glow);
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 8px;
-  padding: 1rem;
   min-height: 5rem;
   white-space: pre-wrap;
   word-break: break-word;

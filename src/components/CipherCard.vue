@@ -49,7 +49,7 @@
       <div class="tab-content">
         <div ref="theoryPanel" class="tab-panel">
           <ScanLine />
-          <div class="cipher-theory">
+          <div class="cipher-theory cyber-panel animated-border">
             <h2 class="section-title">Theory & History</h2>
             <div class="theory-content">
               <slot name="theory"></slot>
@@ -58,7 +58,7 @@
         </div>
 
         <div ref="encryptPanel" class="tab-panel">
-          <div class="cipher-practice">
+          <div class="cipher-practice cyber-panel animated-border">
             <h2 class="section-title">Encrypt Messages</h2>
             <div class="control-group">
               <slot name="cipherKey" panel="encrypt"></slot>
@@ -91,7 +91,7 @@
         </div>
 
         <div ref="decryptPanel" class="tab-panel">
-          <div class="cipher-practice">
+          <div class="cipher-practice cyber-panel animated-border">
             <h2 class="section-title">Decrypt Messages</h2>
             <div v-if="props.showCipherKeyOnDecrypt" class="control-group">
               <slot name="cipherKey" panel="decrypt"></slot>
@@ -644,30 +644,6 @@ const crack = async () => {
   opacity: 0.8;
 }
 
-.status-error {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  color: var(--cryptotron-neon-magenta);
-  font-family: 'Space Mono', monospace;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  animation: error-flicker 0.3s ease-in-out;
-}
-
-@keyframes error-flicker {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.7;
-  }
-}
-
 .cipher-container::before {
   content: '';
   position: absolute;
@@ -675,10 +651,6 @@ const crack = async () => {
   left: 0;
   right: 0;
   height: 2px;
-  /*
-  background: linear-gradient(90deg, var(--cryptotron-neon-cyan), var(--cryptotron-neon-magenta), var(--cryptotron-neon-green));
-  animation: borderFlow 3s linear infinite;
-  */
 }
 
 .tab-navigation {

@@ -219,8 +219,7 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
     </template>
 
     <template #encryptOutput>
-      <div class="acrostic-preview">
-        <div v-for="(line, idx) in coverLines" :key="idx" class="acrostic-line">
+      <div class="acrostic-preview cyber-panel">        <div v-for="(line, idx) in coverLines" :key="idx" class="acrostic-line">
           <span class="gutter-marker" v-if="acrosticMode !== 'telestic'">
             {{ getLineData(line).first }}
           </span>
@@ -249,10 +248,6 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
 }
 
 .acrostic-preview {
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid var(--cryptotron-border-glow);
-  padding: 1.5rem;
-  border-radius: 8px;
   font-family: 'Space Mono', monospace;
   min-height: 10rem;
 }
