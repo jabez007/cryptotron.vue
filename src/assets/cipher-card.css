@@ -70,34 +70,7 @@
   font-size: 0.9rem;
 }
 
-/* Interactive Controls */
-.control-group {
-  margin-bottom: 1.5rem;
-}
-
-.control-label {
-  display: block;
-  color: var(--cryptotron-neon-green);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 0.9rem;
-}
-
-.cipher-input,
-.cipher-select,
-.cipher-textarea {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid var(--cryptotron-border-glow);
-  border-radius: 6px;
-  padding: 0.75rem;
-  color: var(--cryptotron-text-primary);
-  font-family: 'Space Mono', monospace;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-}
+/* Interactive Controls - Now moved to ui-elements.css for DRYness */
 
 .cipher-select {
   cursor: pointer;
@@ -109,70 +82,9 @@
   appearance: none;
 }
 
-.cipher-input:focus,
-.cipher-textarea:focus,
-.cipher-select:focus {
-  outline: none;
-  border-color: var(--cryptotron-neon-cyan);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-  background: rgba(0, 0, 0, 0.9);
-}
-
 .cipher-textarea {
   min-height: 100px;
   resize: vertical;
-}
-
-.cipher-button {
-  background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
-  border: 1px solid var(--cryptotron-neon-cyan);
-  border-radius: 6px;
-  padding: 0.75rem 1.5rem;
-  color: var(--cryptotron-text-primary);
-  font-family: Orbitron, monospace;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.cipher-button:hover {
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-  transform: translateY(-2px);
-}
-
-.cipher-button:active {
-  transform: translateY(0);
-}
-
-.cipher-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.cipher-button:hover::before {
-  left: 100%;
-}
-
-.cipher-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  border-color: #555;
-  box-shadow: none;
-  transform: none !important;
-}
-
-.cipher-button:disabled::before {
-  display: none;
 }
 
 .cipher-button.crack {

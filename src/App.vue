@@ -260,6 +260,7 @@ const openIssues = () => {
 
 <style>
 @import '@/assets/base.css';
+@import '@/assets/ui-elements.css';
 
 /* Accessibility: Respect OS-level reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
