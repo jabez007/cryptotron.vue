@@ -182,7 +182,6 @@ const VS_MIN = 0xfe00
 const VS_MAX = 0xfe0f
 const VS_SUP_MIN = 0xe0100
 const VS_SUP_MAX = 0xe01ef
-const BYTE_SEP = 0x20
 
 const byteToVariationSelector = (byte: number): string =>
   byte <= 0x0f
