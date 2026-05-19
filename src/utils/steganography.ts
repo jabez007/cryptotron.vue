@@ -141,10 +141,14 @@ const decodeHtmlEntities = (input: string): string =>
     .replace(/&#39;/g, "'")
     .replace(/&apos;/g, "'")
     .replace(/&nbsp;/g, ' ')
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) =>
-      String.fromCodePoint(Number.parseInt(hex, 16)),
-    )
-    .replace(/&#(\d+);/g, (_, dec: string) => String.fromCodePoint(Number.parseInt(dec, 10)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex: string) => {
+      const num = Number.parseInt(hex, 16)
+      return Number.isSafeInteger(num) && num >= 0 && num <= 0x10ffff ? String.fromCodePoint(num) : '\uFFFD'
+    })
+    .replace(/&#(\d+);/g, (_, dec: string) => {
+      const num = Number.parseInt(dec, 10)
+      return Number.isSafeInteger(num) && num >= 0 && num <= 0x10ffff ? String.fromCodePoint(num) : '\uFFFD'
+    })
 
 const escapeHtml = (input: string): string =>
   input

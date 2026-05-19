@@ -140,6 +140,14 @@ describe('Invisible Steganography (Tags, ZW, VS)', () => {
       expect(baconDecoder(input)).toBe('B')
     })
 
+    it('does not crash on out-of-range HTML entities in baconDecoder', () => {
+      // These should be handled gracefully by returning \uFFFD
+      const inputHex = '<!--BACON:CARRIERS=5-->\n&#x110000;BCDE'
+      const inputDec = '<!--BACON:CARRIERS=5-->\n&#1114112;BCDE'
+      expect(() => baconDecoder(inputHex)).not.toThrow()
+      expect(() => baconDecoder(inputDec)).not.toThrow()
+    })
+
     it('handles compact zero-width binary (no separators)', () => {
       const ZW_ZERO = '\u200c'
       const ZW_ONE = '\u200d'
@@ -180,7 +188,7 @@ describe('Invisible Steganography (Tags, ZW, VS)', () => {
     it('variation legacy decoder handles invalid numbers', () => {
       const VS_OFFSET = 0xfe00
       const encoded = String.fromCodePoint(VS_OFFSET + 3) + String.fromCodePoint(VS_OFFSET + 0) + String.fromCodePoint(VS_OFFSET + 10)
-      // 30 is not 1-26 or 27, so it returns ''
+      // 30 is not 1-26 or 27, so it returns '0'
       expect(tagsDecoder(encoded)).toBe('0')
     })
 
