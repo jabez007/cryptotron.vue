@@ -36,7 +36,7 @@
 }
 
 .section-title {
-  font-family: 'Orbitron', monospace;
+  font-family: Orbitron, monospace;
   font-size: 1.5rem;
   color: var(--cryptotron-neon-cyan);
   margin-bottom: 1.5rem;
@@ -51,7 +51,7 @@
 
 .theory-content h3 {
   color: var(--cryptotron-neon-green);
-  font-family: 'Orbitron', monospace;
+  font-family: Orbitron, monospace;
   margin: 1.5rem 0 1rem 0;
   font-size: 1.2rem;
 }
@@ -129,7 +129,7 @@
   border-radius: 6px;
   padding: 0.75rem 1.5rem;
   color: var(--cryptotron-text-primary);
-  font-family: 'Orbitron', monospace;
+  font-family: Orbitron, monospace;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
