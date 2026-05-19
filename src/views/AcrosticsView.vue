@@ -3,7 +3,10 @@ import CipherCard from '@/components/CipherCard.vue'
 import { computed, ref, watch } from 'vue'
 import { generateAcrostic } from '@/utils/text-gen'
 
-const acrosticMode = ref<'acrostic' | 'telestic' | 'compound'>('acrostic')
+type AcrosticMode = 'acrostic' | 'telestic' | 'compound'
+const ACROSTIC_MODES: AcrosticMode[] = ['acrostic', 'telestic', 'compound']
+
+const acrosticMode = ref<AcrosticMode>('acrostic')
 const secretMessage = ref('')
 const acrosticKey = ref({ coverText: '' })
 
@@ -47,22 +50,26 @@ const getLineData = (line: string) => {
 }
 
 const acrosticDecrypt = (input: string) => {
-  const lines = input.split('\n').filter(l => l.trim().length > 0)
-  
+  const lines = input.split('\n').filter((l) => l.trim().length > 0)
+
   if (acrosticMode.value === 'acrostic') {
-    return lines.map(l => stripMetadata(l)[0] || '').join('')
+    return lines.map((l) => stripMetadata(l)[0] || '').join('')
   } else if (acrosticMode.value === 'telestic') {
-    return lines.map(l => {
-      const content = stripMetadata(l)
-      return content[content.length - 1] || ''
-    }).join('')
+    return lines
+      .map((l) => {
+        const content = stripMetadata(l)
+        return content[content.length - 1] || ''
+      })
+      .join('')
   } else {
     // Compound
-    return lines.map(l => {
-      const content = stripMetadata(l)
-      if (content.length < 2) return content
-      return content[0] + content[content.length - 1]
-    }).join('')
+    return lines
+      .map((l) => {
+        const content = stripMetadata(l)
+        if (content.length < 2) return content
+        return content[0] + content[content.length - 1]
+      })
+      .join('')
   }
 }
 
@@ -75,9 +82,8 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
   }
 
   if (key === 'm') {
-    const modes: ('acrostic' | 'telestic' | 'compound')[] = ['acrostic', 'telestic', 'compound']
-    const nextIdx = (modes.indexOf(acrosticMode.value) + 1) % modes.length
-    acrosticMode.value = modes[nextIdx]
+    const nextIdx = (ACROSTIC_MODES.indexOf(acrosticMode.value) + 1) % ACROSTIC_MODES.length
+    acrosticMode.value = ACROSTIC_MODES[nextIdx]
     return true
   }
 
@@ -199,12 +205,12 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
       <div class="control-group">
         <label class="control-label">Position Mode (m)</label>
         <div class="mode-selector">
-          <button 
-            v-for="m in ['acrostic', 'telestic', 'compound']" 
+          <button
+            v-for="m in ACROSTIC_MODES"
             :key="m"
             class="cipher-button"
             :class="{ active: acrosticMode === m }"
-            @click="acrosticMode = m as any"
+            @click="acrosticMode = m"
           >
             {{ m.charAt(0).toUpperCase() + m.slice(1) }}
           </button>
