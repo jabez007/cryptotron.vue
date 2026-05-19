@@ -92,3 +92,7 @@ const playfairCipherKey = ref({
     </template>
   </CipherCard>
 </template>
+
+<style scoped>
+@import '@/assets/cipher-card.css';
+</style>

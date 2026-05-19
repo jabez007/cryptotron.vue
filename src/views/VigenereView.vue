@@ -11,14 +11,10 @@ const vigenereCipherKey = ref({
 </script>
 
 <template>
-  <CipherCard
-    title="Vigenère Cipher"
-    :encrypt-algorithm="() => vigenere.encrypt(vigenereCipherKey)"
-    :decrypt-algorithm="() => vigenere.decrypt(vigenereCipherKey)"
-    :crack-algorithm="vigenere.crack"
-    v-model:cipher-key="vigenereCipherKey"
-  >
-    <template v-slot:theory>
+  <CipherCard title="Vigenère Cipher" :encrypt-algorithm="() => vigenere.encrypt(vigenereCipherKey)"
+    :decrypt-algorithm="() => vigenere.decrypt(vigenereCipherKey)" :crack-algorithm="vigenere.crack"
+    v-model:cipher-key="vigenereCipherKey">
+    <template #theory>
       <h3>The Origin Story</h3>
       <p>
         The Vigenère cipher is a method of encrypting alphabetic text by using a series of
@@ -84,5 +80,6 @@ const vigenereCipherKey = ref({
 </template>
 
 <style scoped>
+@import '@/assets/cipher-card.css';
 @import '@/assets/example-grid.css';
 </style>

@@ -94,6 +94,8 @@ const polybiusCipherKey = ref({
 </template>
 
 <style scoped>
+@import '@/assets/cipher-card.css';
+
 .header-char {
   color: var(--neon-magenta);
   font-weight: 900;
