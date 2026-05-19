@@ -970,6 +970,18 @@ const LOG_LEXICON: Record<string, string[]> = {
 }
 
 /**
+ * A secondary index of the lexicon for telestic (end-letter) anchors.
+ */
+const LOG_LEXICON_END: Record<string, string[]> = Object.values(LOG_LEXICON)
+  .flat()
+  .reduce((acc: Record<string, string[]>, word: string) => {
+    const lastChar = word.slice(-1).toLowerCase()
+    if (!acc[lastChar]) acc[lastChar] = []
+    if (!acc[lastChar].includes(word)) acc[lastChar].push(word)
+    return acc
+  }, {})
+
+/**
  * A highly realistic corpus of system log messages.
  * Includes standard log levels and technical terminology.
  */
@@ -1149,17 +1161,15 @@ export const generateAcrostic = (
     let anchorWord = ''
 
     // 1. Try our curated Log Lexicon first for realism
-    const curated = LOG_LEXICON[char] || []
+    const isTrailing = mode === 'telestic' || mode === 'compound'
+    const curated = (isTrailing ? LOG_LEXICON_END[char] : LOG_LEXICON[char]) || []
     if (curated.length > 0) {
       anchorWord = curated[Math.floor(Math.random() * curated.length)]
     }
 
     // 2. Fallback to RiTa if curated list is empty or for extra variety (20% chance)
     if (!anchorWord || Math.random() < 0.2) {
-      const searchRegex =
-        mode === 'acrostic' || mode === 'compound'
-          ? new RegExp(`^${char}`, 'i')
-          : new RegExp(`${char}$`, 'i')
+      const searchRegex = isTrailing ? new RegExp(`${char}$`, 'i') : new RegExp(`^${char}`, 'i')
 
       const candidates = RiTa.searchSync(searchRegex, {
         limit: 50,
@@ -1175,6 +1185,14 @@ export const generateAcrostic = (
         )
         const pool = technical.length > 0 ? technical : candidates
         anchorWord = pool[Math.floor(Math.random() * pool.length)]
+      }
+    }
+
+    // 3. Final Fallback to original logic (leading match) if trailing-match failed everywhere
+    if (!anchorWord && isTrailing) {
+      const originalCurated = LOG_LEXICON[char] || []
+      if (originalCurated.length > 0) {
+        anchorWord = originalCurated[Math.floor(Math.random() * originalCurated.length)]
       }
     }
 
