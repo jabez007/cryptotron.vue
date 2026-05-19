@@ -546,11 +546,10 @@ export const stripTagsPayload = (encodedText: string): string => {
       continue
     }
 
-    const isVariationSelector = (cp >= VS_MIN && cp <= VS_MAX) || (cp >= VS_SUP_MIN && cp <= VS_SUP_MAX)
+    const isVariationSelector =
+      (cp >= VS_MIN && cp <= VS_MAX) || (cp >= VS_SUP_MIN && cp <= VS_SUP_MAX)
     if (isVariationSelector) {
-      if (isMarker(chars[i - 1]) || isMarker(chars[i + 1])) {
-        continue
-      }
+      continue
     }
 
     cover += char

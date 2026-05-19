@@ -112,15 +112,15 @@ describe('Invisible Steganography (Tags, ZW, VS)', () => {
       expect(stripTagsPayload(encoded)).toBe(cover)
     })
 
-    it('removes variation selectors only if they are part of a steganographic sequence', () => {
+    it('removes variation selectors unconditionally', () => {
       const secret = 'Secret'
       const cover = 'Original Cover'
       const encoded = tagsEncoder(secret, cover, 'variation-selectors')
       expect(stripTagsPayload(encoded)).toBe(cover)
 
-      // Test preservation of VS in normal emojis
+      // Test that VS in normal emojis are also stripped (as intended by the new rule)
       const emojiWithVS = '\u{263A}\u{FE0F}' // ☺️
-      expect(stripTagsPayload(emojiWithVS)).toBe(emojiWithVS)
+      expect(stripTagsPayload(emojiWithVS)).toBe('\u{263A}')
 
       // Test stripping VS when adjacent to a marker
       const stegoVS = '\u{FE00}\u{E0041}' // VS-1 followed by TAG 'A'
