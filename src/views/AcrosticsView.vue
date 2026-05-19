@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { generateAcrostic } from '@/utils/text-gen'
 
 const acrosticMode = ref<'acrostic' | 'telestic' | 'compound'>('acrostic')
@@ -17,12 +17,16 @@ const coverText = computed({
   },
 })
 
-const coverLines = computed(() => coverText.value.split('\n').filter(l => l.length > 0))
+const coverLines = computed(() => coverText.value.split('\n').filter((l) => l.length > 0))
 
 const handleGenerateAcrostic = () => {
   if (!secretMessage.value) return
   coverText.value = generateAcrostic(secretMessage.value, acrosticMode.value)
 }
+
+watch(acrosticMode, () => {
+  handleGenerateAcrostic()
+})
 
 const acrosticEncrypt = (input: string) => {
   secretMessage.value = input
