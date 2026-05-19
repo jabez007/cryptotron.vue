@@ -40,7 +40,6 @@ describe('baconEncoder', () => {
 
   it('preserves cover text including non-alpha characters', () => {
     // 'A' needs 5 alpha chars; cover has exactly 5 alpha + punctuation
-    const cover = 'He!lo?'
     // 5 alpha chars, but only first 5 alpha are used (H,e,l,o + need one more)
     // Actually 'He!lo?' has H,e,l,o = 4 alpha — not enough for 'A'
     // Use a cover with 5 alpha chars and punctuation
