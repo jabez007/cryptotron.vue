@@ -1088,16 +1088,20 @@ export const generateThematicFiller = (
   let currentWordCount = 0
   let currentAlphaCount = 0
 
-  const totalEntriesGuess = targetAlphaCount
-    ? Math.ceil(targetAlphaCount / 30)
-    : Math.ceil(targetWordCount / 10)
+  const totalEntriesGuess =
+    targetAlphaCount !== undefined && targetAlphaCount !== null
+      ? Math.ceil(targetAlphaCount / 30)
+      : Math.ceil(targetWordCount / 10)
 
   const fiveMinutesAgo = Date.now() - 5 * 60 * 1000
   const timeStep = (5 * 60 * 1000) / (totalEntriesGuess || 1)
 
   while (
-    (targetAlphaCount && currentAlphaCount < targetAlphaCount) ||
-    (!targetAlphaCount && currentWordCount < targetWordCount)
+    (targetAlphaCount !== undefined &&
+      targetAlphaCount !== null &&
+      currentAlphaCount < targetAlphaCount) ||
+    ((targetAlphaCount === undefined || targetAlphaCount === null) &&
+      currentWordCount < targetWordCount)
   ) {
     const level = LOG_LEVELS[Math.floor(Math.random() * LOG_LEVELS.length)]
     const sub = SUBSYSTEMS[Math.floor(Math.random() * SUBSYSTEMS.length)]
@@ -1117,7 +1121,7 @@ export const generateThematicFiller = (
     if (content) {
       const fullLine = `[${ts}] [${level}] [${sub}] [PID:${pid}] ${content}`
 
-      if (targetAlphaCount) {
+      if (targetAlphaCount !== undefined && targetAlphaCount !== null) {
         const lineAlphaCount = [...fullLine].filter((c) => /[A-Za-z]/.test(c)).length
         currentAlphaCount += lineAlphaCount
       }
