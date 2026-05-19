@@ -244,6 +244,13 @@ export const tagsEncoder = (
     const bytes = new TextEncoder().encode(secret)
     invisible = [...bytes].map(byteToVariationSelector).join('')
   } else if (mode === 'zero-width-binary') {
+    if (unsupported.length > 0) {
+      const uniqueUnsupported = [...new Set(unsupported)].slice(0, 8)
+      const suffix = unsupported.length > uniqueUnsupported.length ? ', ...' : ''
+      throw new Error(
+        `Zero-width Binary supports printable ASCII only (U+0020-U+007E). Unsupported characters: ${uniqueUnsupported.join(' ')}${suffix}`,
+      )
+    }
     invisible = asciiCodes
       .map((cp) => cp.toString(2).padStart(16, '0').replace(/0/g, ZW_ZERO).replace(/1/g, ZW_ONE))
       .join('')
