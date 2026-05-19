@@ -118,34 +118,34 @@ describe('baconEncoder', () => {
 describe('toMarkdown', () => {
   it('wraps type-b chars in bold markdown', () => {
     const styled: StyledChar[] = [
-      { char: 'H', type: 'a' },
-      { char: 'i', type: 'b' },
+      { char: 'H', type: 'a', carriesBit: true },
+      { char: 'i', type: 'b', carriesBit: true },
     ]
-    expect(toMarkdown(styled)).toBe('H**i**')
+    expect(toMarkdown(styled)).toBe('<!--BACON:CARRIERS=2-->\nH**i**')
   })
 
   it('leaves type-a chars as plain text', () => {
-    const styled: StyledChar[] = [{ char: 'X', type: 'a' }]
-    expect(toMarkdown(styled)).toBe('X')
+    const styled: StyledChar[] = [{ char: 'X', type: 'a', carriesBit: true }]
+    expect(toMarkdown(styled)).toBe('<!--BACON:CARRIERS=1-->\nX')
   })
 
   it('handles empty array', () => {
-    expect(toMarkdown([])).toBe('')
+    expect(toMarkdown([])).toBe('<!--BACON:CARRIERS=0-->\n')
   })
 
   it('handles all type-b chars', () => {
     const styled: StyledChar[] = [
-      { char: 'A', type: 'b' },
-      { char: 'B', type: 'b' },
+      { char: 'A', type: 'b', carriesBit: true },
+      { char: 'B', type: 'b', carriesBit: true },
     ]
-    expect(toMarkdown(styled)).toBe('**A****B**')
+    expect(toMarkdown(styled)).toBe('<!--BACON:CARRIERS=2-->\n**A****B**')
   })
 
   it('round-trips through baconEncoder for letter B', () => {
     // 'B' = 00001 → aaaab → first 4 chars plain, last one bold
     const encoded = baconEncoder('B', 'HELLO')
     const md = toMarkdown(encoded)
-    expect(md).toBe('HELL**O**')
+    expect(md).toBe('<!--BACON:CARRIERS=5-->\nHELL**O**')
   })
 })
 
@@ -154,8 +154,8 @@ describe('toMarkdown', () => {
 describe('toHtmlSnippet', () => {
   it('wraps each char in a span with the correct class', () => {
     const styled: StyledChar[] = [
-      { char: 'H', type: 'a' },
-      { char: 'i', type: 'b' },
+      { char: 'H', type: 'a', carriesBit: true },
+      { char: 'i', type: 'b', carriesBit: true },
     ]
     const html = toHtmlSnippet(styled)
     expect(html).toContain('<span class="b-a">H</span>')
@@ -163,47 +163,47 @@ describe('toHtmlSnippet', () => {
   })
 
   it('includes the <style> block', () => {
-    const html = toHtmlSnippet([{ char: 'A', type: 'a' }])
+    const html = toHtmlSnippet([{ char: 'A', type: 'a', carriesBit: true }])
     expect(html).toContain('<style>')
     expect(html).toContain('.b-a')
     expect(html).toContain('.b-b')
   })
 
   it('wraps output in a <p> tag', () => {
-    const html = toHtmlSnippet([{ char: 'X', type: 'a' }])
-    expect(html).toContain('<p>')
+    const html = toHtmlSnippet([{ char: 'X', type: 'a', carriesBit: true }])
+    expect(html).toContain('<p data-bacon-carriers="1">')
     expect(html).toContain('</p>')
   })
 
   it('escapes the < character as &lt;', () => {
-    const styled: StyledChar[] = [{ char: '<', type: 'a' }]
+    const styled: StyledChar[] = [{ char: '<', type: 'a', carriesBit: true }]
     const html = toHtmlSnippet(styled)
     expect(html).toContain('&lt;')
   })
 
   it('escapes ampersands', () => {
-    const styled: StyledChar[] = [{ char: '&', type: 'a' }]
+    const styled: StyledChar[] = [{ char: '&', type: 'a', carriesBit: true }]
     expect(toHtmlSnippet(styled)).toContain('&amp;')
   })
 
   it('escapes double quotes', () => {
-    const styled: StyledChar[] = [{ char: '"', type: 'a' }]
+    const styled: StyledChar[] = [{ char: '"', type: 'a', carriesBit: true }]
     expect(toHtmlSnippet(styled)).toContain('&quot;')
   })
 
   it('escapes single quotes', () => {
-    const styled: StyledChar[] = [{ char: "'", type: 'a' }]
+    const styled: StyledChar[] = [{ char: "'", type: 'a', carriesBit: true }]
     expect(toHtmlSnippet(styled)).toContain('&#39;')
   })
 
   it('escapes greater-than sign as &gt;', () => {
-    const styled: StyledChar[] = [{ char: '>', type: 'a' }]
+    const styled: StyledChar[] = [{ char: '>', type: 'a', carriesBit: true }]
     expect(toHtmlSnippet(styled)).toContain('&gt;')
   })
 
   it('handles empty array', () => {
     const html = toHtmlSnippet([])
-    expect(html).toContain('<p></p>')
+    expect(html).toContain('<p data-bacon-carriers="0"></p>')
   })
 
   it('raw < is not present unescaped inside span content', () => {
@@ -219,30 +219,28 @@ describe('toHtmlSnippet', () => {
 describe('baconDecoder', () => {
   it('decodes markdown bold to recover hidden letter B', () => {
     // 'B' = 00001 → types: aaaab → "HELL**O**"
-    const result = baconDecoder('HELL**O**')
+    const result = baconDecoder('<!--BACON:CARRIERS=5-->\nHELL**O**')
     expect(result).toBe('B')
   })
 
   it('decodes HTML <strong> tags', () => {
-    const html = 'HELL<strong>O</strong>'
+    const html = '<p data-bacon-carriers="5">HELL<strong>O</strong></p>'
     expect(baconDecoder(html)).toBe('B')
   })
 
   it('decodes HTML <b> tags', () => {
-    const html = 'HELL<b>O</b>'
+    const html = '<p data-bacon-carriers="5">HELL<b>O</b></p>'
     expect(baconDecoder(html)).toBe('B')
   })
 
   it('decodes span with b-b class', () => {
-    // Use clean span-only HTML (no style block) so no extra bits leak in
     const html =
-      '<span class="b-a">H</span><span class="b-a">E</span><span class="b-a">L</span><span class="b-a">L</span><span class="b-b">O</span>'
+      '<p data-bacon-carriers="5"><span class="b-a">H</span><span class="b-a">E</span><span class="b-a">L</span><span class="b-a">L</span><span class="b-b">O</span></p>'
     expect(baconDecoder(html)).toBe('B')
   })
 
   it('round-trips encode then decode via markdown for every letter', () => {
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    // Use exactly 5 alpha chars per letter so no extra bits appear
     const cover = 'ABCDE'
     for (const letter of letters) {
       const encoded = baconEncoder(letter, cover)
@@ -253,7 +251,6 @@ describe('baconDecoder', () => {
 
   it('round-trips encode then decode for multi-letter secret via markdown', () => {
     const secret = 'HELLO'
-    // 'HELLO' = 5 letters × 5 bits = 25 bits; need exactly 25 alpha chars
     const cover = 'ABCDEFGHIJKLMNOPQRSTUVWXY'
     const encoded = baconEncoder(secret, cover)
     const md = toMarkdown(encoded)
@@ -262,50 +259,39 @@ describe('baconDecoder', () => {
 
   it('round-trips encode then decode for multi-letter secret via clean span HTML', () => {
     const secret = 'HI'
-    // 'HI' = 10 bits; need exactly 10 alpha chars
     const cover = 'ABCDEFGHIJ'
     const encoded = baconEncoder(secret, cover)
-    // Build clean span HTML (no style block)
-    const cleanHtml = encoded
-      .map(({ char, type }) => `<span class="b-${type}">${char}</span>`)
-      .join('')
+    const cleanHtml = toHtmlSnippet(encoded)
     expect(baconDecoder(cleanHtml)).toBe('HI')
   })
 
   it('returns empty string when no alpha chars present', () => {
-    expect(baconDecoder('123 !@#')).toBe('')
+    expect(baconDecoder('<!--BACON:CARRIERS=0-->\n123 !@#')).toBe('')
   })
 
   it('returns empty string when fewer than 5 alpha chars', () => {
-    // Need at least 5 alpha chars to decode one character
-    expect(baconDecoder('abcd')).toBe('')
+    expect(baconDecoder('<!--BACON:CARRIERS=4-->\nabcd')).toBe('')
   })
 
   it('ignores trailing bits that do not form a complete group of 5', () => {
-    // 7 alpha chars = 1 full group (5) + 2 leftover → decode 1 char
-    // 'A' = 00000 needs exactly 5 chars; cover has 7, so last 2 are ignored
     const encoded = baconEncoder('A', 'ABCDE')
     const md = toMarkdown(encoded)
-    // append 2 more plain chars (not bold) to have 7 total alpha chars
     const mdWith7 = md + 'FG'
     expect(baconDecoder(mdWith7)).toBe('A')
   })
 
   it('is case-insensitive for plaintext alpha input', () => {
-    // lowercase alpha chars should still be classified as type-a bits
-    const result = baconDecoder('hell**o**')
+    const result = baconDecoder('<!--BACON:CARRIERS=5-->\nhell**o**')
     expect(result).toBe('B')
   })
 
   it('handles <strong> and <b> tags mixed', () => {
-    // H=b (bold), E=a, L=a, L=a, O=b (bold) → bits: b a a a b = 10001 = index 17 = 'R'
-    const html = '<strong>H</strong>ELL<b>O</b>'
+    const html = '<p data-bacon-carriers="5"><strong>H</strong>ELL<b>O</b></p>'
     expect(baconDecoder(html)).toBe('R')
   })
 
   it('handles extra whitespace and newlines in plain text', () => {
-    // 'B' = 00001; use "HELL" + newline + "**O**"
-    const result = baconDecoder('HE\nLL**O**')
+    const result = baconDecoder('<!--BACON:CARRIERS=5-->\nHE\nLL**O**')
     expect(result).toBe('B')
   })
 })
@@ -315,7 +301,6 @@ describe('baconDecoder', () => {
 describe('encode/decode symmetry', () => {
   it('encodes and decodes a two-letter secret via markdown', () => {
     const secret = 'OK'
-    // 'OK' = 2 letters × 5 bits = 10 bits; need exactly 10 alpha chars
     const cover = 'ABCDEFGHIJ'
     const encoded = baconEncoder(secret, cover)
     const md = toMarkdown(encoded)
@@ -325,22 +310,22 @@ describe('encode/decode symmetry', () => {
 
   it('handles cover text with punctuation and spaces correctly', () => {
     const secret = 'A'
-    // Need exactly 5 alpha chars with non-alpha scattered
     const cover = 'H.e!l,l?o'
     const encoded = baconEncoder(secret, cover)
     expect(encoded.map((s) => s.char).join('')).toBe(cover)
     const md = toMarkdown(encoded)
-    // Only the 5 alpha chars in 'H.e!l,l?o' encode 'A' = 00000
     expect(baconDecoder(md)).toBe('A')
   })
 
   it('round-trip with cover longer than needed only decodes secret length', () => {
-    // 'Z' = 11001 → needs 5 alpha; use 10 alpha → extra 5 decode to another char
+    // 'Z' = 11001 → needs 5 alpha; use 10 alpha.
+    // baconEncoder sets carriesBit=true for first 5, false for rest.
+    // toMarkdown sets carrierCount=5.
+    // baconDecoder stops after 5 bits and returns only 'Z'.
     const secret = 'Z'
     const cover = 'ABCDEFGHIJ' // 10 alpha chars
     const encoded = baconEncoder(secret, cover)
     const md = toMarkdown(encoded)
-    // First 5 chars encode 'Z', next 5 are all type-a = 00000 = 'A'
-    expect(baconDecoder(md)).toBe('ZA')
+    expect(baconDecoder(md)).toBe('Z')
   })
 })
