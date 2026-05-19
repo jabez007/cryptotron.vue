@@ -151,8 +151,9 @@ const closeMenu = () => {
 }
 
 const handleGlobalKeydown = (e: KeyboardEvent) => {
-  // Ignore if typing in an input
-  if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) return
+  // Ignore if typing in an input, select or editable element
+  const target = e.target as HTMLElement
+  if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) return
 
   const key = e.key.toLowerCase()
 
