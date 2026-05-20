@@ -94,7 +94,6 @@ const polybiusCipherKey = ref({
 </template>
 
 <style scoped>
-
 .header-char {
   color: var(--cryptotron-neon-magenta);
   font-weight: 900;

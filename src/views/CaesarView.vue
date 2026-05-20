@@ -75,5 +75,4 @@ const caesarCipherKey = ref({
   </CipherCard>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

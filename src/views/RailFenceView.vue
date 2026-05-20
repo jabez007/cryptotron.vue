@@ -81,7 +81,6 @@ W . . . E . . . C . . . R
 </template>
 
 <style scoped>
-
 pre.cipher-example {
   background: rgba(0, 0, 0, 0.3);
   padding: 1.5rem;

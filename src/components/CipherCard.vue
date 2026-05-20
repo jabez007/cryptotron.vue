@@ -264,7 +264,8 @@ const handleKeydown = (e: KeyboardEvent) => {
   if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
 
   const target = e.target as HTMLElement
-  const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable
+  const isInput =
+    ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable
   const isKeyInput = target.classList.contains('cipher-input')
 
   // Prevent collision with global navigation menu

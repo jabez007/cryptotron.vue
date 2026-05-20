@@ -93,5 +93,4 @@ const playfairCipherKey = ref({
   </CipherCard>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

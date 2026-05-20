@@ -11,9 +11,13 @@ const vigenereCipherKey = ref({
 </script>
 
 <template>
-  <CipherCard title="Vigenère Cipher" :encrypt-algorithm="() => vigenere.encrypt(vigenereCipherKey)"
-    :decrypt-algorithm="() => vigenere.decrypt(vigenereCipherKey)" :crack-algorithm="vigenere.crack"
-    v-model:cipher-key="vigenereCipherKey">
+  <CipherCard
+    title="Vigenère Cipher"
+    :encrypt-algorithm="() => vigenere.encrypt(vigenereCipherKey)"
+    :decrypt-algorithm="() => vigenere.decrypt(vigenereCipherKey)"
+    :crack-algorithm="vigenere.crack"
+    v-model:cipher-key="vigenereCipherKey"
+  >
     <template #theory>
       <h3>The Origin Story</h3>
       <p>

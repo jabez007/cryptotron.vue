@@ -136,13 +136,13 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
       <h3>III. Medieval Watermarks & Secret Lovers</h3>
       <p>
         During the Middle Ages and the Renaissance, these techniques evolved into structural
-        "watermarks" for authors who wished to claim their work—or their secrets—without alerting the
-        uninitiated.
+        "watermarks" for authors who wished to claim their work—or their secrets—without alerting
+        the uninitiated.
       </p>
       <ul>
         <li>
-          <strong>Aldhelm of Malmesbury (7th Century):</strong> A master of the "Double Acrostic." He
-          composed poems where the first letters spelled a sentence, and the last letters spelled
+          <strong>Aldhelm of Malmesbury (7th Century):</strong> A master of the "Double Acrostic."
+          He composed poems where the first letters spelled a sentence, and the last letters spelled
           the <em>same sentence in reverse</em>, effectively locking the text in a vertical frame.
         </li>
         <li>
@@ -219,7 +219,8 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
     </template>
 
     <template #encryptOutput>
-      <div class="acrostic-preview cyber-panel">        <div v-for="(line, idx) in coverLines" :key="idx" class="acrostic-line">
+      <div class="acrostic-preview cyber-panel">
+        <div v-for="(line, idx) in coverLines" :key="idx" class="acrostic-line">
           <span class="gutter-marker" v-if="acrosticMode !== 'telestic'">
             {{ getLineData(line).first }}
           </span>
@@ -234,7 +235,6 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
 </template>
 
 <style scoped>
-
 .mode-selector {
   display: flex;
   gap: 0.5rem;

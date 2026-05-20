@@ -138,9 +138,9 @@ const baconDecrypt = (input: string) => {
     <template #theory>
       <h3>I. Omnia per Omnia</h3>
       <p>
-        In his seminal 1605 work <em>The Advancement of Learning</em>, Sir Francis Bacon described the
-        "highest degree of a cipher" as one that could signify <strong>Omnia per Omnia</strong>—Latin
-        for "all things by all things."
+        In his seminal 1605 work <em>The Advancement of Learning</em>, Sir Francis Bacon described
+        the "highest degree of a cipher" as one that could signify
+        <strong>Omnia per Omnia</strong>—Latin for "all things by all things."
       </p>
       <p>
         Bacon’s philosophy was radical: he realized that any medium capable of a "twofold
@@ -307,7 +307,6 @@ const baconDecrypt = (input: string) => {
 </template>
 
 <style scoped>
-
 .bacon-practice-stack {
   display: grid;
   gap: 1.25rem;

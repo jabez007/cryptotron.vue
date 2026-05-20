@@ -18,7 +18,7 @@
 
 /* Firefox */
 .cryptotron-app #app-content,
-.cryptotron-app #app-content :deep(*) {
+.cryptotron-app #app-content * {
   scrollbar-width: thin;
   scrollbar-color: var(--cryptotron-neon-cyan) var(--cryptotron-darker-bg);
 }

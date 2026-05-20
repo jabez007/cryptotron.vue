@@ -9,13 +9,24 @@
       </div>
 
       <div class="header-actions">
-        <button class="crt-toggle-btn" @click="toggleCrt" :title="isCrtEnabled ? 'Disable CRT Effects (Clean Mode)' : 'Enable CRT Effects (Cyber Mode)'
-          " :aria-label="isCrtEnabled ? 'Disable CRT Effects' : 'Enable CRT Effects'" :aria-pressed="isCrtEnabled">
+        <button
+          class="crt-toggle-btn"
+          @click="toggleCrt"
+          :title="
+            isCrtEnabled ? 'Disable CRT Effects (Clean Mode)' : 'Enable CRT Effects (Cyber Mode)'
+          "
+          :aria-label="isCrtEnabled ? 'Disable CRT Effects' : 'Enable CRT Effects'"
+          :aria-pressed="isCrtEnabled"
+        >
           <CyberIcon :type="isCrtEnabled ? 'display' : 'display-off'" size="24" />
         </button>
 
-        <button @click="toggleMenu" :class="['hamburger-button', { active: menuOpen }]"
-          aria-label="Toggle navigation menu" :aria-expanded="menuOpen">
+        <button
+          @click="toggleMenu"
+          :class="['hamburger-button', { active: menuOpen }]"
+          aria-label="Toggle navigation menu"
+          :aria-expanded="menuOpen"
+        >
           <span class="hamburger-line"></span>
           <span class="hamburger-line"></span>
           <span class="hamburger-line"></span>
@@ -27,21 +38,37 @@
     <div :class="['nav-overlay-bg', { active: menuOpen }]" @click="closeMenu"></div>
     <nav :class="['nav-overlay', { active: menuOpen }]">
       <template v-for="(item, index) in menuItems" :key="'name' in item ? item.name : item.path">
-        <div v-if="
-          'category' in item &&
-          item.category &&
-          (index === 0 || (menuItems[index - 1] as any).category !== item.category)
-        " class="nav-category">
+        <div
+          v-if="
+            'category' in item &&
+            item.category &&
+            (index === 0 || (menuItems[index - 1] as any).category !== item.category)
+          "
+          class="nav-category"
+        >
           {{ item.category }}
         </div>
-        <RouterLink v-if="'isRoot' in item" :to="item.path" class="nav-root-link"
-          :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }" @click="menuOpen && closeMenu()">
-          <span v-if="menuOpen && menuSelectedIndex === index" class="menu-selection-indicator">&gt;</span>
+        <RouterLink
+          v-if="'isRoot' in item"
+          :to="item.path"
+          class="nav-root-link"
+          :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }"
+          @click="menuOpen && closeMenu()"
+        >
+          <span v-if="menuOpen && menuSelectedIndex === index" class="menu-selection-indicator"
+            >&gt;</span
+          >
           <IconDocumentation />
         </RouterLink>
-        <RouterLink v-else :to="{ name: item.name }"
-          :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }" @click="menuOpen && closeMenu()">
-          <span v-if="menuOpen && menuSelectedIndex === index" class="menu-selection-indicator">&gt;</span>
+        <RouterLink
+          v-else
+          :to="{ name: item.name }"
+          :class="{ 'keyboard-selected': menuOpen && menuSelectedIndex === index }"
+          @click="menuOpen && closeMenu()"
+        >
+          <span v-if="menuOpen && menuSelectedIndex === index" class="menu-selection-indicator"
+            >&gt;</span
+          >
           {{ item.label }}
         </RouterLink>
       </template>
@@ -56,8 +83,12 @@
     </div>
 
     <footer class="app-footer">
-      <button class="bug-report-btn" aria-label="Report a bug or issue" title="Report a bug or issue"
-        @click="openIssues">
+      <button
+        class="bug-report-btn"
+        aria-label="Report a bug or issue"
+        title="Report a bug or issue"
+        @click="openIssues"
+      >
         <IconBug />
       </button>
     </footer>
@@ -702,7 +733,6 @@ nav a.router-link-exact-active:hover {
 }
 
 @keyframes bug-wiggle {
-
   0%,
   100% {
     transform: rotate(0deg);
@@ -730,7 +760,6 @@ nav a.router-link-exact-active:hover {
 
 /* Keyframe Animations */
 @keyframes glitch-effect {
-
   0%,
   100% {
     transform: translateX(0);

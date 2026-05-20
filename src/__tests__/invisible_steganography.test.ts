@@ -89,7 +89,9 @@ describe('Invisible Steganography (Tags, ZW, VS)', () => {
 
     it('detects "Variation Selectors (legacy decimal-token format)"', () => {
       const encoded = tagsEncoder('hello', 'Cover', 'variation-selectors-legacy')
-      expect(detectTagsPayloadFormat(encoded)).toBe('Variation Selectors (legacy decimal-token format)')
+      expect(detectTagsPayloadFormat(encoded)).toBe(
+        'Variation Selectors (legacy decimal-token format)',
+      )
     })
 
     it('returns "No hidden payload detected" for plain text', () => {
@@ -163,7 +165,9 @@ describe('Invisible Steganography (Tags, ZW, VS)', () => {
     it('decodes Alt Tags if readable', () => {
       const ALT_TAG_OFFSET = 0xe00f0
       const secret = 'Hi'
-      const encoded = [...secret].map(c => String.fromCodePoint(c.charCodeAt(0) + ALT_TAG_OFFSET)).join('')
+      const encoded = [...secret]
+        .map((c) => String.fromCodePoint(c.charCodeAt(0) + ALT_TAG_OFFSET))
+        .join('')
       expect(tagsDecoder(encoded)).toBe(secret)
     })
 
@@ -192,14 +196,17 @@ describe('Invisible Steganography (Tags, ZW, VS)', () => {
 
     it('variation legacy decoder handles invalid numbers', () => {
       const VS_OFFSET = 0xfe00
-      const encoded = String.fromCodePoint(VS_OFFSET + 3) + String.fromCodePoint(VS_OFFSET + 0) + String.fromCodePoint(VS_OFFSET + 10)
+      const encoded =
+        String.fromCodePoint(VS_OFFSET + 3) +
+        String.fromCodePoint(VS_OFFSET + 0) +
+        String.fromCodePoint(VS_OFFSET + 10)
       // 30 is not 1-26 or 27, so it returns '0'
       expect(tagsDecoder(encoded)).toBe('0')
     })
 
     it('zero width decoder handles non-ascii results', () => {
       const ZW_ONE = '\u200d'
-      const encoded = (ZW_ONE).repeat(8)
+      const encoded = ZW_ONE.repeat(8)
       expect(tagsDecoder(encoded)).toBe('')
     })
   })

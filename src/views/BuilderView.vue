@@ -664,7 +664,6 @@ const decrypt = () => {
 </style>
 
 <style scoped>
-
 .builder-container {
   height: 100%;
   width: 100%;

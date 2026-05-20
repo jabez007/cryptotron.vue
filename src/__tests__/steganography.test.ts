@@ -81,9 +81,7 @@ describe('baconEncoder', () => {
   })
 
   it('throws when cover text has too few alphabetic characters', () => {
-    expect(() => baconEncoder('AB', 'Hi')).toThrow(
-      /Cover text too short: need 10 letters, got 2/,
-    )
+    expect(() => baconEncoder('AB', 'Hi')).toThrow(/Cover text too short: need 10 letters, got 2/)
   })
 
   it('throws with correct counts in the error message', () => {

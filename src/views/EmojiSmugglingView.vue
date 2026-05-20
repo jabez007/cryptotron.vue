@@ -146,7 +146,8 @@ const tagsDecrypt = (input: string) => {
         <div class="anatomy-card">
           <h4>Grapheme</h4>
           <p>
-            The visual character humans see (e.g., 👍). A single grapheme can hide thousands of bits.
+            The visual character humans see (e.g., 👍). A single grapheme can hide thousands of
+            bits.
           </p>
         </div>
         <div class="anatomy-card">
@@ -184,16 +185,17 @@ const tagsDecrypt = (input: string) => {
       </p>
       <div class="cipher-example">
         <strong>The Interleaving Advantage:</strong><br />
-        Security filters often only scan the "tail" of a message for anomalies. By weaving the
-        ghost data into the middle of the string, the message profile remains balanced and less
-        likely to trigger automated "length discrepancy" alerts.
+        Security filters often only scan the "tail" of a message for anomalies. By weaving the ghost
+        data into the middle of the string, the message profile remains balanced and less likely to
+        trigger automated "length discrepancy" alerts.
       </div>
 
       <h3>V. Modern Threat: LLM Prompt Injection</h3>
       <p>
         One of the most dangerous uses of ghost messages today is against
         <strong>Large Language Models (LLMs)</strong>. Because LLMs "read" the raw code points, an
-        attacker can send a prompt that looks innocent to a human: <code>"Summarize this: 😊"</code>.
+        attacker can send a prompt that looks innocent to a human:
+        <code>"Summarize this: 😊"</code>.
       </p>
       <p>
         Hidden inside that emoji could be an invisible instruction:
@@ -205,9 +207,9 @@ const tagsDecrypt = (input: string) => {
       <p>
         To defend against the invisible, one must change how they look.
         <strong>Normalization</strong> (stripping non-essential modifiers) is the primary defense.
-        In the Spire, we also use <strong>Diff Checks</strong>: comparing the visible grapheme
-        count against the raw character count. A massive discrepancy is the "smoking gun" of a
-        smuggled payload.
+        In the Spire, we also use <strong>Diff Checks</strong>: comparing the visible grapheme count
+        against the raw character count. A massive discrepancy is the "smoking gun" of a smuggled
+        payload.
       </p>
     </template>
 
@@ -272,7 +274,9 @@ const tagsDecrypt = (input: string) => {
       <div class="tags-stack">
         <div class="control-group">
           <label class="control-label">Live Preview</label>
-          <div class="tags-preview cyber-panel" :class="{ reveal: revealMode }">{{ revealText }}</div>
+          <div class="tags-preview cyber-panel" :class="{ reveal: revealMode }">
+            {{ revealText }}
+          </div>
           <p class="tags-hint">
             Press <code>r</code> to toggle reveal, <code>m</code> to switch encoding mode.
           </p>
@@ -306,7 +310,6 @@ const tagsDecrypt = (input: string) => {
 </template>
 
 <style scoped>
-
 .tags-stack {
   display: grid;
   gap: 1rem;
