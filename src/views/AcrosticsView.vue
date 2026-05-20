@@ -105,7 +105,7 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
     :encrypt-algorithm="() => acrosticEncrypt"
     :decrypt-algorithm="() => acrosticDecrypt"
     :normal-mode-key-handler="handleAcrosticNormalModeKey"
-    :on-encrypt-input-change="(val: string) => { secretMessage = val; }"
+    :on-encrypt-input-change="(val: string) => { secretMessage = val; coverText = ''; }"
     :on-encrypt-clear="() => { secretMessage = ''; coverText = ''; }"
     v-model:cipher-key="acrosticKey"
   >

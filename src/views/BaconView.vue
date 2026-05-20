@@ -134,7 +134,7 @@ const baconDecrypt = (input: string) => {
     :decrypt-algorithm="() => baconDecrypt"
     :encrypt-output-override="() => activeExport"
     :normal-mode-key-handler="handleBaconNormalModeKey"
-    :on-encrypt-input-change="(val: string) => (secretMessage = val)"
+    :on-encrypt-input-change="(val: string) => { secretMessage = val; preview = []; activeExport = ''; }"
     :on-encrypt-clear="() => { secretMessage = ''; coverText = ''; preview = []; activeExport = ''; }"
     :encrypt-feedback="lengthError"
     v-model:cipher-key="baconCoverKey"
