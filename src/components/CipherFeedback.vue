@@ -14,12 +14,22 @@ const props = withDefaults(defineProps<Props>(), {
 const statusClass = computed(() => {
   return `status-${props.type}`
 })
+
+const ariaLive = computed(() => {
+  return props.type === 'error' || props.type === 'warning' ? 'assertive' : 'polite'
+})
 </script>
 
 <template>
   <div class="feedback-container">
     <Transition name="fade-slide">
-      <div v-if="text" :class="['status-line', statusClass]">
+      <div
+        v-if="text"
+        :class="['status-line', statusClass]"
+        role="status"
+        :aria-live="ariaLive"
+        aria-atomic="true"
+      >
         <CyberIcon :type="type === 'info' ? 'about' : 'error'" size="16" />
         <span class="feedback-text">{{ text }}</span>
       </div>
