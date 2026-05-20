@@ -432,10 +432,9 @@ const showYankedTooltip = ref(false)
 let crackTimer: ReturnType<typeof setTimeout> | null = null
 
 const yankOutput = () => {
-  const overriddenEncryptOutput = props.encryptOutputOverride?.()
   const output =
     cipherActiveTab.value === 'encrypt'
-      ? (overriddenEncryptOutput ?? encryptOutput.value)
+      ? (props.encryptOutputOverride?.() ?? encryptOutput.value)
       : decryptOutput.value
   if (!output) return
 
