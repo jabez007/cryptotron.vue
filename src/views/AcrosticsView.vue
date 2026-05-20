@@ -23,7 +23,10 @@ const coverText = computed({
 const coverLines = computed(() => coverText.value.split('\n').filter((l) => l.length > 0))
 
 const handleGenerateAcrostic = () => {
-  if (!secretMessage.value) return
+  if (!secretMessage.value) {
+    coverText.value = ''
+    return
+  }
   coverText.value = generateAcrostic(secretMessage.value, acrosticMode.value)
 }
 
@@ -33,6 +36,10 @@ watch(acrosticMode, () => {
 
 const acrosticEncrypt = (input: string) => {
   secretMessage.value = input
+  if (!secretMessage.value) {
+    coverText.value = ''
+    return ''
+  }
   // Always regenerate logs to keep it fresh and automated
   handleGenerateAcrostic()
   return coverText.value
