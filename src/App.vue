@@ -183,7 +183,8 @@ const closeMenu = () => {
 
 const handleGlobalKeydown = (e: KeyboardEvent) => {
   // Ignore if typing in an input, select or editable element
-  const target = e.target as HTMLElement
+  if (!(e.target instanceof HTMLElement)) return
+  const target = e.target
   if (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable) return
 
   const key = e.key.toLowerCase()
@@ -246,13 +247,15 @@ const handleGlobalKeydown = (e: KeyboardEvent) => {
   // Escape to Home
   if (e.key === 'Escape') {
     // Check if target is in a component handling its own Escape (like CipherCard in Vim mode)
-    const target = e.target as HTMLElement
-    const vimContainer = target.closest('[data-vim-mode]')
-    const vimMode = vimContainer?.getAttribute('data-vim-mode')
+    if (e.target instanceof HTMLElement) {
+      const target = e.target
+      const vimContainer = target.closest('[data-vim-mode]')
+      const vimMode = vimContainer?.getAttribute('data-vim-mode')
 
-    if (vimMode === 'insert' || vimMode === 'key') {
-      // Let the component handle it
-      return
+      if (vimMode === 'insert' || vimMode === 'key') {
+        // Let the component handle it
+        return
+      }
     }
 
     e.preventDefault()
