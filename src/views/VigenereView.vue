@@ -18,7 +18,7 @@ const vigenereCipherKey = ref({
     :crack-algorithm="vigenere.crack"
     v-model:cipher-key="vigenereCipherKey"
   >
-    <template v-slot:theory>
+    <template #theory>
       <h3>The Origin Story</h3>
       <p>
         The Vigenère cipher is a method of encrypting alphabetic text by using a series of
@@ -77,7 +77,7 @@ const vigenereCipherKey = ref({
         <strong>One-Time Pad</strong>, which remains mathematically unbreakable if used correctly.
       </p>
     </template>
-    <template v-slot:cipherKey>
+    <template #cipherKey>
       <KeyVigenere v-model:cipher-key="vigenereCipherKey" />
     </template>
   </CipherCard>

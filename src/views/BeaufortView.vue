@@ -18,7 +18,7 @@ const beaufortCipherKey = ref({
     :crack-algorithm="beaufort.crack"
     v-model:cipher-key="beaufortCipherKey"
   >
-    <template v-slot:theory>
+    <template #theory>
       <h3>The Origin Story</h3>
       <p>
         The Beaufort cipher is a variant of the Vigenère cipher, created by Sir Francis Beaufort
@@ -75,7 +75,7 @@ const beaufortCipherKey = ref({
         cryptographic strength.
       </p>
     </template>
-    <template v-slot:cipherKey>
+    <template #cipherKey>
       <KeyBeaufort v-model:cipher-key="beaufortCipherKey" />
     </template>
   </CipherCard>

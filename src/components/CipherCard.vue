@@ -49,7 +49,7 @@
       <div class="tab-content">
         <div ref="theoryPanel" class="tab-panel">
           <ScanLine />
-          <div class="cipher-theory">
+          <div class="cipher-theory cyber-panel animated-border">
             <h2 class="section-title">Theory & History</h2>
             <div class="theory-content">
               <slot name="theory"></slot>
@@ -58,15 +58,16 @@
         </div>
 
         <div ref="encryptPanel" class="tab-panel">
-          <div class="cipher-practice">
+          <div class="cipher-practice cyber-panel animated-border">
             <h2 class="section-title">Encrypt Messages</h2>
             <div class="control-group">
-              <slot name="cipherKey"></slot>
+              <slot name="cipherKey" panel="encrypt"></slot>
             </div>
 
             <div class="control-group">
               <label class="control-label">Input Text:</label>
               <textarea
+                ref="encryptInputField"
                 v-model="encryptInput"
                 placeholder="Enter text to encrypt..."
                 class="cipher-textarea"
@@ -78,25 +79,28 @@
               <button @click="clearEncrypt" class="cipher-button">Clear</button>
             </div>
 
-            <div v-if="encryptError" class="status-error">
-              <CyberIcon type="error" size="16" />
-              <span>{{ encryptError }}</span>
-            </div>
+            <CipherFeedback
+              :text="encryptError || props.encryptFeedback"
+              :type="encryptError ? 'error' : props.encryptFeedbackType"
+            />
 
-            <CipherOutput label="Output" :text="encryptOutput" />
+            <slot name="encryptOutput" :text="encryptOutput" :label="'Output'">
+              <CipherOutput label="Output" :text="encryptOutput" />
+            </slot>
           </div>
         </div>
 
         <div ref="decryptPanel" class="tab-panel">
-          <div class="cipher-practice">
+          <div class="cipher-practice cyber-panel animated-border">
             <h2 class="section-title">Decrypt Messages</h2>
-            <div class="control-group">
-              <slot name="cipherKey"></slot>
+            <div v-if="props.showCipherKeyOnDecrypt" class="control-group">
+              <slot name="cipherKey" panel="decrypt"></slot>
             </div>
 
             <div class="control-group">
               <label class="control-label">Input Text:</label>
               <textarea
+                ref="decryptInputField"
                 v-model="decryptInput"
                 placeholder="Enter text to decrypt..."
                 class="cipher-textarea"
@@ -123,12 +127,14 @@
               </button>
             </div>
 
-            <div v-if="decryptError" class="status-error">
-              <CyberIcon type="error" size="16" />
-              <span>{{ decryptError }}</span>
-            </div>
+            <CipherFeedback
+              :text="decryptError || props.decryptFeedback"
+              :type="decryptError ? 'error' : props.decryptFeedbackType"
+            />
 
-            <CipherOutput label="Output" :text="decryptOutput" />
+            <slot name="decryptOutput" :text="decryptOutput" :label="'Output'">
+              <CipherOutput label="Output" :text="decryptOutput" />
+            </slot>
           </div>
         </div>
       </div>
@@ -137,8 +143,10 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import type { PropType } from 'vue'
 import CipherOutput from './CipherOutput.vue'
+import CipherFeedback from './CipherFeedback.vue'
 import ScanLine from './ScanLine.vue'
 import CyberIcon from './icons/CyberIcon.vue'
 
@@ -163,6 +171,47 @@ const props = defineProps({
     type: Function,
     required: false,
   },
+  encryptOutputOverride: {
+    type: Function as PropType<(() => string) | undefined>,
+    required: false,
+  },
+  normalModeKeyHandler: {
+    type: Function as PropType<((key: string, activeTab: string) => boolean) | undefined>,
+    required: false,
+  },
+  showCipherKeyOnDecrypt: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
+  onEncryptInputChange: {
+    type: Function as PropType<((value: string) => void) | undefined>,
+    required: false,
+  },
+  onEncryptClear: {
+    type: Function as PropType<(() => void) | undefined>,
+    required: false,
+  },
+  onDecryptClear: {
+    type: Function as PropType<(() => void) | undefined>,
+    required: false,
+  },
+  encryptFeedback: {
+    type: String,
+    default: '',
+  },
+  encryptFeedbackType: {
+    type: String as PropType<'error' | 'warning' | 'info'>,
+    default: 'error',
+  },
+  decryptFeedback: {
+    type: String,
+    default: '',
+  },
+  decryptFeedbackType: {
+    type: String as PropType<'error' | 'warning' | 'info'>,
+    default: 'error',
+  },
 })
 
 const emit = defineEmits<{
@@ -174,6 +223,8 @@ const root = ref<HTMLElement | null>(null)
 const theoryPanel = ref<HTMLElement | null>(null)
 const encryptPanel = ref<HTMLElement | null>(null)
 const decryptPanel = ref<HTMLElement | null>(null)
+const encryptInputField = ref<HTMLTextAreaElement | null>(null)
+const decryptInputField = ref<HTMLTextAreaElement | null>(null)
 
 const getPanel = (tabId: string) => {
   if (tabId === 'theory') return theoryPanel.value
@@ -226,11 +277,14 @@ const isKeyMode = ref(false)
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.defaultPrevented) return
 
-  // Ignore shortcuts if Ctrl, Meta (Cmd), or Alt are pressed
-  if (e.ctrlKey || e.metaKey || e.altKey) return
+  // Ignore shortcuts if any modifier key is pressed
+  if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
 
-  const isInput = ['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)
-  const isKeyInput = (e.target as HTMLElement).classList.contains('cipher-input')
+  if (!(e.target instanceof HTMLElement)) return
+  const target = e.target
+  const isInput =
+    ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable
+  const isKeyInput = target.classList.contains('cipher-input')
 
   // Prevent collision with global navigation menu
   const isMenuOpen = document.querySelector('.nav-overlay.active') !== null
@@ -263,13 +317,17 @@ const handleKeydown = (e: KeyboardEvent) => {
   if (!isInsertMode.value) {
     switch (key) {
       case 'i': {
-        const panel = getPanel(cipherActiveTab.value)
-        const textarea = panel?.querySelector('textarea') as HTMLTextAreaElement
-        if (textarea) {
+        const target =
+          cipherActiveTab.value === 'encrypt'
+            ? encryptInputField.value
+            : cipherActiveTab.value === 'decrypt'
+              ? decryptInputField.value
+              : null
+        if (target) {
           e.preventDefault()
           isInsertMode.value = true
           isKeyMode.value = false
-          setTimeout(() => textarea.focus(), 0)
+          setTimeout(() => target.focus(), 0)
         }
         break
       }
@@ -309,6 +367,12 @@ const handleKeydown = (e: KeyboardEvent) => {
         break
       case 'y':
         yankOutput()
+        break
+      default:
+        if (props.normalModeKeyHandler) {
+          const handled = props.normalModeKeyHandler(key, cipherActiveTab.value)
+          if (handled) e.preventDefault()
+        }
         break
     }
   }
@@ -351,11 +415,30 @@ const clearEncrypt = () => {
   encryptInput.value = ''
   encryptOutput.value = ''
   encryptError.value = ''
+  props.onEncryptClear?.()
 }
 
 const decryptInput = ref('')
 const decryptOutput = ref('')
 const decryptError = ref('')
+
+watch(encryptInput, (value) => {
+  encryptError.value = ''
+  props.onEncryptInputChange?.(value)
+})
+
+watch(decryptInput, () => {
+  decryptError.value = ''
+})
+
+watch(
+  () => props.cipherKey,
+  () => {
+    encryptError.value = ''
+    decryptError.value = ''
+  },
+  { deep: true },
+)
 
 const decrypt = () => {
   if (!decryptInput.value) return
@@ -374,6 +457,7 @@ const clearDecrypt = () => {
   decryptInput.value = ''
   decryptOutput.value = ''
   decryptError.value = ''
+  props.onDecryptClear?.()
 }
 
 const isCracking = ref(false)
@@ -381,7 +465,10 @@ const showYankedTooltip = ref(false)
 let crackTimer: ReturnType<typeof setTimeout> | null = null
 
 const yankOutput = () => {
-  const output = cipherActiveTab.value === 'encrypt' ? encryptOutput.value : decryptOutput.value
+  const output =
+    cipherActiveTab.value === 'encrypt'
+      ? (props.encryptOutputOverride?.() ?? encryptOutput.value)
+      : decryptOutput.value
   if (!output) return
 
   navigator.clipboard
@@ -448,6 +535,49 @@ const crack = async () => {
 <style scoped>
 @import '@/assets/cipher-card.css';
 
+/* Slotted Style Overrides */
+:slotted(.theory-content h3) {
+  color: var(--cryptotron-neon-green);
+  font-family: 'Orbitron', monospace;
+  margin: 1.5rem 0 1rem 0;
+  font-size: 1.2rem;
+}
+
+:slotted(.theory-content p) {
+  margin-bottom: 1rem;
+}
+
+:slotted(.control-label) {
+  display: block;
+  color: var(--cryptotron-neon-green);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+}
+
+:slotted(.cipher-example) {
+  background: rgba(0, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.9rem;
+}
+
+:slotted(ul) {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+:slotted(li) {
+  line-height: 1.6;
+}
+
 .cipher-content {
   min-width: 100%;
   max-width: calc(100vw - 5rem);
@@ -461,7 +591,7 @@ const crack = async () => {
   font-weight: 700;
   text-align: center;
   margin-bottom: 3rem;
-  background: linear-gradient(45deg, var(--neon-green), var(--neon-cyan));
+  background: linear-gradient(45deg, var(--cryptotron-neon-green), var(--cryptotron-neon-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -499,9 +629,9 @@ const crack = async () => {
 }
 
 .yank-alert {
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   font-weight: 700;
-  text-shadow: 0 0 5px var(--neon-green);
+  text-shadow: 0 0 5px var(--cryptotron-neon-green);
   animation: yank-flicker 0.2s infinite;
 }
 
@@ -518,57 +648,33 @@ const crack = async () => {
 
 .vim-status-bar.mode-insert {
   background: rgba(255, 0, 255, 0.15);
-  border-bottom-color: var(--neon-magenta);
+  border-bottom-color: var(--cryptotron-neon-magenta);
 }
 
 .vim-status-bar.mode-key {
   background: rgba(0, 255, 65, 0.15);
-  border-bottom-color: var(--neon-green);
+  border-bottom-color: var(--cryptotron-neon-green);
 }
 
 .mode-tag {
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   font-weight: 700;
   letter-spacing: 1px;
 }
 
 .mode-insert .mode-tag {
-  color: var(--neon-magenta);
-  text-shadow: 0 0 5px var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
+  text-shadow: 0 0 5px var(--cryptotron-neon-magenta);
 }
 
 .mode-key .mode-tag {
-  color: var(--neon-green);
-  text-shadow: 0 0 5px var(--neon-green);
+  color: var(--cryptotron-neon-green);
+  text-shadow: 0 0 5px var(--cryptotron-neon-green);
 }
 
 .mode-hint {
   color: var(--text-secondary);
   opacity: 0.8;
-}
-
-.status-error {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  color: var(--neon-magenta);
-  font-family: 'Space Mono', monospace;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  animation: error-flicker 0.3s ease-in-out;
-}
-
-@keyframes error-flicker {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.7;
-  }
 }
 
 .cipher-container::before {
@@ -578,10 +684,6 @@ const crack = async () => {
   left: 0;
   right: 0;
   height: 2px;
-  /*
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta), var(--neon-green));
-  animation: borderFlow 3s linear infinite;
-  */
 }
 
 .tab-navigation {
@@ -632,20 +734,20 @@ const crack = async () => {
 }
 
 .tab-button.active .tab-label {
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
 }
 
 .tab-button.active .tab-label::before {
   content: '> [';
   opacity: 1;
-  color: var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
 }
 
 .tab-button.active .tab-label::after {
   content: '] <';
   opacity: 1;
-  color: var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
 }
 
 .tab-icon {
@@ -700,12 +802,12 @@ const crack = async () => {
 }
 
 .tab-button:hover {
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   background: rgba(0, 255, 255, 0.05);
 }
 
 .tab-button.active {
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   background: rgba(0, 255, 255, 0.1);
 }
 
@@ -716,7 +818,7 @@ const crack = async () => {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+  background: linear-gradient(90deg, var(--cryptotron-neon-cyan), var(--cryptotron-neon-magenta));
   animation: tabGlow 2s ease-in-out infinite alternate;
   will-change: box-shadow;
 }

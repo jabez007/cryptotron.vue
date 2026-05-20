@@ -12,7 +12,7 @@
     </div>
 
     <div class="about-grid">
-      <div class="about-card" style="animation-delay: -2s">
+      <div class="about-card cyber-panel animated-border" style="animation-delay: -2s">
         <h2 class="card-title">Mission Statement</h2>
         <div class="card-content">
           <p>
@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <div class="about-card" style="animation-delay: -3s">
+      <div class="about-card cyber-panel animated-border" style="animation-delay: -3s">
         <h2 class="card-title">What You'll Find</h2>
         <div class="card-content">
           <ul class="feature-list">
@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <div class="about-card" style="animation-delay: -11s">
+      <div class="about-card cyber-panel animated-border" style="animation-delay: -11s">
         <h2 class="card-title">Why Classical Ciphers Matter</h2>
         <div class="card-content">
           <p>
@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      <div class="about-card" style="animation-delay: -19s">
+      <div class="about-card cyber-panel animated-border" style="animation-delay: -19s">
         <h2 class="card-title">Design Philosophy</h2>
         <div class="card-content">
           <p>
@@ -80,7 +80,10 @@
         </div>
       </div>
 
-      <div class="about-card full-width-card">
+      <div
+        class="about-card full-width-card cyber-panel animated-border"
+        style="animation-delay: -27s"
+      >
         <h2 class="card-title">Technology Stack</h2>
         <div class="card-content">
           <p>
@@ -116,7 +119,7 @@
   font-weight: 700;
   text-align: center;
   margin-bottom: 3rem;
-  background: linear-gradient(45deg, var(--neon-green), var(--neon-cyan));
+  background: linear-gradient(45deg, var(--cryptotron-neon-green), var(--cryptotron-neon-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -155,14 +158,6 @@
 .about-card {
   flex: 1 0 29%;
   margin: 2rem;
-  background: var(--cryptotron-card-bg);
-  border: 1px solid var(--cryptotron-border-glow);
-  border-radius: 12px;
-  padding: 2rem;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  position: relative;
-  overflow: hidden;
 }
 
 @media only screen and (max-width: 768px) {
@@ -176,32 +171,10 @@
   }
 }
 
-.about-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta), var(--neon-green));
-  animation: borderFlow 5s linear infinite;
-  animation-delay: inherit;
-}
-
-@keyframes borderFlow {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
-}
-
 .card-title {
   font-family: 'Orbitron', monospace;
   font-size: 1.5rem;
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   margin-bottom: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -217,7 +190,7 @@
 }
 
 .highlight {
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   font-weight: 700;
 }
 
@@ -237,7 +210,7 @@
   content: '▶';
   position: absolute;
   left: 0;
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   font-size: 0.8rem;
 }
 
@@ -256,7 +229,7 @@
   padding: 1rem;
   text-align: center;
   font-family: 'Orbitron', monospace;
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -274,7 +247,7 @@
 
 .quote-box {
   background: rgba(0, 255, 65, 0.05);
-  border-left: 4px solid var(--neon-green);
+  border-left: 4px solid var(--cryptotron-neon-green);
   padding: 1.5rem;
   margin: 2rem 0;
   border-radius: 0 8px 8px 0;
@@ -289,7 +262,7 @@
   top: -0.5rem;
   left: 1rem;
   font-size: 3rem;
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   font-family: 'Orbitron', monospace;
 }
 </style>

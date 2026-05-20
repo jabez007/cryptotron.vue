@@ -664,8 +664,6 @@ const decrypt = () => {
 </style>
 
 <style scoped>
-@import '@/assets/cipher-card.css';
-
 .builder-container {
   height: 100%;
   width: 100%;
@@ -679,7 +677,7 @@ const decrypt = () => {
 }
 
 .drag-active {
-  background-color: var(--neon-cyan);
+  background-color: var(--cryptotron-neon-cyan);
 }
 
 .vue-flow {
@@ -696,7 +694,7 @@ const decrypt = () => {
   width: 56px;
   height: 56px;
   background: linear-gradient(45deg, rgba(255, 0, 255, 0.2), rgba(255, 0, 255, 0.1));
-  border: 1px solid var(--neon-magenta);
+  border: 1px solid var(--cryptotron-neon-magenta);
   border-radius: 50%;
   box-shadow:
     0 0 10px rgba(255, 0, 255, 0.3),
@@ -707,7 +705,7 @@ const decrypt = () => {
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 100;
-  color: var(--neon-magenta);
+  color: var(--cryptotron-neon-magenta);
   text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
   overflow: hidden;
 }
@@ -766,11 +764,11 @@ const decrypt = () => {
 
 .save-btn {
   background: linear-gradient(45deg, rgba(0, 255, 65, 0.2), rgba(0, 255, 65, 0.1));
-  border: 1px solid var(--neon-green);
+  border: 1px solid var(--cryptotron-neon-green);
   box-shadow:
     0 0 10px rgba(0, 255, 65, 0.3),
     inset 0 1px 0 rgba(0, 255, 65, 0.2);
-  color: var(--neon-green);
+  color: var(--cryptotron-neon-green);
   text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
   transition: all 0.3s ease;
 }
@@ -787,11 +785,11 @@ const decrypt = () => {
 
 .load-btn {
   background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.1));
-  border: 1px solid var(--neon-cyan);
+  border: 1px solid var(--cryptotron-neon-cyan);
   box-shadow:
     0 0 10px rgba(0, 255, 255, 0.3),
     inset 0 1px 0 rgba(0, 255, 255, 0.2);
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
   transition: all 0.3s ease;
 }

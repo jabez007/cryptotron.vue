@@ -67,5 +67,20 @@ export default (parentRouteName?: string) => {
       path: `${rootPath}playfair`,
       component: () => import('@/views/PlayfairView.vue'),
     },
+    {
+      name: 'cryptotron-bacon',
+      path: `${rootPath}bacon`,
+      component: () => import('@/views/BaconView.vue'),
+    },
+    {
+      name: 'cryptotron-emoji-smuggling',
+      path: `${rootPath}emoji-smuggling`,
+      component: () => import('@/views/EmojiSmugglingView.vue'),
+    },
+    {
+      name: 'cryptotron-acrostic',
+      path: `${rootPath}acrostic`,
+      component: () => import('@/views/AcrosticsView.vue'),
+    },
   ]
 }

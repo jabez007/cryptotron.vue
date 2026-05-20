@@ -17,7 +17,7 @@ const railFenceCipherKey = ref({
     :crack-algorithm="railFence.crack"
     v-model:cipher-key="railFenceCipherKey"
   >
-    <template v-slot:theory>
+    <template #theory>
       <h3>The Origin Story</h3>
       <p>
         The Rail-Fence cipher (also called a zigzag cipher) is a classic example of a
@@ -74,7 +74,7 @@ W . . . E . . . C . . . R
         rail-fence transposition.
       </p>
     </template>
-    <template v-slot:cipherKey>
+    <template #cipherKey>
       <KeyRailFence v-model:cipherKey="railFenceCipherKey" />
     </template>
   </CipherCard>

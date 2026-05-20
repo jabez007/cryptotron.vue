@@ -2,43 +2,12 @@
 .cipher-practice {
   max-width: calc(100vw - 7rem);
   min-width: 100%;
-  /* margin-bottom: 2rem; */
-  background: var(--cryptotron-card-bg);
-  border: 1px solid var(--cryptotron-border-glow);
-  border-radius: 12px;
-  padding: 2rem;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.cipher-theory::before,
-.cipher-practice::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta), var(--neon-green));
-  animation: borderFlow 5s linear infinite;
-}
-
-@keyframes borderFlow {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
 }
 
 .section-title {
-  font-family: 'Orbitron', monospace;
+  font-family: Orbitron, monospace;
   font-size: 1.5rem;
-  color: var(--neon-cyan);
+  color: var(--cryptotron-neon-cyan);
   margin-bottom: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -49,18 +18,18 @@
   color: var(--cryptotron-text-secondary);
 }
 
-.theory-content :deep(h3) {
-  color: var(--neon-green);
-  font-family: 'Orbitron', monospace;
+.theory-content h3 {
+  color: var(--cryptotron-neon-green);
+  font-family: Orbitron, monospace;
   margin: 1.5rem 0 1rem 0;
   font-size: 1.2rem;
 }
 
-.theory-content :deep(p) {
+.theory-content p {
   margin-bottom: 1rem;
 }
 
-:deep(.cipher-example) {
+.cipher-example {
   background: rgba(0, 255, 255, 0.05);
   border: 1px solid rgba(0, 255, 255, 0.2);
   border-radius: 8px;
@@ -70,40 +39,16 @@
   font-size: 0.9rem;
 }
 
-/* Interactive Controls */
-.control-group {
-  margin-bottom: 1.5rem;
-}
+/* Interactive Controls - Now moved to ui-elements.css for DRYness */
 
-:deep(.control-label) {
-  display: block;
-  color: var(--neon-green);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 0.9rem;
-}
-
-:deep(.cipher-input),
-.cipher-textarea {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid var(--cryptotron-border-glow);
-  border-radius: 6px;
-  padding: 0.75rem;
-  color: var(--cryptotron-text-primary);
-  font-family: 'Space Mono', monospace;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-}
-
-.cipher-input:focus,
-.cipher-textarea:focus {
-  outline: none;
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-  background: rgba(0, 0, 0, 0.9);
+.cipher-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300ff41' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  appearance: none;
 }
 
 .cipher-textarea {
@@ -111,67 +56,15 @@
   resize: vertical;
 }
 
-.cipher-button {
-  background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
-  border: 1px solid var(--neon-cyan);
-  border-radius: 6px;
-  padding: 0.75rem 1.5rem;
-  color: var(--cryptotron-text-primary);
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.cipher-button:hover {
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-  transform: translateY(-2px);
-}
-
-.cipher-button:active {
-  transform: translateY(0);
-}
-
-.cipher-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.cipher-button:hover::before {
-  left: 100%;
-}
-
-.cipher-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  border-color: #555;
-  box-shadow: none;
-  transform: none !important;
-}
-
-.cipher-button:disabled::before {
-  display: none;
-}
-
 .cipher-button.crack {
-  border-color: var(--neon-magenta);
+  border-color: var(--cryptotron-neon-magenta);
   background: linear-gradient(45deg, rgba(255, 0, 255, 0.2), rgba(0, 255, 255, 0.1));
   text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
 }
 
 .cipher-button.crack:hover:not(:disabled) {
   box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
-  border-color: var(--neon-magenta);
+  border-color: var(--cryptotron-neon-magenta);
 }
 
 /* Glitch Animation for "Cracking..." */
@@ -193,13 +86,13 @@
 
 .glitch-text::before {
   animation: glitch-anim-1 2s infinite linear alternate-reverse;
-  text-shadow: 2px 0 var(--neon-cyan);
+  text-shadow: 2px 0 var(--cryptotron-neon-cyan);
   left: 2px;
 }
 
 .glitch-text::after {
   animation: glitch-anim-2 3s infinite linear alternate-reverse;
-  text-shadow: -2px 0 var(--neon-magenta);
+  text-shadow: -2px 0 var(--cryptotron-neon-magenta);
   left: -2px;
 }
 
@@ -253,9 +146,46 @@
   }
 }
 
-.button-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
+/* Shared Theory Styles */
+.theory-content code {
+  font-family: var(--font-mono);
+  color: var(--cryptotron-neon-green);
+}
+
+.theory-content ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.theory-content li {
+  line-height: 1.6;
+}
+
+.anatomy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.anatomy-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--cryptotron-border-glow);
+  padding: 1.25rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.anatomy-card h4 {
+  color: var(--cryptotron-neon-green);
+  margin-bottom: 0.75rem;
+  font-family: Orbitron, sans-serif;
+  font-size: 1rem;
+}
+
+.anatomy-card p {
+  font-size: 0.95rem;
+  margin-bottom: 0;
 }

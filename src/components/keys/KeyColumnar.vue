@@ -11,9 +11,7 @@
     <div v-if="keyword.hasError" class="error-messages">
       <p v-for="error in keyword.errors" :key="error">{{ error }}</p>
     </div>
-    <small class="control-help">
-      Used to determine the order in which columns are read.
-    </small>
+    <small class="control-help"> Used to determine the order in which columns are read. </small>
   </div>
 </template>
 
