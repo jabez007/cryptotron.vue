@@ -80,7 +80,7 @@
         </div>
       </div>
 
-      <div class="about-card full-width-card">
+      <div class="about-card full-width-card cyber-panel animated-border" style="animation-delay: -27s">
         <h2 class="card-title">Technology Stack</h2>
         <div class="card-content">
           <p>
