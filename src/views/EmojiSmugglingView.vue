@@ -101,7 +101,7 @@ const appendEmojiCarrier = (emoji: string) => {
 
 const clearEncryptState = () => {
   secretMessage.value = ''
-  revealMode.value = false
+  revealMode.value = true
   coverText.value = '👍'
   encodingMode.value = 'variation-selectors'
   interleave.value = false
