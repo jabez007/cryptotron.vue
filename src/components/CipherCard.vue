@@ -79,10 +79,10 @@
               <button @click="clearEncrypt" class="cipher-button">Clear</button>
             </div>
 
-            <div v-if="encryptError" class="status-error">
-              <CyberIcon type="error" size="16" />
-              <span>{{ encryptError }}</span>
-            </div>
+            <CipherFeedback
+              :text="encryptError || props.encryptFeedback"
+              :type="encryptError ? 'error' : props.encryptFeedbackType"
+            />
 
             <slot name="encryptOutput" :text="encryptOutput" :label="'Output'">
               <CipherOutput label="Output" :text="encryptOutput" />
@@ -127,10 +127,10 @@
               </button>
             </div>
 
-            <div v-if="decryptError" class="status-error">
-              <CyberIcon type="error" size="16" />
-              <span>{{ decryptError }}</span>
-            </div>
+            <CipherFeedback
+              :text="decryptError || props.decryptFeedback"
+              :type="decryptError ? 'error' : props.decryptFeedbackType"
+            />
 
             <slot name="decryptOutput" :text="decryptOutput" :label="'Output'">
               <CipherOutput label="Output" :text="decryptOutput" />
@@ -146,6 +146,7 @@
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { PropType } from 'vue'
 import CipherOutput from './CipherOutput.vue'
+import CipherFeedback from './CipherFeedback.vue'
 import ScanLine from './ScanLine.vue'
 import CyberIcon from './icons/CyberIcon.vue'
 
@@ -194,6 +195,22 @@ const props = defineProps({
   onDecryptClear: {
     type: Function as PropType<(() => void) | undefined>,
     required: false,
+  },
+  encryptFeedback: {
+    type: String,
+    default: '',
+  },
+  encryptFeedbackType: {
+    type: String as PropType<'error' | 'warning' | 'info'>,
+    default: 'error',
+  },
+  decryptFeedback: {
+    type: String,
+    default: '',
+  },
+  decryptFeedbackType: {
+    type: String as PropType<'error' | 'warning' | 'info'>,
+    default: 'error',
   },
 })
 
@@ -400,13 +417,27 @@ const clearEncrypt = () => {
   props.onEncryptClear?.()
 }
 
-watch(encryptInput, (value) => {
-  props.onEncryptInputChange?.(value)
-})
-
 const decryptInput = ref('')
 const decryptOutput = ref('')
 const decryptError = ref('')
+
+watch(encryptInput, (value) => {
+  encryptError.value = ''
+  props.onEncryptInputChange?.(value)
+})
+
+watch(decryptInput, () => {
+  decryptError.value = ''
+})
+
+watch(
+  () => props.cipherKey,
+  () => {
+    encryptError.value = ''
+    decryptError.value = ''
+  },
+  { deep: true },
+)
 
 const decrypt = () => {
   if (!decryptInput.value) return

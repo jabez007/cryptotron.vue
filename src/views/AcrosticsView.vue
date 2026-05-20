@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
+import CipherOutput from '@/components/CipherOutput.vue'
 import { computed, ref, watch } from 'vue'
 import { generateAcrostic } from '@/utils/text-gen'
 
@@ -104,6 +105,8 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
     :encrypt-algorithm="() => acrosticEncrypt"
     :decrypt-algorithm="() => acrosticDecrypt"
     :normal-mode-key-handler="handleAcrosticNormalModeKey"
+    :on-encrypt-input-change="(val: string) => { secretMessage = val; }"
+    :on-encrypt-clear="() => { secretMessage = ''; coverText = ''; }"
     v-model:cipher-key="acrosticKey"
   >
     <template #theory>
@@ -226,17 +229,21 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
     </template>
 
     <template #encryptOutput>
-      <div class="acrostic-preview cyber-panel">
-        <div v-for="(line, idx) in coverLines" :key="idx" class="acrostic-line">
-          <span class="gutter-marker" v-if="acrosticMode !== 'telestic'">
-            {{ getLineData(line).first }}
-          </span>
-          <span class="line-content">{{ line }}</span>
-          <span class="gutter-marker" v-if="acrosticMode !== 'acrostic'">
-            {{ getLineData(line).last }}
-          </span>
+      <div class="control-group">
+        <label class="control-label">Live Preview</label>
+        <div class="acrostic-preview">
+          <div v-for="(line, idx) in coverLines" :key="idx" class="acrostic-line">
+            <span class="gutter-marker" v-if="acrosticMode !== 'telestic'">
+              {{ getLineData(line).first }}
+            </span>
+            <span class="line-content">{{ line }}</span>
+            <span class="gutter-marker" v-if="acrosticMode !== 'acrostic'">
+              {{ getLineData(line).last }}
+            </span>
+          </div>
         </div>
       </div>
+      <CipherOutput label="Export Output" :text="coverText" />
     </template>
   </CipherCard>
 </template>
@@ -256,14 +263,19 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
 
 .acrostic-preview {
   font-family: 'Space Mono', monospace;
-  min-height: 10rem;
+  height: 200px;
+  overflow-y: auto;
+  padding: 1.25rem;
+  background: rgba(0, 255, 65, 0.03);
+  border: 1px solid rgba(0, 255, 65, 0.2);
+  border-radius: 8px;
 }
 
 .acrostic-line {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.25rem;
-  border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+  border-bottom: 1px solid rgba(0, 255, 65, 0.05);
   padding-bottom: 0.25rem;
 }
 
@@ -272,23 +284,13 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
   font-weight: 700;
   width: 1.5rem;
   text-align: center;
+  text-shadow: 0 0 5px var(--cryptotron-neon-magenta);
 }
 
 .line-content {
   flex: 1;
   color: var(--cryptotron-text-primary);
   padding: 0 1rem;
-}
-
-.bacon-preview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.bacon-secondary-button {
-  font-size: 0.8rem;
-  padding: 0.4rem 0.8rem;
+  opacity: 0.9;
 }
 </style>

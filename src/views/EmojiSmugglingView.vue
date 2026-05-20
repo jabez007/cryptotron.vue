@@ -28,27 +28,27 @@ const coverText = computed({
 const secretMessage = ref('')
 const encodedInput = ref('')
 
-const encodeResult = computed(() => {
-  try {
-    return {
-      encoded: tagsEncoder(
-        secretMessage.value,
-        coverText.value,
-        encodingMode.value,
-        interleave.value,
-      ),
-      warning: '',
-    }
-  } catch (error) {
-    return {
-      encoded: coverText.value,
-      warning: error instanceof Error ? error.message : 'Unsupported characters detected.',
-    }
-  }
-})
+const manualEncodedOutput = ref('')
+const manualEncodingWarning = ref('')
 
-const encodedOutput = computed(() => encodeResult.value.encoded)
-const encodingWarning = computed(() => encodeResult.value.warning)
+const runEncoding = () => {
+  try {
+    manualEncodedOutput.value = tagsEncoder(
+      secretMessage.value,
+      coverText.value,
+      encodingMode.value,
+      interleave.value,
+    )
+    manualEncodingWarning.value = ''
+  } catch (error) {
+    manualEncodedOutput.value = coverText.value
+    manualEncodingWarning.value =
+      error instanceof Error ? error.message : 'Unsupported characters detected.'
+  }
+}
+
+const encodedOutput = computed(() => manualEncodedOutput.value || coverText.value)
+const encodingWarning = computed(() => manualEncodingWarning.value)
 const meter = computed(() => `${encodedOutput.value.length} / 2000`)
 
 const extracted = computed(() => tagsDecoder(encodedInput.value))
@@ -76,6 +76,7 @@ const handleNormalModeKey = (key: string, activeTab: string) => {
 
   if (key === 'm') {
     encodingMode.value = nextMode(encodingMode.value)
+    runEncoding()
     return true
   }
 
@@ -84,6 +85,7 @@ const handleNormalModeKey = (key: string, activeTab: string) => {
 
 const tagsEncrypt = (input: string) => {
   secretMessage.value = input
+  runEncoding()
   return encodedOutput.value
 }
 
@@ -93,10 +95,12 @@ const setSecretMessage = (value: string) => {
 
 const useEmojiCarrier = (emoji: string) => {
   coverText.value = emoji
+  runEncoding()
 }
 
 const appendEmojiCarrier = (emoji: string) => {
   coverText.value = `${coverText.value}${emoji}`
+  runEncoding()
 }
 
 const clearEncryptState = () => {
@@ -105,6 +109,8 @@ const clearEncryptState = () => {
   coverText.value = '👍'
   encodingMode.value = 'variation-selectors'
   interleave.value = false
+  manualEncodedOutput.value = ''
+  manualEncodingWarning.value = ''
 }
 
 const clearDecryptState = () => {
@@ -128,6 +134,8 @@ const tagsDecrypt = (input: string) => {
     :on-encrypt-input-change="setSecretMessage"
     :on-encrypt-clear="clearEncryptState"
     :on-decrypt-clear="clearDecryptState"
+    :encrypt-feedback="encodingWarning"
+    encrypt-feedback-type="warning"
     v-model:cipher-key="tagsKey"
   >
     <template #theory>
@@ -272,7 +280,7 @@ const tagsDecrypt = (input: string) => {
 
     <template #encryptOutput>
       <div class="tags-stack">
-        <div class="control-group">
+        <div>
           <label class="control-label">Live Preview</label>
           <div class="tags-preview cyber-panel" :class="{ reveal: revealMode }">
             {{ revealText }}
@@ -282,15 +290,12 @@ const tagsDecrypt = (input: string) => {
           </p>
         </div>
 
-        <div class="control-group">
+        <div>
           <label class="control-label">Payload Meter</label>
           <p class="tags-meter">Total Characters: {{ meter }}</p>
-          <p v-if="encodingWarning" class="status-error tags-warning">
-            <span>{{ encodingWarning }}</span>
-          </p>
         </div>
 
-        <div class="control-group">
+        <div>
           <CipherOutput label="Raw Encoded Output" :text="encodedOutput" />
         </div>
       </div>
@@ -298,7 +303,7 @@ const tagsDecrypt = (input: string) => {
 
     <template #decryptOutput>
       <div class="tags-stack">
-        <div class="control-group">
+        <div>
           <p class="tags-hint">
             Auto-detected format: <strong>{{ detectedFormat }}</strong>
           </p>
@@ -316,7 +321,8 @@ const tagsDecrypt = (input: string) => {
 }
 
 .tags-preview {
-  min-height: 5rem;
+  height: 120px;
+  overflow-y: auto;
   padding: 1rem;
   white-space: pre-wrap;
   word-break: break-word;

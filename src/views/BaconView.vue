@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
+import CipherOutput from '@/components/CipherOutput.vue'
 import { computed, ref } from 'vue'
 import {
   baconDecoder,
@@ -14,7 +15,6 @@ const baconCoverKey = ref({ coverText: '' })
 const secretMessage = ref('')
 const encodedInput = ref('')
 const exportMode = ref<'html' | 'markdown'>('html')
-const copiedNotice = ref('')
 
 const coverText = computed({
   get: () => baconCoverKey.value.coverText ?? '',
@@ -33,20 +33,31 @@ const bitLength = computed(
 const handleGenerateCover = () => {
   if (bitLength.value === 0) return
   coverText.value = generateBaconCover(bitLength.value)
+  if (secretMessage.value) {
+    updatePreview()
+    activeExport.value =
+      exportMode.value === 'html' ? toHtmlSnippet(preview.value) : toMarkdown(preview.value)
+  }
 }
 
-const preview = computed<StyledChar[]>(() => {
+const preview = ref<StyledChar[]>([])
+
+const updatePreview = () => {
   try {
-    return baconEncoder(secretMessage.value, coverText.value)
+    preview.value = baconEncoder(secretMessage.value, coverText.value)
   } catch (error) {
     console.error('Bacon encoder preview failed', {
       error,
       secretLength: secretMessage.value.length,
       coverLength: coverText.value.length,
     })
-    return [...coverText.value].map((char) => ({ char, type: 'a' as const, carriesBit: false }))
+    preview.value = [...coverText.value].map((char) => ({
+      char,
+      type: 'a' as const,
+      carriesBit: false,
+    }))
   }
-})
+}
 
 const alphaLength = computed(() => [...coverText.value].filter((c) => /[A-Za-z]/.test(c)).length)
 const lengthError = computed(() =>
@@ -67,40 +78,20 @@ const extracted = computed(() => {
   }
 })
 
-const htmlExport = computed(() => toHtmlSnippet(preview.value))
-const markdownExport = computed(() => toMarkdown(preview.value))
-const activeExport = computed(() =>
-  exportMode.value === 'html' ? htmlExport.value : markdownExport.value,
-)
-
-const copyActiveExport = async () => {
-  if (!activeExport.value) return
-
-  try {
-    await navigator.clipboard.writeText(activeExport.value)
-    copiedNotice.value = `${exportMode.value.toUpperCase()} copied`
-    setTimeout(() => {
-      copiedNotice.value = ''
-    }, 2000)
-  } catch (error) {
-    console.error('Failed to copy Bacon export', { error, exportMode: exportMode.value })
-    copiedNotice.value = 'Copy failed'
-    setTimeout(() => {
-      copiedNotice.value = ''
-    }, 2000)
-  }
-}
+const activeExport = ref('')
 
 const handleBaconNormalModeKey = (key: string, activeTab: string) => {
   if (activeTab !== 'encrypt') return false
 
   if (key === 'm') {
     exportMode.value = exportMode.value === 'html' ? 'markdown' : 'html'
+    activeExport.value = exportMode.value === 'html' ? toHtmlSnippet(preview.value) : toMarkdown(preview.value)
     return true
   }
 
   if (key === 'g') {
     handleGenerateCover()
+    updatePreview()
     return true
   }
 
@@ -113,6 +104,8 @@ const handleBaconNormalModeKey = (key: string, activeTab: string) => {
  */
 const baconEncrypt = (input: string) => {
   secretMessage.value = input
+  updatePreview()
+  activeExport.value = exportMode.value === 'html' ? toHtmlSnippet(preview.value) : toMarkdown(preview.value)
   return activeExport.value
 }
 
@@ -133,6 +126,9 @@ const baconDecrypt = (input: string) => {
     :decrypt-algorithm="() => baconDecrypt"
     :encrypt-output-override="() => activeExport"
     :normal-mode-key-handler="handleBaconNormalModeKey"
+    :on-encrypt-input-change="(val: string) => (secretMessage = val)"
+    :on-encrypt-clear="() => { secretMessage = ''; coverText = ''; preview = []; activeExport = ''; }"
+    :encrypt-feedback="lengthError"
     v-model:cipher-key="baconCoverKey"
   >
     <template #theory>
@@ -256,11 +252,7 @@ const baconDecrypt = (input: string) => {
 
     <template #encryptOutput>
       <div class="bacon-practice-stack">
-        <p v-if="lengthError" class="status-error bacon-inline-error">
-          <span>{{ lengthError }}</span>
-        </p>
-
-        <div class="control-group">
+        <div>
           <div class="bacon-preview-header">
             <label class="control-label">Live Preview</label>
           </div>
@@ -271,7 +263,7 @@ const baconDecrypt = (input: string) => {
           </div>
         </div>
 
-        <div class="control-group">
+        <div>
           <div class="bacon-preview-header">
             <label class="control-label">Export Output</label>
             <div class="bacon-export-actions">
@@ -282,25 +274,10 @@ const baconDecrypt = (input: string) => {
               >
                 {{ exportMode === 'html' ? 'Switch to Markdown (m)' : 'Switch to HTML (m)' }}
               </button>
-              <button
-                class="cipher-button bacon-secondary-button"
-                type="button"
-                @click="copyActiveExport"
-              >
-                Copy {{ exportMode.toUpperCase() }}
-              </button>
             </div>
           </div>
-          <p v-if="copiedNotice" class="bacon-copy-notice">{{ copiedNotice }}</p>
-          <textarea :value="activeExport" rows="8" class="cipher-textarea" readonly />
+          <CipherOutput :label="exportMode.toUpperCase()" :text="activeExport" />
         </div>
-      </div>
-    </template>
-
-    <template #decryptOutput>
-      <div class="control-group">
-        <label class="control-label">Decoded Secret Preview</label>
-        <textarea :value="extracted" rows="3" class="cipher-textarea" readonly />
       </div>
     </template>
   </CipherCard>
@@ -328,7 +305,8 @@ const baconDecrypt = (input: string) => {
 }
 
 .bacon-preview {
-  min-height: 5rem;
+  height: 150px;
+  overflow-y: auto;
   white-space: pre-wrap;
   word-break: break-word;
   color: var(--cryptotron-text-primary);
@@ -344,18 +322,5 @@ const baconDecrypt = (input: string) => {
   font-weight: 700;
   color: var(--cryptotron-neon-green);
   text-shadow: 0 0 5px var(--cryptotron-neon-green);
-}
-
-.bacon-inline-error {
-  margin-top: -0.25rem;
-}
-
-.bacon-copy-notice {
-  margin: 0 0 0.5rem;
-  color: var(--cryptotron-neon-green);
-  font-family: 'Space Mono', monospace;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 </style>
