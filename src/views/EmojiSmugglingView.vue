@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
 import CipherOutput from '@/components/CipherOutput.vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch, onUnmounted } from 'vue'
 import {
   detectTagsPayloadFormat,
   tagsDecoder,
@@ -51,6 +51,24 @@ const encodedOutput = computed(() => manualEncodedOutput.value || coverText.valu
 const encodingWarning = computed(() => manualEncodingWarning.value)
 const meter = computed(() => `${encodedOutput.value.length} / 2000`)
 
+// Watch for changes to ensure feedback isn't stale
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
+const debouncedRunEncoding = () => {
+  if (debounceTimer) clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    runEncoding()
+    debounceTimer = null
+  }, 300) // 300ms debounce
+}
+
+watch([secretMessage, coverText, encodingMode, interleave], () => {
+  debouncedRunEncoding()
+})
+
+onUnmounted(() => {
+  if (debounceTimer) clearTimeout(debounceTimer)
+})
+
 const extracted = computed(() => tagsDecoder(encodedInput.value))
 const detectedFormat = computed(() => detectTagsPayloadFormat(encodedInput.value))
 
@@ -76,7 +94,6 @@ const handleNormalModeKey = (key: string, activeTab: string) => {
 
   if (key === 'm') {
     encodingMode.value = nextMode(encodingMode.value)
-    runEncoding()
     return true
   }
 
@@ -95,12 +112,10 @@ const setSecretMessage = (value: string) => {
 
 const useEmojiCarrier = (emoji: string) => {
   coverText.value = emoji
-  runEncoding()
 }
 
 const appendEmojiCarrier = (emoji: string) => {
   coverText.value = `${coverText.value}${emoji}`
-  runEncoding()
 }
 
 const clearEncryptState = () => {
