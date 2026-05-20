@@ -37,6 +37,7 @@
   height: 2px;
   background: linear-gradient(90deg, var(--cryptotron-neon-cyan), var(--cryptotron-neon-magenta), var(--cryptotron-neon-green));
   animation: cryptotron-borderFlow 5s linear infinite;
+  animation-delay: inherit;
   z-index: 10;
 }
 
