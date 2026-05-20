@@ -35,8 +35,7 @@ const handleGenerateCover = () => {
   coverText.value = generateBaconCover(bitLength.value)
   if (secretMessage.value) {
     updatePreview()
-    activeExport.value =
-      exportMode.value === 'html' ? toHtmlSnippet(preview.value) : toMarkdown(preview.value)
+    updateActiveExport()
   }
 }
 
@@ -80,12 +79,21 @@ const extracted = computed(() => {
 
 const activeExport = ref('')
 
+const updateActiveExport = () => {
+  activeExport.value =
+    exportMode.value === 'html' ? toHtmlSnippet(preview.value) : toMarkdown(preview.value)
+}
+
+const toggleExportMode = () => {
+  exportMode.value = exportMode.value === 'html' ? 'markdown' : 'html'
+  updateActiveExport()
+}
+
 const handleBaconNormalModeKey = (key: string, activeTab: string) => {
   if (activeTab !== 'encrypt') return false
 
   if (key === 'm') {
-    exportMode.value = exportMode.value === 'html' ? 'markdown' : 'html'
-    activeExport.value = exportMode.value === 'html' ? toHtmlSnippet(preview.value) : toMarkdown(preview.value)
+    toggleExportMode()
     return true
   }
 
@@ -105,7 +113,7 @@ const handleBaconNormalModeKey = (key: string, activeTab: string) => {
 const baconEncrypt = (input: string) => {
   secretMessage.value = input
   updatePreview()
-  activeExport.value = exportMode.value === 'html' ? toHtmlSnippet(preview.value) : toMarkdown(preview.value)
+  updateActiveExport()
   return activeExport.value
 }
 
@@ -270,7 +278,7 @@ const baconDecrypt = (input: string) => {
               <button
                 class="cipher-button bacon-secondary-button"
                 type="button"
-                @click="exportMode = exportMode === 'html' ? 'markdown' : 'html'"
+                @click="toggleExportMode"
               >
                 {{ exportMode === 'html' ? 'Switch to Markdown (m)' : 'Switch to HTML (m)' }}
               </button>
