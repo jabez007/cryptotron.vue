@@ -7,6 +7,7 @@ const props = defineProps<{
     | 'encrypt'
     | 'decrypt'
     | 'copy'
+    | 'scan'
     | 'crack'
     | 'save'
     | 'load'
@@ -76,6 +77,14 @@ const colors = {
       <path d="M9 4H19V15H9V4Z" :stroke="colors.cyan" stroke-width="1.5" />
       <path d="M12 8H16" :stroke="colors.cyan" stroke-width="1" />
       <path d="M12 11H16" :stroke="colors.cyan" stroke-width="1" />
+    </g>
+
+    <!-- Scan / OCR -->
+    <g v-if="type === 'scan'">
+      <rect x="4" y="5" width="16" height="14" rx="1" :stroke="colors.cyan" stroke-width="1.5" />
+      <path d="M7 9H9M15 9H17M7 15H9M15 15H17" :stroke="colors.cyan" stroke-width="1.5" />
+      <path d="M10 9H14M10 15H14" :stroke="colors.magenta" stroke-width="1.5" />
+      <path d="M12 9V15" :stroke="colors.green" stroke-width="1.5" opacity="0.9" />
     </g>
 
     <!-- Crack / Scanner / Targeting -->

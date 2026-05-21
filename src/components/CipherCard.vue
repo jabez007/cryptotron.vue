@@ -99,6 +99,33 @@
 
             <div class="control-group">
               <label class="control-label">Input Text:</label>
+              <div class="ocr-actions">
+                <input
+                  ref="ocrFileInput"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/bmp,image/gif"
+                  class="ocr-file-input"
+                  @change="handleOcrFileChange"
+                />
+                <button
+                  type="button"
+                  class="cipher-button ocr-upload"
+                  :disabled="isOcrProcessing"
+                  @click="openOcrFilePicker"
+                >
+                  <span v-if="isOcrProcessing" class="button-content">
+                    <CyberIcon type="scan" size="18" class="button-icon pulse" />
+                    Scanning...
+                  </span>
+                  <span v-else class="button-content">
+                    <CyberIcon type="scan" size="18" class="button-icon" />
+                    Scan Image
+                  </span>
+                </button>
+              </div>
+              <p class="ocr-helper">
+                Route intercepted. Import printed text from a screenshot before decrypting.
+              </p>
               <textarea
                 ref="decryptInputField"
                 v-model="decryptInput"
@@ -128,8 +155,8 @@
             </div>
 
             <CipherFeedback
-              :text="decryptError || props.decryptFeedback"
-              :type="decryptError ? 'error' : props.decryptFeedbackType"
+              :text="decryptError || ocrStatusMessage || props.decryptFeedback"
+              :type="decryptError ? 'error' : ocrStatusType || props.decryptFeedbackType"
             />
 
             <slot name="decryptOutput" :text="decryptOutput" :label="'Output'">
@@ -145,6 +172,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { PropType } from 'vue'
+import type { LoggerMessage } from 'tesseract.js'
 import CipherOutput from './CipherOutput.vue'
 import CipherFeedback from './CipherFeedback.vue'
 import ScanLine from './ScanLine.vue'
@@ -218,6 +246,9 @@ const emit = defineEmits<{
   'update:cipherKey': [key: object]
 }>()
 
+type OcrModule = typeof import('tesseract.js')
+type OcrWorker = Awaited<ReturnType<OcrModule['createWorker']>>
+
 const cipherActiveTab = ref('theory')
 const root = ref<HTMLElement | null>(null)
 const theoryPanel = ref<HTMLElement | null>(null)
@@ -225,6 +256,7 @@ const encryptPanel = ref<HTMLElement | null>(null)
 const decryptPanel = ref<HTMLElement | null>(null)
 const encryptInputField = ref<HTMLTextAreaElement | null>(null)
 const decryptInputField = ref<HTMLTextAreaElement | null>(null)
+const ocrFileInput = ref<HTMLInputElement | null>(null)
 
 const getPanel = (tabId: string) => {
   if (tabId === 'theory') return theoryPanel.value
@@ -392,6 +424,10 @@ onUnmounted(() => {
   root.value?.removeEventListener('keydown', handleKeydown)
   if (switchTabTimer) clearTimeout(switchTabTimer)
   if (crackTimer) clearTimeout(crackTimer)
+  if (ocrWorker) {
+    void ocrWorker.terminate()
+    ocrWorker = null
+  }
 })
 
 const encryptInput = ref('')
@@ -421,6 +457,99 @@ const clearEncrypt = () => {
 const decryptInput = ref('')
 const decryptOutput = ref('')
 const decryptError = ref('')
+const isOcrProcessing = ref(false)
+const ocrStatusMessage = ref('')
+const ocrStatusType = ref<'warning' | 'info' | ''>('')
+
+let tesseractModulePromise: Promise<OcrModule> | null = null
+let ocrWorker: OcrWorker | null = null
+
+const loadTesseract = async () => {
+  if (!tesseractModulePromise) {
+    tesseractModulePromise = import('tesseract.js')
+  }
+
+  return tesseractModulePromise
+}
+
+const getOcrWorker = async () => {
+  if (ocrWorker) return ocrWorker
+
+  const module = await loadTesseract()
+  ocrWorker = await module.createWorker('eng', 1, {
+    logger: (message: LoggerMessage) => {
+      if (!isOcrProcessing.value) return
+
+      if (message.status === 'recognizing text' && typeof message.progress === 'number') {
+        ocrStatusType.value = 'info'
+        ocrStatusMessage.value = `OCR ${Math.round(message.progress * 100)}%`
+      } else if (message.status === 'loading tesseract core') {
+        ocrStatusType.value = 'info'
+        ocrStatusMessage.value = 'Loading OCR engine...'
+      } else if (message.status === 'initializing tesseract') {
+        ocrStatusType.value = 'info'
+        ocrStatusMessage.value = 'Initializing OCR engine...'
+      } else if (message.status === 'loading language traineddata') {
+        ocrStatusType.value = 'info'
+        ocrStatusMessage.value = 'Loading OCR language data...'
+      }
+    },
+  })
+
+  return ocrWorker
+}
+
+const openOcrFilePicker = () => {
+  if (isOcrProcessing.value) return
+  ocrFileInput.value?.click()
+}
+
+const resetOcrInput = () => {
+  if (ocrFileInput.value) {
+    ocrFileInput.value.value = ''
+  }
+}
+
+const handleOcrFileChange = async (event: Event) => {
+  const input = event.target as HTMLInputElement | null
+  const file = input?.files?.[0]
+  if (!file) return
+
+  isOcrProcessing.value = true
+  decryptError.value = ''
+  ocrStatusType.value = 'info'
+  ocrStatusMessage.value = 'Preparing image for OCR...'
+
+  try {
+    const worker = await getOcrWorker()
+    const {
+      data: { text, confidence },
+    } = await worker.recognize(file)
+
+    const normalizedText = text.trim()
+    if (!normalizedText) {
+      ocrStatusType.value = 'warning'
+      ocrStatusMessage.value = 'No text detected. Try a clearer image.'
+      return
+    }
+
+    decryptInput.value = normalizedText
+    ocrStatusType.value = confidence < 70 ? 'warning' : 'info'
+    ocrStatusMessage.value =
+      confidence < 70
+        ? `OCR imported with low confidence (${Math.round(confidence)}%). Review before cracking.`
+        : `OCR imported (${Math.round(confidence)}% confidence).`
+
+    await nextTick()
+    decryptInputField.value?.focus()
+  } catch (err) {
+    console.error(err)
+    decryptError.value = 'ocr failed'
+  } finally {
+    isOcrProcessing.value = false
+    resetOcrInput()
+  }
+}
 
 watch(encryptInput, (value) => {
   encryptError.value = ''
@@ -457,6 +586,8 @@ const clearDecrypt = () => {
   decryptInput.value = ''
   decryptOutput.value = ''
   decryptError.value = ''
+  ocrStatusMessage.value = ''
+  ocrStatusType.value = ''
   props.onDecryptClear?.()
 }
 
@@ -596,6 +727,30 @@ const crack = async () => {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+}
+
+.ocr-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.ocr-file-input {
+  display: none;
+}
+
+.ocr-upload {
+  min-width: 12rem;
+}
+
+.ocr-helper {
+  margin: 0 0 0.75rem;
+  color: var(--cryptotron-text-secondary);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  opacity: 0.82;
+  text-transform: uppercase;
 }
 
 /* Tabbed Interface */
