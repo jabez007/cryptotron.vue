@@ -1,23 +1,34 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
+import KeyAcrostic, {
+  type AcrosticCipherKey,
+  type AcrosticMode,
+} from '@/components/keys/KeyAcrostic.vue'
 import CipherOutput from '@/components/CipherOutput.vue'
 import { computed, ref, watch } from 'vue'
 import { generateAcrostic } from '@/utils/text-gen'
 
-type AcrosticMode = 'acrostic' | 'telestic' | 'compound'
 const ACROSTIC_MODES: AcrosticMode[] = ['acrostic', 'telestic', 'compound']
 
-const acrosticMode = ref<AcrosticMode>('acrostic')
+const defaultAcrosticKey = (): AcrosticCipherKey => ({
+  coverText: '',
+  mode: 'acrostic',
+})
+
 const secretMessage = ref('')
-const acrosticKey = ref({ coverText: '' })
+const acrosticKey = ref<AcrosticCipherKey>(defaultAcrosticKey())
 
 const coverText = computed({
   get: () => acrosticKey.value.coverText ?? '',
   set: (value: string) => {
-    acrosticKey.value = {
-      ...acrosticKey.value,
-      coverText: value,
-    }
+    acrosticKey.value = { ...acrosticKey.value, coverText: value }
+  },
+})
+
+const acrosticMode = computed<AcrosticMode>({
+  get: () => acrosticKey.value.mode ?? 'acrostic',
+  set: (value) => {
+    acrosticKey.value = { ...acrosticKey.value, mode: value }
   },
 })
 
@@ -106,7 +117,7 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
     :decrypt-algorithm="() => acrosticDecrypt"
     :normal-mode-key-handler="handleAcrosticNormalModeKey"
     :on-encrypt-input-change="(val: string) => { secretMessage = val; coverText = ''; }"
-    :on-encrypt-clear="() => { secretMessage = ''; coverText = ''; }"
+    :on-encrypt-clear="() => { secretMessage = ''; acrosticKey = defaultAcrosticKey(); }"
     v-model:cipher-key="acrosticKey"
   >
     <template #theory>
@@ -213,18 +224,8 @@ const handleAcrosticNormalModeKey = (key: string, activeTab: string) => {
 
     <template #cipherKey>
       <div class="control-group">
-        <label class="control-label">Position Mode (m)</label>
-        <div class="mode-selector">
-          <button
-            v-for="m in ACROSTIC_MODES"
-            :key="m"
-            class="cipher-button"
-            :class="{ active: acrosticMode === m }"
-            @click="acrosticMode = m"
-          >
-            {{ m.charAt(0).toUpperCase() + m.slice(1) }}
-          </button>
-        </div>
+        <label class="control-label">Configuration</label>
+        <KeyAcrostic v-model:cipher-key="acrosticKey" />
       </div>
     </template>
 

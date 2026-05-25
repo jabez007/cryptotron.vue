@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
+import KeyBacon, { type BaconCipherKey } from '@/components/keys/KeyBacon.vue'
 import CipherOutput from '@/components/CipherOutput.vue'
 import { computed, ref } from 'vue'
 import {
@@ -11,18 +12,26 @@ import {
 } from '@/utils/steganography'
 import { generateBaconCover } from '@/utils/text-gen'
 
-const baconCoverKey = ref({ coverText: '' })
+const defaultBaconKey = (): BaconCipherKey => ({
+  coverText: '',
+  exportMode: 'html',
+})
+
+const baconCoverKey = ref<BaconCipherKey>(defaultBaconKey())
 const secretMessage = ref('')
 const encodedInput = ref('')
-const exportMode = ref<'html' | 'markdown'>('html')
 
 const coverText = computed({
   get: () => baconCoverKey.value.coverText ?? '',
   set: (value: string) => {
-    baconCoverKey.value = {
-      ...baconCoverKey.value,
-      coverText: value,
-    }
+    baconCoverKey.value = { ...baconCoverKey.value, coverText: value }
+  },
+})
+
+const exportMode = computed({
+  get: () => baconCoverKey.value.exportMode ?? 'html',
+  set: (value: 'html' | 'markdown') => {
+    baconCoverKey.value = { ...baconCoverKey.value, exportMode: value }
   },
 })
 
@@ -35,7 +44,6 @@ const handleGenerateCover = () => {
   coverText.value = generateBaconCover(bitLength.value)
   if (secretMessage.value) {
     updatePreview()
-    updateActiveExport()
   }
 }
 
@@ -77,16 +85,12 @@ const extracted = computed(() => {
   }
 })
 
-const activeExport = ref('')
-
-const updateActiveExport = () => {
-  activeExport.value =
-    exportMode.value === 'html' ? toHtmlSnippet(preview.value) : toMarkdown(preview.value)
-}
+const activeExport = computed(() =>
+  exportMode.value === 'html' ? toHtmlSnippet(preview.value) : toMarkdown(preview.value),
+)
 
 const toggleExportMode = () => {
   exportMode.value = exportMode.value === 'html' ? 'markdown' : 'html'
-  updateActiveExport()
 }
 
 const handleBaconNormalModeKey = (key: string, activeTab: string) => {
@@ -113,7 +117,6 @@ const handleBaconNormalModeKey = (key: string, activeTab: string) => {
 const baconEncrypt = (input: string) => {
   secretMessage.value = input
   updatePreview()
-  updateActiveExport()
   return activeExport.value
 }
 
@@ -134,8 +137,8 @@ const baconDecrypt = (input: string) => {
     :decrypt-algorithm="() => baconDecrypt"
     :encrypt-output-override="() => activeExport"
     :normal-mode-key-handler="handleBaconNormalModeKey"
-    :on-encrypt-input-change="(val: string) => { secretMessage = val; preview = []; activeExport = ''; }"
-    :on-encrypt-clear="() => { secretMessage = ''; coverText = ''; preview = []; activeExport = ''; }"
+    :on-encrypt-input-change="(val: string) => { secretMessage = val; preview = []; }"
+    :on-encrypt-clear="() => { secretMessage = ''; baconCoverKey = defaultBaconKey(); preview = []; }"
     :encrypt-feedback="lengthError"
     v-model:cipher-key="baconCoverKey"
   >
@@ -238,22 +241,10 @@ const baconDecrypt = (input: string) => {
 
     <template #cipherKey="{ panel }">
       <div v-if="panel !== 'decrypt'" class="control-group">
-        <div class="bacon-preview-header">
-          <label class="control-label">Cover Text</label>
-          <button
-            class="cipher-button bacon-secondary-button"
-            type="button"
-            @click="handleGenerateCover"
-            :disabled="bitLength === 0"
-          >
-            Generate Cover (g)
-          </button>
-        </div>
-        <textarea
-          v-model="coverText"
-          rows="6"
-          class="cipher-textarea cipher-input"
-          placeholder="Enter the visible carrier text or generate one..."
+        <KeyBacon
+          v-model:cipher-key="baconCoverKey"
+          :generate-disabled="bitLength === 0"
+          @generate-cover="handleGenerateCover"
         />
       </div>
     </template>
@@ -274,15 +265,6 @@ const baconDecrypt = (input: string) => {
         <div>
           <div class="bacon-preview-header">
             <label class="control-label">Export Output</label>
-            <div class="bacon-export-actions">
-              <button
-                class="cipher-button bacon-secondary-button"
-                type="button"
-                @click="toggleExportMode"
-              >
-                {{ exportMode === 'html' ? 'Switch to Markdown (m)' : 'Switch to HTML (m)' }}
-              </button>
-            </div>
           </div>
           <CipherOutput :label="exportMode.toUpperCase()" :text="activeExport" />
         </div>
@@ -304,12 +286,6 @@ const baconDecrypt = (input: string) => {
   gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 0.5rem;
-}
-
-.bacon-export-actions {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
 }
 
 .bacon-preview {
