@@ -1,4 +1,39 @@
-import { type Connection, type Edge } from '@vue-flow/core'
+import { type Connection, type Edge, type Node } from '@vue-flow/core'
+
+const STEGANOGRAPHY_TYPES = new Set(['bacon', 'emoji-smuggling', 'acrostic'])
+
+export function isSteganographyType(type?: string): boolean {
+  return type ? STEGANOGRAPHY_TYPES.has(type) : false
+}
+
+export function validateSteganographyTopology(
+  nodes: Array<Pick<Node, 'id' | 'data'>>,
+  edges: Array<Pick<Edge, 'source' | 'target'>>,
+): string | null {
+  const stegoNodes = nodes.filter((node) => isSteganographyType(node.data?.type))
+
+  if (stegoNodes.length === 0) {
+    return null
+  }
+
+  if (stegoNodes.length > 1) {
+    return 'Only one steganography node can be used in a builder graph.'
+  }
+
+  const stegoNode = stegoNodes[0]
+  const outgoingCount = edges.filter((edge) => edge.source === stegoNode.id).length
+  const incomingCount = edges.filter((edge) => edge.target === stegoNode.id).length
+
+  if (outgoingCount > 0) {
+    return 'Steganography must be the last step in encryption and cannot feed into another node.'
+  }
+
+  if (incomingCount > 1) {
+    return 'Steganography nodes can only accept one input path.'
+  }
+
+  return null
+}
 
 /*
  * The Union-Find structure keeps track of connected components.
