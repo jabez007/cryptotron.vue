@@ -194,7 +194,7 @@ const validateNewEdge = (
   existingEdges: Edge[],
   newEdge: Connection,
   oldEdge: Partial<Edge> = { source: '', target: '' },
-): boolean => {
+): string | null => {
   console.debug('Validating new edge', newEdge, oldEdge)
   const candidateEdges = oldEdge.id
     ? existingEdges.filter((edge) => edge.id !== oldEdge.id)
@@ -203,21 +203,18 @@ const validateNewEdge = (
   /* */
   if (candidateEdges.some((e) => e.source === newEdge.source)) {
     if (oldEdge.source !== newEdge.source) {
-      console.warn(`Node ${newEdge.source} already has an edge from it`)
-      return false
+      return `Node ${newEdge.source} already has an outgoing edge.`
     }
   }
   if (candidateEdges.some((e) => e.target === newEdge.target)) {
     if (oldEdge.target !== newEdge.target) {
-      console.warn(`Node ${newEdge.target} already has an edge to it`)
-      return false
+      return `Node ${newEdge.target} already has an incoming edge.`
     }
   }
   /* */
 
   if (willCreateCycle(candidateEdges, newEdge)) {
-    console.warn(`Connecting Node ${newEdge.source} to Node ${newEdge.target} will create a loop`)
-    return false
+    return `Connecting Node ${newEdge.source} to Node ${newEdge.target} will create a loop.`
   }
 
   const topologyError = validateSteganographyTopology(existingNodes, [
@@ -229,11 +226,10 @@ const validateNewEdge = (
   ])
 
   if (topologyError) {
-    console.warn(topologyError)
-    return false
+    return topologyError
   }
   /* */
-  return true
+  return null
 }
 
 onConnect((connection) => {
@@ -242,12 +238,9 @@ onConnect((connection) => {
   const existing = getEdges.value
   const currentNodes = getNodes.value
   console.debug('Existing edges', existing)
-  if (!validateNewEdge(currentNodes, existing, connection)) {
-    const topologyError = validateSteganographyTopology(currentNodes, [
-      ...existing,
-      { source: connection.source, target: connection.target } as Edge,
-    ])
-    if (topologyError) rejectBuilderAction(topologyError)
+  const rejectionReason = validateNewEdge(currentNodes, existing, connection)
+  if (rejectionReason) {
+    rejectBuilderAction(rejectionReason)
     return
   }
   /* */
@@ -265,12 +258,9 @@ onEdgeUpdate(({ connection, edge }) => {
   const existing = getEdges.value
   const currentNodes = getNodes.value
   console.debug('Existing edges', existing)
-  if (!validateNewEdge(currentNodes, existing, connection, edge)) {
-    const topologyError = validateSteganographyTopology(currentNodes, [
-      ...existing.filter((currentEdge) => currentEdge.id !== edge.id),
-      { source: connection.source, target: connection.target } as Edge,
-    ])
-    if (topologyError) rejectBuilderAction(topologyError)
+  const rejectionReason = validateNewEdge(currentNodes, existing, connection, edge)
+  if (rejectionReason) {
+    rejectBuilderAction(rejectionReason)
     return
   }
   /* */

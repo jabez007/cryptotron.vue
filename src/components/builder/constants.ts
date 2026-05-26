@@ -25,9 +25,23 @@ import type { AcrosticMode } from '@/components/keys/KeyAcrostic.vue'
 
 type CipherCategory = 'classical' | 'steganography'
 type CipherPlacement = 'any' | 'terminal'
+const STEGO_PLAINTEXT_PATTERN = /^[a-z]+$/
+
+const validateStegoPlaintext = (
+  input: string,
+  wrapperName: 'baconEncrypt' | 'acrosticEncrypt',
+  helperName: 'baconEncoder' | 'generateAcrostic',
+) => {
+  if (!STEGO_PLAINTEXT_PATTERN.test(input)) {
+    throw new Error(
+      `[${wrapperName}] Rejecting lossy input before ${helperName}: expected lowercase ASCII letters matching /^[a-z]+$/.`,
+    )
+  }
+}
 
 const baconEncrypt =
   (key: { coverText?: string; exportMode?: 'html' | 'markdown' }) => (input: string) => {
+    validateStegoPlaintext(input, 'baconEncrypt', 'baconEncoder')
     const preview = baconEncoder(input, key.coverText ?? '')
     return (key.exportMode ?? 'html') === 'html' ? toHtmlSnippet(preview) : toMarkdown(preview)
   }
@@ -53,8 +67,11 @@ const emojiSmugglingEncrypt =
 
 const emojiSmugglingDecrypt = () => (input: string) => tagsDecoder(input)
 
-const acrosticEncrypt = (key: { mode?: AcrosticMode }) => (input: string) =>
-  input ? generateAcrostic(input, key.mode ?? 'acrostic') : ''
+const acrosticEncrypt = (key: { mode?: AcrosticMode }) => (input: string) => {
+  if (!input) return ''
+  validateStegoPlaintext(input, 'acrosticEncrypt', 'generateAcrostic')
+  return generateAcrostic(input, key.mode ?? 'acrostic')
+}
 
 const stripAcrosticMetadata = (line: string) => line.trim().replace(/^(\[[^\]]+\]\s*)+/, '')
 

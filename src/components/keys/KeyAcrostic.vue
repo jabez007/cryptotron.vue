@@ -4,11 +4,13 @@
       Position Mode:
       <span class="label-hint">(m)</span>
     </label>
-    <div class="mode-selector">
+    <div class="mode-selector" role="radiogroup" aria-label="Acrostic position mode">
       <button
         v-for="option in modeOptions"
         :key="option"
         type="button"
+        role="radio"
+        :aria-checked="localMode === option"
         class="mode-button"
         :class="{ active: localMode === option }"
         @click="localMode = option"

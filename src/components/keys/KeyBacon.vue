@@ -5,11 +5,13 @@
         Export Mode:
         <span class="label-hint">(m)</span>
       </label>
-      <div class="mode-selector">
+      <div class="mode-selector" role="radiogroup" aria-label="Bacon export mode">
         <button
           v-for="option in exportModeOptions"
           :key="option"
           type="button"
+          role="radio"
+          :aria-checked="localExportMode === option"
           class="mode-button"
           :class="{ active: localExportMode === option }"
           @click="localExportMode = option"
