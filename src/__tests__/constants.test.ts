@@ -126,3 +126,31 @@ describe('availableCiphers – structural integrity', () => {
     expect(unique.size).toBe(types.length)
   })
 })
+
+describe('builder steganography wrappers', () => {
+  it('bacon builder wrapper returns empty string for empty input', () => {
+    const bacon = availableCiphers.find((cipher) => cipher.type === 'bacon')
+    expect(bacon).toBeDefined()
+
+    const encrypt = bacon!.encryptAlgorithm({ coverText: 'abcdefghij', exportMode: 'html' })
+    expect(encrypt('')).toBe('')
+  })
+
+  it('bacon builder wrapper rejects lossy input before baconEncoder', () => {
+    const bacon = availableCiphers.find((cipher) => cipher.type === 'bacon')
+    expect(bacon).toBeDefined()
+
+    const encrypt = bacon!.encryptAlgorithm({ coverText: 'abcdefghij', exportMode: 'html' })
+    expect(() => encrypt('abc123')).toThrow(/baconEncrypt/)
+    expect(() => encrypt('abc123')).toThrow(/baconEncoder/)
+  })
+
+  it('acrostic builder wrapper rejects lossy input before generateAcrostic', () => {
+    const acrostic = availableCiphers.find((cipher) => cipher.type === 'acrostic')
+    expect(acrostic).toBeDefined()
+
+    const encrypt = acrostic!.encryptAlgorithm({ mode: 'acrostic' })
+    expect(() => encrypt('hello world')).toThrow(/acrosticEncrypt/)
+    expect(() => encrypt('hello world')).toThrow(/generateAcrostic/)
+  })
+})

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import CipherCard from '@/components/CipherCard.vue'
+import KeyEmojiSmuggling, {
+  type EmojiSmugglingCipherKey,
+} from '@/components/keys/KeyEmojiSmuggling.vue'
 import CipherOutput from '@/components/CipherOutput.vue'
 import { computed, ref, watch, onUnmounted } from 'vue'
 import {
@@ -9,19 +12,33 @@ import {
   type InvisibleEncodingMode,
 } from '@/utils/steganography'
 
-const emojiOptions = ['👍', '🤓', '😎', '🫥', '🕵️', '🧠', '🔐', '🛰️']
-const tagsKey = ref({ coverText: '👍' })
+const defaultTagsKey = (): EmojiSmugglingCipherKey => ({
+  coverText: '👍',
+  encodingMode: 'variation-selectors',
+  interleave: false,
+})
+
+const tagsKey = ref<EmojiSmugglingCipherKey>(defaultTagsKey())
 const revealMode = ref(true)
-const encodingMode = ref<InvisibleEncodingMode>('variation-selectors')
-const interleave = ref(false)
 
 const coverText = computed({
   get: () => tagsKey.value.coverText ?? '',
   set: (value: string) => {
-    tagsKey.value = {
-      ...tagsKey.value,
-      coverText: value,
-    }
+    tagsKey.value = { ...tagsKey.value, coverText: value }
+  },
+})
+
+const encodingMode = computed<InvisibleEncodingMode>({
+  get: () => tagsKey.value.encodingMode ?? 'variation-selectors',
+  set: (value) => {
+    tagsKey.value = { ...tagsKey.value, encodingMode: value }
+  },
+})
+
+const interleave = computed({
+  get: () => tagsKey.value.interleave ?? false,
+  set: (value: boolean) => {
+    tagsKey.value = { ...tagsKey.value, interleave: value }
   },
 })
 
@@ -110,20 +127,10 @@ const setSecretMessage = (value: string) => {
   secretMessage.value = value
 }
 
-const useEmojiCarrier = (emoji: string) => {
-  coverText.value = emoji
-}
-
-const appendEmojiCarrier = (emoji: string) => {
-  coverText.value = `${coverText.value}${emoji}`
-}
-
 const clearEncryptState = () => {
   secretMessage.value = ''
   revealMode.value = true
-  coverText.value = '👍'
-  encodingMode.value = 'variation-selectors'
-  interleave.value = false
+  tagsKey.value = defaultTagsKey()
   manualEncodedOutput.value = ''
   manualEncodingWarning.value = ''
 }
@@ -237,59 +244,9 @@ const tagsDecrypt = (input: string) => {
     </template>
 
     <template #cipherKey>
-      <div class="control-grid">
-        <div class="control-group">
-          <label class="control-label">
-            Encoding Mode
-            <span class="label-hint">(m)</span>
-          </label>
-          <select v-model="encodingMode" class="cipher-select">
-            <option value="tags">Unicode Tags</option>
-            <option value="zero-width-binary">Zero-width Binary</option>
-            <option value="variation-selectors">Variation Selectors (UTF-8 bytes)</option>
-            <option value="variation-selectors-nibbles">Variation Selectors (4-bit nibbles)</option>
-            <option value="variation-selectors-legacy">Variation Selectors (Legacy A=1)</option>
-          </select>
-        </div>
-
-        <div class="control-group checkbox-group">
-          <label class="mode-option">
-            <input v-model="interleave" type="checkbox" />
-            Interleave Payload
-          </label>
-        </div>
-      </div>
-
       <div class="control-group">
-        <label class="control-label">Carrier Emoji / Cover Text</label>
-        <div class="emoji-picker">
-          <button
-            v-for="emoji in emojiOptions"
-            :key="emoji"
-            type="button"
-            class="emoji-chip"
-            @click="useEmojiCarrier(emoji)"
-          >
-            {{ emoji }}
-          </button>
-        </div>
-        <div class="emoji-picker">
-          <button
-            v-for="emoji in emojiOptions"
-            :key="`${emoji}-append`"
-            type="button"
-            class="emoji-chip secondary"
-            @click="appendEmojiCarrier(emoji)"
-          >
-            +{{ emoji }}
-          </button>
-        </div>
-        <textarea
-          v-model="coverText"
-          rows="3"
-          class="cipher-textarea cipher-input"
-          placeholder="Paste your own emoji or custom carrier text here..."
-        />
+        <label class="control-label">Configuration</label>
+        <KeyEmojiSmuggling v-model:cipher-key="tagsKey" />
       </div>
     </template>
 

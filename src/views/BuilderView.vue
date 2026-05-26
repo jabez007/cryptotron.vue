@@ -16,7 +16,11 @@ import {
   defaultEdges,
   defaultNodes,
 } from '@/components/builder/constants'
-import { willCreateCycle, GraphAnalyzer } from '@/components/builder/utils'
+import {
+  validateSteganographyTopology,
+  willCreateCycle,
+  GraphAnalyzer,
+} from '@/components/builder/utils'
 import AddNodeModal from '@/components/builder/ModalAddNode.vue'
 import EditNodeModal from '@/components/builder/ModalEditNode.vue'
 import SaveGraphModal from '@/components/builder/ModalSaveGraph.vue'
@@ -76,6 +80,11 @@ const closeAddNodeModal = () => {
   }
 }
 
+const rejectBuilderAction = (message: string) => {
+  console.warn(message)
+  alert(message)
+}
+
 const handleAddNode = (nodeData: { label: string; type: string }) => {
   const selectedCipher = availableCiphers.find((c) => c.type === nodeData.type)
   if (!selectedCipher) return
@@ -102,6 +111,12 @@ const handleAddNode = (nodeData: { label: string; type: string }) => {
       x: 50 + (existingNodes.length % 4) * 150,
       y: maxY + 120,
     },
+  }
+
+  const topologyError = validateSteganographyTopology([...existingNodes, newNode], getEdges.value)
+  if (topologyError) {
+    rejectBuilderAction(topologyError)
+    return
   }
 
   addNodes([newNode])
@@ -175,40 +190,57 @@ onNodeDoubleClick(({ event, node }) => {
 })
 
 const validateNewEdge = (
+  existingNodes: Node[],
   existingEdges: Edge[],
   newEdge: Connection,
   oldEdge: Partial<Edge> = { source: '', target: '' },
-): boolean => {
+): string | null => {
   console.debug('Validating new edge', newEdge, oldEdge)
+  const candidateEdges = oldEdge.id
+    ? existingEdges.filter((edge) => edge.id !== oldEdge.id)
+    : existingEdges
+
   /* */
-  if (existingEdges.some((e) => e.source === newEdge.source)) {
+  if (candidateEdges.some((e) => e.source === newEdge.source)) {
     if (oldEdge.source !== newEdge.source) {
-      console.warn(`Node ${newEdge.source} already has an edge from it`)
-      return false
+      return `Node ${newEdge.source} already has an outgoing edge.`
     }
   }
-  if (existingEdges.some((e) => e.target === newEdge.target)) {
+  if (candidateEdges.some((e) => e.target === newEdge.target)) {
     if (oldEdge.target !== newEdge.target) {
-      console.warn(`Node ${newEdge.target} already has an edge to it`)
-      return false
+      return `Node ${newEdge.target} already has an incoming edge.`
     }
   }
   /* */
 
-  if (willCreateCycle(existingEdges, newEdge)) {
-    console.warn(`Connecting Node ${newEdge.source} to Node ${newEdge.target} will create a loop`)
-    return false
+  if (willCreateCycle(candidateEdges, newEdge)) {
+    return `Connecting Node ${newEdge.source} to Node ${newEdge.target} will create a loop.`
+  }
+
+  const topologyError = validateSteganographyTopology(existingNodes, [
+    ...candidateEdges,
+    {
+      source: newEdge.source,
+      target: newEdge.target,
+    } as Edge,
+  ])
+
+  if (topologyError) {
+    return topologyError
   }
   /* */
-  return true
+  return null
 }
 
 onConnect((connection) => {
   console.debug('On Connect', connection)
   /* */
   const existing = getEdges.value
+  const currentNodes = getNodes.value
   console.debug('Existing edges', existing)
-  if (!validateNewEdge(existing, connection)) {
+  const rejectionReason = validateNewEdge(currentNodes, existing, connection)
+  if (rejectionReason) {
+    rejectBuilderAction(rejectionReason)
     return
   }
   /* */
@@ -224,8 +256,11 @@ onEdgeUpdate(({ connection, edge }) => {
   console.debug('On Edge Update', connection, edge)
   /* */
   const existing = getEdges.value
+  const currentNodes = getNodes.value
   console.debug('Existing edges', existing)
-  if (!validateNewEdge(existing, connection, edge)) {
+  const rejectionReason = validateNewEdge(currentNodes, existing, connection, edge)
+  if (rejectionReason) {
+    rejectBuilderAction(rejectionReason)
     return
   }
   /* */
@@ -345,6 +380,8 @@ const handleLoadGraph = (cipherFile: File) => {
             decryptAlgorithm: cipherData.decryptAlgorithm,
             crackAlgorithm: cipherData.crackAlgorithm,
             cipherKeyComponent: cipherData.cipherKeyComponent,
+            category: cipherData.category,
+            placement: cipherData.placement,
           },
         }
       })
@@ -359,6 +396,12 @@ const handleLoadGraph = (cipherFile: File) => {
         }
       })
       console.debug('Enhanced edges from cipher file data', enhancedEdges)
+
+      const topologyError = validateSteganographyTopology(enhancedNodes, enhancedEdges)
+      if (topologyError) {
+        rejectBuilderAction(topologyError)
+        return
+      }
 
       nodes.value = [...enhancedNodes]
       edges.value = [...enhancedEdges]
@@ -422,6 +465,12 @@ const getTraversedNodedata = () => {
   const currentNodes = getNodes.value
   console.debug('Current edges', currentEdges)
   console.debug('Current nodes', currentNodes)
+
+  const topologyError = validateSteganographyTopology(currentNodes, currentEdges)
+  if (topologyError) {
+    rejectBuilderAction(topologyError)
+    return
+  }
 
   const graph = new GraphAnalyzer(currentEdges)
   console.log('Found root nodes', graph.getRootNodes())
