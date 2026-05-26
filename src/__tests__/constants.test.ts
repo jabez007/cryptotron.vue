@@ -128,6 +128,14 @@ describe('availableCiphers – structural integrity', () => {
 })
 
 describe('builder steganography wrappers', () => {
+  it('bacon builder wrapper returns empty string for empty input', () => {
+    const bacon = availableCiphers.find((cipher) => cipher.type === 'bacon')
+    expect(bacon).toBeDefined()
+
+    const encrypt = bacon!.encryptAlgorithm({ coverText: 'abcdefghij', exportMode: 'html' })
+    expect(encrypt('')).toBe('')
+  })
+
   it('bacon builder wrapper rejects lossy input before baconEncoder', () => {
     const bacon = availableCiphers.find((cipher) => cipher.type === 'bacon')
     expect(bacon).toBeDefined()

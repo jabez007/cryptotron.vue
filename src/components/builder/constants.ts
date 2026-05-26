@@ -41,6 +41,7 @@ const validateStegoPlaintext = (
 
 const baconEncrypt =
   (key: { coverText?: string; exportMode?: 'html' | 'markdown' }) => (input: string) => {
+    if (input === '') return ''
     validateStegoPlaintext(input, 'baconEncrypt', 'baconEncoder')
     const preview = baconEncoder(input, key.coverText ?? '')
     return (key.exportMode ?? 'html') === 'html' ? toHtmlSnippet(preview) : toMarkdown(preview)
