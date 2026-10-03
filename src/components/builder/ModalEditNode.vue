@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, shallowRef, watch, type Ref } from 'vue'
 import type { Node } from '@vue-flow/core'
 import CyberIcon from '../icons/CyberIcon.vue'
 
@@ -27,7 +27,8 @@ const emit = defineEmits<{
   'update-node': [node: Node]
 }>()
 
-const localNode = ref<Node>({ ...props.node })
+// Cast instead of ref<Node>: unwrapping vue-flow's Node type trips TS2589 on newer Vue 3.5 releases.
+const localNode = ref({ ...props.node }) as Ref<Node>
 const keyComponent = shallowRef(null)
 
 const hasKeyComponent = computed(() => keyComponent.value !== null)
