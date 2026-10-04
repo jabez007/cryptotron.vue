@@ -1,20 +1,12 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
-    },
-    {
-      "path": "./tsconfig.app.json"
-    }
-  ],
+  "extends": "./tsconfig.app.json",
+  "include": ["env.d.ts", "src/index.ts"],
   "compilerOptions": {
-    "outDir": "lib",
-    "declaration": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.lib.tsbuildinfo",
     "noEmit": false,
-    "emitDeclarationOnly": true
-  },
-  "exclude": [
-    "src/main.ts"
-  ]
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "rootDir": "./src",
+    "outDir": "./lib/types"
+  }
 }

@@ -1,4 +1,4 @@
-import type { App } from 'vue'
+import type { App, Component } from 'vue'
 import type { Router } from 'vue-router'
 import CryptoTronRoutes from './router/routes'
 
@@ -8,7 +8,8 @@ interface PluginOptions {
 }
 
 export default {
-  app: () => import('./App.vue'),
+  // Typed as a plain async component so the published types don't reference a .vue file
+  app: (): Promise<{ default: Component }> => import('./App.vue'),
   install(_app: App, options: PluginOptions) {
     if (!options?.router) {
       throw new Error('[CryptoTron] Router instance is required when installing the plugin')
