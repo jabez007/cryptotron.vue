@@ -17,18 +17,25 @@
   },
   "files": [
     "lib/**/*",
+    "types/index.d.cts",
     "README.md"
   ],
-  "main": "./lib/cryptotron-app.umd.js",
+  "main": "./lib/cryptotron-app.umd.cjs",
   "module": "./lib/cryptotron-app.es.js",
   "exports": {
     ".": {
-      "import": "./lib/cryptotron-app.es.js",
-      "require": "./lib/cryptotron-app.umd.js"
+      "import": {
+        "types": "./lib/types/index.d.ts",
+        "default": "./lib/cryptotron-app.es.js"
+      },
+      "require": {
+        "types": "./types/index.d.cts",
+        "default": "./lib/cryptotron-app.umd.cjs"
+      }
     },
     "./style.css": "./lib/cryptotron.vue.css"
   },
-  "types": "./lib/index.d.ts",
+  "types": "./types/index.d.cts",
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
@@ -41,7 +48,8 @@
     "format": "prettier --write src/",
     "prepublishOnly": "npm run build:lib",
     "predeploy": "npm run build",
-    "deploy": "gh-pages --dist dist --branch main --dotfiles"
+    "deploy": "gh-pages --dist dist --branch main --dotfiles",
+    "check:package": "npm run build:lib && node scripts/check-package.mjs"
   },
   "dependencies": {
     "@jabez007/cryptotron.js": "^0.4.0",
