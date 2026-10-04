@@ -43,7 +43,8 @@ export default defineConfig({
         {
           format: 'umd',
           name: "CryptoTronApp",
-          entryFileNames: 'cryptotron-app.umd.js',
+          // .cjs because the package is "type": "module", where .js files load as ESM
+          entryFileNames: 'cryptotron-app.umd.cjs',
           inlineDynamicImports: true,
           globals: {
             vue: "Vue",

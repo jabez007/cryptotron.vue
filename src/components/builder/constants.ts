@@ -70,7 +70,6 @@ const emojiSmugglingDecrypt = () => (input: string) => tagsDecoder(input)
 
 const acrosticEncrypt = (key: { mode?: AcrosticMode }) => (input: string) => {
   if (!input) return ''
-  validateStegoPlaintext(input, 'acrosticEncrypt', 'generateAcrostic')
   return generateAcrostic(input, key.mode ?? 'acrostic')
 }
 

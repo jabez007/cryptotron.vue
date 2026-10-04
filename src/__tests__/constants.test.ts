@@ -145,12 +145,15 @@ describe('builder steganography wrappers', () => {
     expect(() => encrypt('abc123')).toThrow(/baconEncoder/)
   })
 
-  it('acrostic builder wrapper rejects lossy input before generateAcrostic', () => {
+  it('acrostic builder wrapper normalizes non-letter input like the standalone acrostics view', () => {
     const acrostic = availableCiphers.find((cipher) => cipher.type === 'acrostic')
     expect(acrostic).toBeDefined()
 
     const encrypt = acrostic!.encryptAlgorithm({ mode: 'acrostic' })
-    expect(() => encrypt('hello world')).toThrow(/acrosticEncrypt/)
-    expect(() => encrypt('hello world')).toThrow(/generateAcrostic/)
+    const decrypt = acrostic!.decryptAlgorithm({ mode: 'acrostic' })
+    const result = encrypt('hello world')
+
+    expect(result).toContain('\n')
+    expect(decrypt(result).toLowerCase()).toBe('helloworld')
   })
 })
